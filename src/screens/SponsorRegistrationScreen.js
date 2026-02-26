@@ -40,25 +40,33 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
     }, []);
 
     const handlePay = async () => {
+        if (!user) {
+            Alert.alert('Login Required', 'Please login to partner with EventSphere.');
+            navigation.navigate('Login');
+            return;
+        }
+
         if (!companyName.trim() || !contactEmail.trim()) {
             Alert.alert('Missing Info', 'Please fill in your company name and contact email.');
             return;
         }
 
-        const amount = event.sponsorshipAmount || 0;
+        const amount = parseFloat(event.sponsorshipAmount) || 0;
+        console.log("Starting sponsorship payment:", { amount, eventId: event.id, companyName });
+
         if (amount <= 0) {
-            // If for some reason it's free
             await finalizeRegistration('FREE');
             return;
         }
 
         setLoading(true);
         try {
-            if (Platform.OS === 'web') {
-                const { RAZORPAY_KEY_ID, RAZORPAY_MERCHANT_NAME, RAZORPAY_THEME_COLOR, CURRENCY_MULTIPLIER } = require('../config/razorpayConfig');
+            const { RAZORPAY_KEY_ID, RAZORPAY_MERCHANT_NAME, RAZORPAY_THEME_COLOR, CURRENCY_MULTIPLIER } = require('../config/razorpayConfig');
 
+            if (Platform.OS === 'web') {
                 if (typeof window.Razorpay === 'undefined') {
-                    Alert.alert('Error', 'Razorpay script not loaded. Please refresh and try again.');
+                    console.error("Razorpay script not found on window object");
+                    Alert.alert('Error', 'Razorpay checkout is still loading. Please wait 2 seconds and try again.');
                     setLoading(false);
                     return;
                 }
@@ -70,6 +78,7 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                     name: RAZORPAY_MERCHANT_NAME,
                     description: `Sponsorship for ${event.title}`,
                     handler: async function (response) {
+                        console.log("Razorpay payment success (Web):", response.razorpay_payment_id);
                         await finalizeRegistration(response.razorpay_payment_id);
                     },
                     prefill: {
@@ -80,15 +89,25 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                         event_id: event.id,
                         type: 'sponsorship'
                     },
-                    theme: { color: RAZORPAY_THEME_COLOR }
+                    theme: { color: RAZORPAY_THEME_COLOR },
+                    modal: {
+                        ondismiss: function () {
+                            console.log("Razorpay modal dismissed");
+                            setLoading(false);
+                        }
+                    }
                 };
 
                 const rzp = new window.Razorpay(options);
+                rzp.on('payment.failed', function (response) {
+                    console.error("Razorpay payment failed (Web):", response.error);
+                    Alert.alert('Payment Failed', response.error.description);
+                    setLoading(false);
+                });
                 rzp.open();
             } else {
                 // Mobile Implementation
                 const RazorpayCheckout = require('react-native-razorpay').default;
-                const { RAZORPAY_KEY_ID, RAZORPAY_MERCHANT_NAME, RAZORPAY_THEME_COLOR, CURRENCY_MULTIPLIER } = require('../config/razorpayConfig');
 
                 const options = {
                     description: `Sponsorship for ${event.title}`,
@@ -106,9 +125,10 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                 };
 
                 RazorpayCheckout.open(options).then(async (data) => {
+                    console.log("Razorpay payment success (Mobile):", data.razorpay_payment_id);
                     await finalizeRegistration(data.razorpay_payment_id);
                 }).catch((error) => {
-                    console.error('Razorpay Error:', error);
+                    console.error('Razorpay Error (Mobile):', error);
                     Alert.alert('Payment Failed', error.description || 'The transaction was cancelled or failed.');
                     setLoading(false);
                 });
