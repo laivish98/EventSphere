@@ -206,13 +206,7 @@ export default function ScanTicketScreen({ navigation }) {
                 </View>
                 <TouchableOpacity
                     style={[styles.iconButton, torchOn && styles.iconButtonActive]}
-                    onPress={() => {
-                        if (Platform.OS === 'web') {
-                            Alert.alert('Web Limitation', 'Flash/Torch control is not supported in browser environments for security reasons. Please use a mobile device.');
-                            return;
-                        }
-                        setTorchOn(v => !v);
-                    }}
+                    onPress={() => setTorchOn(v => !v)}
                 >
                     <MaterialCommunityIcons name={torchOn ? 'flash' : 'flash-outline'} size={24} color="white" />
                 </TouchableOpacity>
