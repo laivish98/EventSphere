@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
     View, Text, StyleSheet, ScrollView, TouchableOpacity,
-    TextInput, Dimensions, Alert
+    TextInput, Dimensions, Alert, Platform, Linking
 } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 
@@ -25,52 +25,140 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
     const [contactEmail, setContactEmail] = useState(user?.email || '');
     const [loading, setLoading] = useState(false);
 
+    useEffect(() => {
+        // Load Razorpay Script for Web
+        if (Platform.OS === 'web') {
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.async = true;
+            document.body.appendChild(script);
+            return () => {
+                const existingScript = document.querySelector('script[src="https://checkout.razorpay.com/v1/checkout.js"]');
+                if (existingScript) document.body.removeChild(existingScript);
+            };
+        }
+    }, []);
+
     const handlePay = async () => {
         if (!companyName.trim() || !contactEmail.trim()) {
             Alert.alert('Missing Info', 'Please fill in your company name and contact email.');
             return;
         }
+
+        const amount = event.sponsorshipAmount || 0;
+        if (amount <= 0) {
+            // If for some reason it's free
+            await finalizeRegistration('FREE');
+            return;
+        }
+
         setLoading(true);
-        // Simulate payment delay
-        setTimeout(async () => {
-            try {
-                // 1. Create the sponsorship record
-                const sponsorDoc = {
-                    eventId: event.id,
-                    eventTitle: event.title,
-                    sponsorId: user.uid,
-                    sponsorName: companyName,
-                    sponsorEmail: contactEmail,
-                    sponsorLogo: logoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(companyName)}&background=random&color=fff`,
-                    sponsorDetails: details,
-                    amount: event.sponsorshipAmount || 0,
-                    timestamp: serverTimestamp(),
+        try {
+            if (Platform.OS === 'web') {
+                const { RAZORPAY_KEY_ID, RAZORPAY_MERCHANT_NAME, RAZORPAY_THEME_COLOR, CURRENCY_MULTIPLIER } = require('../config/razorpayConfig');
+
+                if (typeof window.Razorpay === 'undefined') {
+                    Alert.alert('Error', 'Razorpay script not loaded. Please refresh and try again.');
+                    setLoading(false);
+                    return;
+                }
+
+                const options = {
+                    key: RAZORPAY_KEY_ID,
+                    amount: Math.round(amount * CURRENCY_MULTIPLIER),
+                    currency: 'INR',
+                    name: RAZORPAY_MERCHANT_NAME,
+                    description: `Sponsorship for ${event.title}`,
+                    handler: async function (response) {
+                        await finalizeRegistration(response.razorpay_payment_id);
+                    },
+                    prefill: {
+                        name: companyName,
+                        email: contactEmail,
+                    },
+                    notes: {
+                        event_id: event.id,
+                        type: 'sponsorship'
+                    },
+                    theme: { color: RAZORPAY_THEME_COLOR }
                 };
 
-                await addDoc(collection(db, 'sponsorships'), sponsorDoc);
+                const rzp = new window.Razorpay(options);
+                rzp.open();
+            } else {
+                // Mobile Implementation
+                const RazorpayCheckout = require('react-native-razorpay').default;
+                const { RAZORPAY_KEY_ID, RAZORPAY_MERCHANT_NAME, RAZORPAY_THEME_COLOR, CURRENCY_MULTIPLIER } = require('../config/razorpayConfig');
 
-                // 2. Link the sponsor to the event document for display in EventDetails
-                const eventRef = doc(db, 'events', event.id);
-                await updateDoc(eventRef, {
-                    sponsors: arrayUnion({
-                        name: companyName,
-                        logo: sponsorDoc.sponsorLogo,
-                        id: user.uid
-                    })
+                const options = {
+                    description: `Sponsorship for ${event.title}`,
+                    image: event.imageUrl || event.image,
+                    currency: 'INR',
+                    key: RAZORPAY_KEY_ID,
+                    amount: Math.round(amount * CURRENCY_MULTIPLIER),
+                    name: RAZORPAY_MERCHANT_NAME,
+                    prefill: {
+                        email: contactEmail,
+                        contact: '9988776655',
+                        name: companyName
+                    },
+                    theme: { color: RAZORPAY_THEME_COLOR }
+                };
+
+                RazorpayCheckout.open(options).then(async (data) => {
+                    await finalizeRegistration(data.razorpay_payment_id);
+                }).catch((error) => {
+                    console.error('Razorpay Error:', error);
+                    Alert.alert('Payment Failed', error.description || 'The transaction was cancelled or failed.');
+                    setLoading(false);
                 });
-
-                Alert.alert(
-                    '🎉 Sponsorship Confirmed!',
-                    `Thank you, ${companyName}! Your sponsorship of ₹${(event.sponsorshipAmount || 0).toLocaleString()} for ${event.title} has been registered.`,
-                    [{ text: 'Done', onPress: () => navigation.navigate('Home') }]
-                );
-            } catch (error) {
-                console.error("Sponsorship error:", error);
-                Alert.alert('Error', error.message);
-            } finally {
-                setLoading(false);
             }
-        }, 1500);
+        } catch (error) {
+            console.error('Payment Initialization Error:', error);
+            Alert.alert('Error', 'Could not initialize payment. Please try again.');
+            setLoading(false);
+        }
+    };
+
+    const finalizeRegistration = async (paymentId) => {
+        try {
+            // 1. Create the sponsorship record
+            const sponsorDoc = {
+                eventId: event.id,
+                eventTitle: event.title,
+                sponsorId: user.uid,
+                sponsorName: companyName,
+                sponsorEmail: contactEmail,
+                sponsorLogo: logoUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(companyName)}&background=random&color=fff`,
+                sponsorDetails: details,
+                amount: event.sponsorshipAmount || 0,
+                paymentId: paymentId,
+                timestamp: serverTimestamp(),
+            };
+
+            await addDoc(collection(db, 'sponsorships'), sponsorDoc);
+
+            // 2. Link the sponsor to the event document for display in EventDetails
+            const eventRef = doc(db, 'events', event.id);
+            await updateDoc(eventRef, {
+                sponsors: arrayUnion({
+                    name: companyName,
+                    logo: sponsorDoc.sponsorLogo,
+                    id: user.uid
+                })
+            });
+
+            Alert.alert(
+                '🎉 Sponsorship Confirmed!',
+                `Thank you, ${companyName}! Your sponsorship of ₹${(event.sponsorshipAmount || 0).toLocaleString()} for ${event.title} has been registered.`,
+                [{ text: 'Done', onPress: () => navigation.navigate('Home') }]
+            );
+        } catch (error) {
+            console.error("Sponsorship error:", error);
+            Alert.alert('Error', error.message);
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
