@@ -43,8 +43,8 @@ export default function EventDetailsScreen({ route, navigation }) {
     }, [user, event.participants]);
 
     const fetchOrganizer = async () => {
-        if (!event.createdBy) {
-            console.log('Skipping organizer fetch: event.createdBy is missing');
+        if (!event.createdBy || typeof event.createdBy !== 'string' || event.createdBy.trim() === '') {
+            console.log('Skipping organizer fetch: event.createdBy is invalid');
             return;
         }
         try {
@@ -58,8 +58,8 @@ export default function EventDetailsScreen({ route, navigation }) {
     };
 
     const checkFollowStatus = async () => {
-        if (!user || !event.createdBy) {
-            console.log('Skipping follow check: missing user or event.createdBy');
+        if (!user || !event.createdBy || typeof event.createdBy !== 'string' || event.createdBy.trim() === '') {
+            console.log('Skipping follow check: invalid user or event.createdBy');
             return;
         }
         try {

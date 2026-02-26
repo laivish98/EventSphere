@@ -58,6 +58,13 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
             return;
         }
 
+        // Refined check for event.createdBy
+        if (!event.createdBy || typeof event.createdBy !== 'string' || event.createdBy.trim() === '') {
+            console.error('Invalid event.createdBy: Cannot process sponsorship without event organizer info.');
+            Alert.alert('Error', 'Event organizer information is missing or invalid. Please contact support.');
+            return;
+        }
+
         // Robust number parsing
         const rawAmount = String(event.sponsorshipAmount || '0').replace(/[^0-9.]/g, '');
         const amount = parseFloat(rawAmount) || 0;
@@ -178,6 +185,11 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                 }).catch((error) => {
                     clearTimeout(safetyRetry);
                     console.error('Razorpay Error (Mobile):', error);
+                    // Handle cancelled transaction
+                    if (error.code === 2) { // Specific error code for user cancellation in Razorpay React Native
+                        setLoading(false);
+                        return;
+                    }
                     Alert.alert('Payment Failed', error.description || 'The transaction was cancelled or failed.');
                     setLoading(false);
                 });
