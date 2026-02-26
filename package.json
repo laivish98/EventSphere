@@ -18,10 +18,13 @@
     "expo-barcode-scanner": "^13.0.1",
     "expo-blur": "~15.0.8",
     "expo-camera": "~17.0.10",
+    "expo-file-system": "^55.0.9",
     "expo-image-picker": "~17.0.10",
     "expo-linear-gradient": "~15.0.8",
+    "expo-sharing": "^55.0.10",
     "expo-status-bar": "~3.0.9",
     "firebase": "^12.9.0",
+    "html2canvas": "^1.4.1",
     "qrcode": "^1.5.4",
     "react": "19.1.0",
     "react-dom": "19.1.0",
@@ -34,6 +37,7 @@
     "react-native-screens": "~4.16.0",
     "react-native-svg": "15.12.1",
     "react-native-vector-icons": "^10.3.0",
+    "react-native-view-shot": "^4.0.3",
     "react-native-web": "^0.21.0"
   },
   "private": true

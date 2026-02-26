@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Share, Platform, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { LinearGradient } from 'expo-linear-gradient';
+import ViewShot from 'react-native-view-shot';
+import * as Sharing from 'expo-sharing';
 import { useTheme } from '../context/ThemeContext';
 import { auth, db } from '../services/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
@@ -14,13 +16,41 @@ export default function CertificateScreen({ route, navigation }) {
     const { eventTitle, userName, date, university } = route.params;
     const [sending, setSending] = React.useState(false);
 
+    const viewShotRef = useRef();
+
     const handleShare = async () => {
         try {
+            if (Platform.OS === 'web') {
+                // Web specific download (since Share.share only supports text on web)
+                const html2canvas = require('html2canvas');
+                const element = document.getElementById('certificate-to-capture');
+                if (element) {
+                    const canvas = await html2canvas(element, {
+                        scale: 2, // High resolution
+                        backgroundColor: null,
+                        useCORS: true
+                    });
+                    const image = canvas.toDataURL("image/png");
+                    const link = document.createElement('a');
+                    link.href = image;
+                    link.download = `Certificate_${userName.replace(/\s+/g, '_')}.png`;
+                    link.click();
+                }
+            } else {
+                // Mobile: Capture and Share
+                const uri = await viewShotRef.current.capture();
+                await Sharing.shareAsync(uri, {
+                    mimeType: 'image/png',
+                    dialogTitle: 'Share my Certificate',
+                    UTI: 'public.png'
+                });
+            }
+        } catch (error) {
+            console.error('Error sharing:', error);
+            // Fallback to text share if capture fails
             await Share.share({
                 message: `I just received my certificate for participating in ${eventTitle} via EventSphere!`,
             });
-        } catch (error) {
-            console.error('Error sharing:', error);
         }
     };
 
@@ -77,38 +107,48 @@ export default function CertificateScreen({ route, navigation }) {
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <View style={styles.certificateContainer}>
-                    <LinearGradient
-                        colors={['#ffffff', '#f8fafc']}
-                        style={styles.certificateCard}
+                    <ViewShot
+                        ref={viewShotRef}
+                        options={{ format: "png", quality: 1.0 }}
+                        style={{ width: '100%' }}
                     >
-                        {/* Decorative Border */}
-                        <View style={styles.borderInner} />
+                        <View id="certificate-to-capture">
+                            <LinearGradient
+                                colors={['#ffffff', '#f8fafc']}
+                                style={styles.certificateCard}
+                            >
+                                {/* Decorative Border */}
+                                <View style={styles.borderInner} />
 
-                        <View style={styles.topSection}>
-                            <MaterialCommunityIcons name="seal-variant" size={60} color={colors.primary} />
-                            <Text style={styles.certHeading}>CERTIFICATE OF PARTICIPATION</Text>
-                        </View>
+                                <View style={styles.topSection}>
+                                    <MaterialCommunityIcons name="seal-variant" size={60} color={colors.primary} />
+                                    <Text style={styles.certHeading}>CERTIFICATE OF PARTICIPATION</Text>
+                                </View>
 
-                        <View style={styles.mainSection}>
-                            <Text style={styles.certSub}>This is to certify that</Text>
-                            <Text style={[styles.certName, { color: colors.primary }]}>{userName}</Text>
-                            <Text style={styles.universityName}>{university}</Text>
-                            <Text style={[styles.certSub, { marginTop: 12 }]}>has successfully participated in</Text>
-                            <Text style={styles.certEvent}>{eventTitle}</Text>
-                        </View>
+                                <View style={styles.mainSection}>
+                                    <Text style={styles.certSub}>This is to certify that</Text>
+                                    <Text style={[styles.certName, { color: colors.primary }]}>{userName}</Text>
+                                    <Text style={styles.universityName}>{university}</Text>
+                                    <Text style={[styles.certSub, { marginTop: 12 }]}>has successfully participated in</Text>
+                                    <Text style={styles.certEvent}>{eventTitle}</Text>
+                                </View>
 
-                        <View style={styles.bottomSection}>
-                            <View style={styles.divider} />
-                            <Text style={styles.certDate}>{date}</Text>
-                            <View style={styles.verifiedBadge}>
-                                <MaterialCommunityIcons name="check-decagram" size={16} color={colors.primary} />
-                                <Text style={[styles.verifiedText, { color: colors.primary }]}>EventSphere Verified</Text>
-                            </View>
-                            <View style={styles.signatureContainer}>
-                                <Text style={styles.signatureText}>EventSphere</Text>
-                            </View>
+                                <View style={styles.bottomSection}>
+                                    <View style={styles.divider} />
+                                    <Text style={styles.certDate}>{date}</Text>
+                                    <View pointerEvents="none">
+                                        <View style={styles.verifiedBadge}>
+                                            <MaterialCommunityIcons name="check-decagram" size={16} color={colors.primary} />
+                                            <Text style={[styles.verifiedText, { color: colors.primary }]}>EventSphere Verified</Text>
+                                        </View>
+                                    </View>
+                                    <View style={styles.signatureContainer}>
+                                        <Text style={styles.signatureText}>EventSphere</Text>
+                                    </View>
+                                </View>
+                            </LinearGradient>
                         </View>
-                    </LinearGradient>
+                    </ViewShot>
                 </View>
 
                 <View style={styles.buttonGroup}>
