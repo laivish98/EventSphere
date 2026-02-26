@@ -43,6 +43,10 @@ export default function EventDetailsScreen({ route, navigation }) {
     }, [user, event.participants]);
 
     const fetchOrganizer = async () => {
+        if (!event.createdBy) {
+            console.log('Skipping organizer fetch: event.createdBy is missing');
+            return;
+        }
         try {
             const orgDoc = await getDoc(doc(db, 'users', event.createdBy));
             if (orgDoc.exists()) {
@@ -54,7 +58,10 @@ export default function EventDetailsScreen({ route, navigation }) {
     };
 
     const checkFollowStatus = async () => {
-        if (!user || !event.createdBy) return;
+        if (!user || !event.createdBy) {
+            console.log('Skipping follow check: missing user or event.createdBy');
+            return;
+        }
         try {
             const q = query(
                 collection(db, 'follows'),
@@ -472,7 +479,10 @@ export default function EventDetailsScreen({ route, navigation }) {
                                     {event.sponsors.map((sponsor, index) => (
                                         <View key={index} style={styles.sponsorItem}>
                                             <View style={[styles.sponsorCircle, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                                                <Image source={{ uri: sponsor.logo }} style={styles.sponsorLogoFull} />
+                                                <Image
+                                                    source={{ uri: (sponsor.logo && sponsor.logo !== 'data:;base64,=') ? sponsor.logo : `https://ui-avatars.com/api/?name=${encodeURIComponent(sponsor.name)}&background=random&color=fff` }}
+                                                    style={styles.sponsorLogoFull}
+                                                />
                                             </View>
                                             <Text style={[styles.sponsorName, { color: colors.textSecondary }]} numberOfLines={1}>{sponsor.name}</Text>
                                         </View>

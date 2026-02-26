@@ -52,6 +52,12 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
             return;
         }
 
+        if (!event?.id) {
+            console.error("Missing event ID in navigation params");
+            Alert.alert('Error', 'Invalid event data. Please go back and try again.');
+            return;
+        }
+
         // Robust number parsing
         const rawAmount = String(event.sponsorshipAmount || '0').replace(/[^0-9.]/g, '');
         const amount = parseFloat(rawAmount) || 0;
@@ -60,17 +66,19 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
             amount,
             rawAmount,
             eventId: event.id,
-            hasRazorpayKey: !!RazorpayConfig.RAZORPAY_KEY_ID,
+            razorpayKeyPrefix: RazorpayConfig.RAZORPAY_KEY_ID ? RazorpayConfig.RAZORPAY_KEY_ID.substring(0, 8) + '...' : 'MISSING',
             platform: Platform.OS
         });
 
         if (amount <= 0) {
+            console.log("Processing free sponsorship...");
             await finalizeRegistration('FREE');
             return;
         }
 
         if (!RazorpayConfig.RAZORPAY_KEY_ID) {
-            Alert.alert('Configuration Error', 'Razorpay API Key is missing. Please check your environment variables.');
+            console.error("CRITICAL: Razorpay API Key is missing from config!");
+            Alert.alert('Gateway Error', 'The payment gateway is not configured properly. Please contact support.');
             return;
         }
 
@@ -80,9 +88,10 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
         const safetyRetry = setTimeout(() => {
             if (loading) {
                 setLoading(false);
+                console.warn("Safety timeout triggered: Loading state reset");
                 Alert.alert('Taking too long?', 'The payment gateway is taking a while. Please check if a pop-up was blocked or try again.');
             }
-        }, 10000);
+        }, 12000); // 12 seconds buffer
 
         try {
             const { RAZORPAY_KEY_ID, RAZORPAY_MERCHANT_NAME, RAZORPAY_THEME_COLOR, CURRENCY_MULTIPLIER } = RazorpayConfig;
@@ -96,7 +105,7 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                     script.async = true;
                     document.body.appendChild(script);
 
-                    Alert.alert('Loading Checkout', 'Preparing secure payment gateway... Please click again in 3 seconds.');
+                    Alert.alert('Loading Checkout', 'Preparing secure payment gateway... Please click pay again in 3 seconds.');
                     setLoading(false);
                     clearTimeout(safetyRetry);
                     return;
@@ -138,7 +147,7 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                 rzp.on('payment.failed', function (response) {
                     console.error("Razorpay payment failed (Web):", response.error);
                     clearTimeout(safetyRetry);
-                    Alert.alert('Payment Failed', response.error.description || 'Verification failed.');
+                    Alert.alert('Payment Failed', response.error.description || 'Transaction could not be completed.');
                     setLoading(false);
                 });
                 rzp.open();
@@ -176,7 +185,7 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
         } catch (error) {
             clearTimeout(safetyRetry);
             console.error('Payment Initialization Error:', error);
-            Alert.alert('Error', 'Could not initialize payment: ' + (error.message || 'Unknown error'));
+            Alert.alert('Error', 'Could not initialize payment: ' + (error.message || 'Check your internet connection'));
             setLoading(false);
         }
     };
