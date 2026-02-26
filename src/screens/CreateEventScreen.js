@@ -23,7 +23,7 @@ export default function CreateEventScreen({ navigation }) {
     const [department, setDepartment] = useState('');
     const [acceptsSponsorship, setAcceptsSponsorship] = useState(true);
     const [loading, setLoading] = useState(false);
-    const [selectedImage, setSelectedImage] = useState(null);
+    const [selectedImage, setSelectedImage] = useState('https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2670&auto=format&fit=crop');
     const [suggestedImages, setSuggestedImages] = useState([]);
 
     const CATEGORY_IMAGE_POOLS = {
@@ -134,8 +134,21 @@ export default function CreateEventScreen({ navigation }) {
             Alert.alert('Success ✨', 'Your event has been published to the community!');
             navigation.goBack();
         } catch (error) {
-            console.error("Firestore post error:", error);
-            Alert.alert('Publishing Error', error.message || 'Failed to connect to database. Please check your network.');
+            console.error("Firestore post error details:", {
+                code: error.code,
+                message: error.message,
+                user: user.uid,
+                data: { title: trimmedTitle, category }
+            });
+
+            let errorMessage = 'Failed to connect to database. Please check your network.';
+            if (error.code === 'permission-denied') {
+                errorMessage = 'Permission denied. Please ensure you are logged in correctly.';
+            } else if (error.message.includes('blocked-by-client')) {
+                errorMessage = 'Request blocked by your browser. Please disable ad-blockers and try again.';
+            }
+
+            Alert.alert('Publishing Error', errorMessage);
         } finally {
             setLoading(false);
         }
@@ -260,7 +273,13 @@ export default function CreateEventScreen({ navigation }) {
                 <View style={styles.thumbnailSection}>
                     <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>Event Poster</Text>
                     <View style={[styles.thumbnailContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                        <Image source={{ uri: selectedImage }} style={styles.thumbnailImage} />
+                        {selectedImage ? (
+                            <Image source={{ uri: selectedImage }} style={styles.thumbnailImage} />
+                        ) : (
+                            <View style={styles.imagePlaceholder}>
+                                <MaterialCommunityIcons name="image-off" size={40} color={colors.border} />
+                            </View>
+                        )}
                         <LinearGradient
                             colors={['transparent', 'rgba(0,0,0,0.6)']}
                             style={styles.thumbnailOverlay}
