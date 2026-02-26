@@ -1,7 +1,7 @@
 // Razorpay Configuration
 // Replace with your actual Live/Test keys from the Razorpay Dashboard
 
-export const RAZORPAY_KEY_ID = 'rzp_test_SKkYWBblBUkX5W';
+export const RAZORPAY_KEY_ID = process.env.EXPO_PUBLIC_RAZORPAY_KEY_ID;
 export const RAZORPAY_MERCHANT_NAME = 'EventSphere';
 export const RAZORPAY_THEME_COLOR = '#135bec';
 
