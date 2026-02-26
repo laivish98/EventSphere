@@ -23,9 +23,36 @@ import SecurityScreen from '../screens/SecurityScreen';
 
 const Stack = createNativeStackNavigator();
 
+const linking = {
+    prefixes: ['https://event-sphere-delta.vercel.app', 'http://localhost:19006'],
+    config: {
+        screens: {
+            Welcome: 'welcome',
+            Login: 'login',
+            Signup: 'signup',
+            Home: 'home',
+            CreateEvent: 'create-event',
+            EventDetails: 'event/:id',
+            Ticket: 'ticket/:id',
+            ScanTicket: 'scan',
+            SponsorRegistration: 'sponsor',
+            OrganizerDashboard: 'dashboard',
+            Profile: 'profile',
+            EventChat: 'chat/:id',
+            Certificate: 'certificate',
+            EditEvent: 'edit-event/:id',
+            EditProfile: 'edit-profile',
+            FollowList: 'follows',
+            About: 'about',
+            HelpCenter: 'help',
+            Security: 'security',
+        },
+    },
+};
+
 export default function AppNavigator() {
     return (
-        <NavigationContainer>
+        <NavigationContainer linking={linking}>
             <Stack.Navigator
                 initialRouteName="Welcome"
                 screenOptions={{ headerShown: false }}
