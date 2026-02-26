@@ -15,6 +15,15 @@ const firebaseConfig = {
   measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID
 };
 
+// Diagnostic logging for production (Safe: only logs first 4 chars)
+if (Platform.OS === 'web') {
+  console.log("Firebase Init Trace:", {
+    hasKey: !!firebaseConfig.apiKey,
+    keyPrefix: firebaseConfig.apiKey ? firebaseConfig.apiKey.substring(0, 4) : 'none',
+    projectId: firebaseConfig.projectId
+  });
+}
+
 const app = initializeApp(firebaseConfig);
 
 // Initialize Auth with persistence based on platform
