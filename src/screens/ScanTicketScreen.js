@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
     Text, View, StyleSheet, TouchableOpacity,
-    Animated, Easing, Dimensions, TextInput, Modal
+    Animated, Easing, Dimensions, TextInput, Modal,
+    Pressable
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -204,12 +205,43 @@ export default function ScanTicketScreen({ navigation }) {
                         <Text style={styles.liveText}>Live Camera</Text>
                     </View>
                 </View>
-                <TouchableOpacity
-                    style={[styles.iconButton, torchOn && styles.iconButtonActive]}
-                    onPress={() => setTorchOn(v => !v)}
+                <Pressable
+                    style={({ pressed }) => [
+                        styles.iconButton,
+                        torchOn && styles.iconButtonActive,
+                        pressed && { opacity: 0.7 }
+                    ]}
+                    onPress={async () => {
+                        const newTorchState = !torchOn;
+                        setTorchOn(newTorchState);
+
+                        // Mobile Browser Fallback: Direct MediaStream manipulation
+                        if (Platform.OS === 'web') {
+                            try {
+                                const videoElements = document.getElementsByTagName('video');
+                                for (let i = 0; i < videoElements.length; i++) {
+                                    const stream = videoElements[i].srcObject;
+                                    if (stream) {
+                                        const tracks = stream.getVideoTracks();
+                                        for (const track of tracks) {
+                                            const capabilities = track.getCapabilities?.() || {};
+                                            if (capabilities.torch) {
+                                                await track.applyConstraints({
+                                                    advanced: [{ torch: newTorchState }]
+                                                });
+                                                console.log(`Torch successfully ${newTorchState ? 'enabled' : 'disabled'} via MediaStream`);
+                                            }
+                                        }
+                                    }
+                                }
+                            } catch (e) {
+                                console.warn("Mobile browser torch fallback failed:", e);
+                            }
+                        }
+                    }}
                 >
                     <MaterialCommunityIcons name={torchOn ? 'flash' : 'flash-outline'} size={24} color="white" />
-                </TouchableOpacity>
+                </Pressable>
             </LinearGradient>
 
             {/* Bottom Result Sheet */}
