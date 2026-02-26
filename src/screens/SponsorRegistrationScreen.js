@@ -25,6 +25,18 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
     const [details, setDetails] = useState('');
     const [contactEmail, setContactEmail] = useState(user?.email || '');
     const [loading, setLoading] = useState(false);
+    const [debugCount, setDebugCount] = useState(0);
+    const [showDiagnostics, setShowDiagnostics] = useState(false);
+
+    const handleDebugTrigger = () => {
+        setDebugCount(prev => {
+            if (prev + 1 >= 5) {
+                setShowDiagnostics(true);
+                return 0;
+            }
+            return prev + 1;
+        });
+    };
 
     useEffect(() => {
         // Load Razorpay Script for Web
@@ -85,39 +97,39 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
 
         if (!RazorpayConfig.RAZORPAY_KEY_ID) {
             console.error("CRITICAL: Razorpay API Key is missing from config!");
-            Alert.alert('Gateway Error', 'The payment gateway is not configured properly. Please contact support.');
+            Alert.alert('Gateway Error', 'The payment gateway is not configured properly. (Key Missing)');
+            return;
+        }
+
+        // MOBILE BROWSER GESTURE OPTIMIZATION: 
+        // We set loading immediately and check script status.
+        // If script is missing on web, we load it and wait.
+        if (Platform.OS === 'web' && typeof window.Razorpay === 'undefined') {
+            setLoading(true);
+            const script = document.createElement('script');
+            script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+            script.async = true;
+            document.body.appendChild(script);
+            Alert.alert('Loading Gateway', 'Preparing secure checkout... Please click PAY again in 3 seconds.');
+            setLoading(false);
             return;
         }
 
         setLoading(true);
 
-        // Safety timeout to reset loading state if modal doesn't open
+        // Safety timeout
         const safetyRetry = setTimeout(() => {
             if (loading) {
                 setLoading(false);
                 console.warn("Safety timeout triggered: Loading state reset");
-                Alert.alert('Taking too long?', 'The payment gateway is taking a while. Please check if a pop-up was blocked or try again.');
+                Alert.alert('Gateway Unresponsive', 'If the payment window didn\'t open, please check if your browser blocked a pop-up.');
             }
-        }, 12000); // 12 seconds buffer
+        }, 12000);
 
         try {
             const { RAZORPAY_KEY_ID, RAZORPAY_MERCHANT_NAME, RAZORPAY_THEME_COLOR, CURRENCY_MULTIPLIER } = RazorpayConfig;
 
             if (Platform.OS === 'web') {
-                if (typeof window.Razorpay === 'undefined') {
-                    console.error("Razorpay script not found. Attempting reload...");
-                    // Try to re-inject script once
-                    const script = document.createElement('script');
-                    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
-                    script.async = true;
-                    document.body.appendChild(script);
-
-                    Alert.alert('Loading Checkout', 'Preparing secure payment gateway... Please click pay again in 3 seconds.');
-                    setLoading(false);
-                    clearTimeout(safetyRetry);
-                    return;
-                }
-
                 const options = {
                     key: RAZORPAY_KEY_ID,
                     amount: Math.round(amount * CURRENCY_MULTIPLIER),
@@ -126,7 +138,6 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                     description: `Sponsorship for ${event.title}`,
                     handler: async function (response) {
                         clearTimeout(safetyRetry);
-                        console.log("Razorpay payment success (Web):", response.razorpay_payment_id);
                         await finalizeRegistration(response.razorpay_payment_id);
                     },
                     prefill: {
@@ -140,11 +151,9 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                     theme: { color: RAZORPAY_THEME_COLOR },
                     modal: {
                         ondismiss: function () {
-                            console.log("Razorpay modal dismissed");
                             clearTimeout(safetyRetry);
                             setLoading(false);
                         },
-                        // Fix for some browsers
                         escape: true,
                         backdropclose: false
                     }
@@ -152,14 +161,13 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
 
                 const rzp = new window.Razorpay(options);
                 rzp.on('payment.failed', function (response) {
-                    console.error("Razorpay payment failed (Web):", response.error);
                     clearTimeout(safetyRetry);
-                    Alert.alert('Payment Failed', response.error.description || 'Transaction could not be completed.');
+                    Alert.alert('Payment Failed', response.error.description || 'Transaction cancelled.');
                     setLoading(false);
                 });
                 rzp.open();
             } else {
-                // Mobile Implementation
+                // Mobile native Implementation
                 const RazorpayCheckoutModule = require('react-native-razorpay');
                 const RazorpayCheckout = RazorpayCheckoutModule.default || RazorpayCheckoutModule;
 
@@ -180,24 +188,20 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
 
                 RazorpayCheckout.open(options).then(async (data) => {
                     clearTimeout(safetyRetry);
-                    console.log("Razorpay payment success (Mobile):", data.razorpay_payment_id);
                     await finalizeRegistration(data.razorpay_payment_id);
                 }).catch((error) => {
                     clearTimeout(safetyRetry);
-                    console.error('Razorpay Error (Mobile):', error);
-                    // Handle cancelled transaction
-                    if (error.code === 2) { // Specific error code for user cancellation in Razorpay React Native
+                    if (error.code === 2) {
                         setLoading(false);
                         return;
                     }
-                    Alert.alert('Payment Failed', error.description || 'The transaction was cancelled or failed.');
+                    Alert.alert('Payment Failed', error.description || 'Transaction failed.');
                     setLoading(false);
                 });
             }
         } catch (error) {
             clearTimeout(safetyRetry);
-            console.error('Payment Initialization Error:', error);
-            Alert.alert('Error', 'Could not initialize payment: ' + (error.message || 'Check your internet connection'));
+            Alert.alert('Initialization Error', error.message || 'Check your internet connection');
             setLoading(false);
         }
     };
@@ -247,16 +251,44 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar style={isDarkMode ? "light" : "dark"} />
 
-            {/* Top App Bar */}
-            <View style={[styles.appBar, { backgroundColor: isDarkMode ? 'rgba(16, 22, 34, 0.9)' : 'rgba(255, 255, 255, 0.9)', borderBottomColor: colors.border }]}>
-                <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => navigation.goBack()}>
-                    <MaterialCommunityIcons name="arrow-left" size={24} color={isDarkMode ? "white" : colors.text} />
-                </TouchableOpacity>
-                <Text style={[styles.appBarTitle, { color: colors.text }]}>Partner with EventSphere</Text>
-                <View style={{ width: 40 }} />
-            </View>
+            <LinearGradient
+                colors={isDarkMode ? ['#1e3a8a', '#1e1b4b'] : ['#135bec', '#1e40af']}
+                style={styles.header}
+            >
+                <View style={styles.headerTop}>
+                    <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                        <MaterialCommunityIcons name="arrow-left" size={24} color="white" />
+                    </TouchableOpacity>
+                    <TouchableOpacity onPress={handleDebugTrigger} activeOpacity={1}>
+                        <Text style={styles.headerTitle}>Sponsorship Deal</Text>
+                    </TouchableOpacity>
+                    <View style={{ width: 40 }} />
+                </View>
+
+                <View style={styles.eventMiniCard}>
+                    <View style={styles.amountBadge}>
+                        <Text style={styles.amountLabel}>Partner with us for</Text>
+                        <Text style={styles.amountValue}>₹{event.sponsorshipAmount || '0'}</Text>
+                    </View>
+                </View>
+            </LinearGradient>
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                {showDiagnostics && (
+                    <View style={[styles.diagnosticCard, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f0f0f0' }]}>
+                        <View style={styles.diagnosticHeader}>
+                            <Text style={[styles.diagnosticTitle, { color: colors.text }]}>System Diagnostics</Text>
+                            <TouchableOpacity onPress={() => setShowDiagnostics(false)}>
+                                <MaterialCommunityIcons name="close" size={20} color={colors.text} />
+                            </TouchableOpacity>
+                        </View>
+                        <Text style={[styles.diagText, { color: colors.text }]}>• Platform: {Platform.OS}</Text>
+                        <Text style={[styles.diagText, { color: colors.text }]}>• Razorpay SDK: {typeof window !== 'undefined' && window.Razorpay ? 'Loaded' : 'Missing'}</Text>
+                        <Text style={[styles.diagText, { color: colors.text }]}>• API Key Prefix: {RazorpayConfig.RAZORPAY_KEY_ID ? RazorpayConfig.RAZORPAY_KEY_ID.substring(0, 8) : 'NONE'}</Text>
+                        <Text style={[styles.diagText, { color: colors.text }]}>• Event ID: {event?.id || 'NULL'}</Text>
+                    </View>
+                )}
+
                 {/* Header */}
                 <View style={styles.headerSection}>
                     <Text style={[styles.headerTitle, { color: colors.text }]}>Sponsor "{event.title}"</Text>
@@ -377,14 +409,19 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    appBar: {
+    header: {
+        paddingTop: 55,
+        paddingHorizontal: 16,
+        paddingBottom: 20,
+        borderBottomLeftRadius: 20,
+        borderBottomRightRadius: 20,
+        overflow: 'hidden',
+    },
+    headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingTop: 55,
-        paddingHorizontal: 16,
-        paddingBottom: 12,
-        borderBottomWidth: 1,
+        marginBottom: 20,
     },
     backButton: {
         width: 40,
@@ -393,12 +430,24 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    appBarTitle: {
+    headerTitle: {
         fontSize: 17,
         fontWeight: '600',
         color: 'white',
         textAlign: 'center',
-        flex: 1,
+    },
+    eventMiniCard: {
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderRadius: 12,
+        padding: 16,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    amountBadge: {
+        flexDirection: 'row',
+        alignItems: 'baseline',
+        gap: 8,
     },
     scrollContent: {
         paddingBottom: 40,
@@ -408,46 +457,10 @@ const styles = StyleSheet.create({
         paddingTop: 24,
         paddingBottom: 8,
     },
-    headerTitle: {
-        fontSize: 30,
-        fontWeight: 'bold',
-        color: 'white',
-        marginBottom: 8,
-    },
     headerSubtitle: {
         fontSize: 15,
         color: '#9ca3af',
         lineHeight: 22,
-    },
-    metricsRow: {
-        flexDirection: 'row',
-        paddingHorizontal: 20,
-        paddingVertical: 24,
-        gap: 12,
-    },
-    metricCard: {
-        flex: 1,
-        backgroundColor: '#1c2333',
-        borderRadius: 16,
-        padding: 14,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.07)',
-        gap: 8,
-    },
-    metricIconRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-    },
-    metricLabel: {
-        fontSize: 12,
-        color: '#9ca3af',
-        fontWeight: '500',
-    },
-    metricValue: {
-        fontSize: 26,
-        fontWeight: 'bold',
-        color: 'white',
     },
     amountCard: {
         marginHorizontal: 20,
