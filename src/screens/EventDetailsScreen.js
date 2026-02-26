@@ -271,8 +271,12 @@ export default function EventDetailsScreen({ route, navigation }) {
     const onShare = async () => {
         try {
             const eventVenue = event.venue || event.location;
+            const eventUrl = `https://event-sphere-delta.vercel.app/event/${event.id}`;
+
             await Share.share({
-                message: `Check out ${event.title} at ${eventVenue} on EventSphere!`,
+                title: event.title,
+                message: `Check out ${event.title} at ${eventVenue} on EventSphere!\n\nView here: ${eventUrl}`,
+                url: eventUrl // url field is supported on some platforms (iOS)
             });
         } catch (error) {
             console.error(error.message);
