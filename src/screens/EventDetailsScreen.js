@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Image, Dimensions, Share, Platform, Alert, Modal, TextInput, Linking } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { StatusBar } from 'expo-status-bar';
 import EventMap from '../components/EventMap';
 import { useTheme } from '../context/ThemeContext';
