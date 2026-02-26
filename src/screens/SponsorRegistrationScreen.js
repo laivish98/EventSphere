@@ -11,6 +11,7 @@ import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { db } from '../services/firebase';
 import { collection, addDoc, serverTimestamp, doc, updateDoc, arrayUnion } from 'firebase/firestore';
+import * as RazorpayConfig from '../config/razorpayConfig';
 
 const { width } = Dimensions.get('window');
 
@@ -51,23 +52,53 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
             return;
         }
 
-        const amount = parseFloat(event.sponsorshipAmount) || 0;
-        console.log("Starting sponsorship payment:", { amount, eventId: event.id, companyName });
+        // Robust number parsing
+        const rawAmount = String(event.sponsorshipAmount || '0').replace(/[^0-9.]/g, '');
+        const amount = parseFloat(rawAmount) || 0;
+
+        console.log("Sponsorship Debug:", {
+            amount,
+            rawAmount,
+            eventId: event.id,
+            hasRazorpayKey: !!RazorpayConfig.RAZORPAY_KEY_ID,
+            platform: Platform.OS
+        });
 
         if (amount <= 0) {
             await finalizeRegistration('FREE');
             return;
         }
 
+        if (!RazorpayConfig.RAZORPAY_KEY_ID) {
+            Alert.alert('Configuration Error', 'Razorpay API Key is missing. Please check your environment variables.');
+            return;
+        }
+
         setLoading(true);
+
+        // Safety timeout to reset loading state if modal doesn't open
+        const safetyRetry = setTimeout(() => {
+            if (loading) {
+                setLoading(false);
+                Alert.alert('Taking too long?', 'The payment gateway is taking a while. Please check if a pop-up was blocked or try again.');
+            }
+        }, 10000);
+
         try {
-            const { RAZORPAY_KEY_ID, RAZORPAY_MERCHANT_NAME, RAZORPAY_THEME_COLOR, CURRENCY_MULTIPLIER } = require('../config/razorpayConfig');
+            const { RAZORPAY_KEY_ID, RAZORPAY_MERCHANT_NAME, RAZORPAY_THEME_COLOR, CURRENCY_MULTIPLIER } = RazorpayConfig;
 
             if (Platform.OS === 'web') {
                 if (typeof window.Razorpay === 'undefined') {
-                    console.error("Razorpay script not found on window object");
-                    Alert.alert('Error', 'Razorpay checkout is still loading. Please wait 2 seconds and try again.');
+                    console.error("Razorpay script not found. Attempting reload...");
+                    // Try to re-inject script once
+                    const script = document.createElement('script');
+                    script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+                    script.async = true;
+                    document.body.appendChild(script);
+
+                    Alert.alert('Loading Checkout', 'Preparing secure payment gateway... Please click again in 3 seconds.');
                     setLoading(false);
+                    clearTimeout(safetyRetry);
                     return;
                 }
 
@@ -78,6 +109,7 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                     name: RAZORPAY_MERCHANT_NAME,
                     description: `Sponsorship for ${event.title}`,
                     handler: async function (response) {
+                        clearTimeout(safetyRetry);
                         console.log("Razorpay payment success (Web):", response.razorpay_payment_id);
                         await finalizeRegistration(response.razorpay_payment_id);
                     },
@@ -93,21 +125,27 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                     modal: {
                         ondismiss: function () {
                             console.log("Razorpay modal dismissed");
+                            clearTimeout(safetyRetry);
                             setLoading(false);
-                        }
+                        },
+                        // Fix for some browsers
+                        escape: true,
+                        backdropclose: false
                     }
                 };
 
                 const rzp = new window.Razorpay(options);
                 rzp.on('payment.failed', function (response) {
                     console.error("Razorpay payment failed (Web):", response.error);
-                    Alert.alert('Payment Failed', response.error.description);
+                    clearTimeout(safetyRetry);
+                    Alert.alert('Payment Failed', response.error.description || 'Verification failed.');
                     setLoading(false);
                 });
                 rzp.open();
             } else {
                 // Mobile Implementation
-                const RazorpayCheckout = require('react-native-razorpay').default;
+                const RazorpayCheckoutModule = require('react-native-razorpay');
+                const RazorpayCheckout = RazorpayCheckoutModule.default || RazorpayCheckoutModule;
 
                 const options = {
                     description: `Sponsorship for ${event.title}`,
@@ -125,17 +163,20 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                 };
 
                 RazorpayCheckout.open(options).then(async (data) => {
+                    clearTimeout(safetyRetry);
                     console.log("Razorpay payment success (Mobile):", data.razorpay_payment_id);
                     await finalizeRegistration(data.razorpay_payment_id);
                 }).catch((error) => {
+                    clearTimeout(safetyRetry);
                     console.error('Razorpay Error (Mobile):', error);
                     Alert.alert('Payment Failed', error.description || 'The transaction was cancelled or failed.');
                     setLoading(false);
                 });
             }
         } catch (error) {
+            clearTimeout(safetyRetry);
             console.error('Payment Initialization Error:', error);
-            Alert.alert('Error', 'Could not initialize payment. Please try again.');
+            Alert.alert('Error', 'Could not initialize payment: ' + (error.message || 'Unknown error'));
             setLoading(false);
         }
     };
