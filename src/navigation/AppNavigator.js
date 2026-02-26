@@ -24,7 +24,11 @@ import SecurityScreen from '../screens/SecurityScreen';
 const Stack = createNativeStackNavigator();
 
 const linking = {
-    prefixes: ['https://event-sphere-delta.vercel.app', 'http://localhost:19006'],
+    prefixes: [
+        'https://event-sphere-delta.vercel.app',
+        'https://event-sphere-gt2f9q1yy-laivishsharma123-9438s-projects.vercel.app',
+        'http://localhost:19006'
+    ],
     config: {
         screens: {
             Welcome: 'welcome',
