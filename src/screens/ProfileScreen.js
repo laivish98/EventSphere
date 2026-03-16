@@ -129,8 +129,15 @@ export default function ProfileScreen({ navigation }) {
                     <View style={styles.profileInfoMain}>
                         <View style={styles.avatarWrapper}>
                             <Image
-                                source={{ uri: userData.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'User')}&background=random&color=fff` }}
+                                source={{
+                                    uri: (userData?.avatarUrl && !userData.avatarUrl.includes('iran.liara.run'))
+                                        ? userData.avatarUrl
+                                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'User')}&background=random&color=fff`
+                                }}
                                 style={[styles.avatar, { borderColor: colors.primary + '30' }]}
+                                onError={() => {
+                                    console.log('Profile avatar load error, falling back');
+                                }}
                             />
                         </View>
 

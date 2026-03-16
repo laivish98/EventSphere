@@ -22,6 +22,8 @@ export default function LoginScreen({ navigation }) {
         const trimmedEmail = email.trim();
         const trimmedPassword = password.trim();
 
+        console.log('[Login] Attempting login for:', trimmedEmail);
+
         if (!trimmedEmail || !trimmedPassword) {
             alert('Please fill in all fields');
             return;
@@ -29,6 +31,7 @@ export default function LoginScreen({ navigation }) {
         setLoading(true);
         try {
             const cred = await login(trimmedEmail, trimmedPassword);
+            console.log('[Login] Success: UID', cred.user.uid);
             const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
             const role = userDoc.exists() ? userDoc.data().role : 'student';
             if (role === 'admin' || role === 'organizer') {
@@ -37,6 +40,7 @@ export default function LoginScreen({ navigation }) {
                 navigation.replace('Home');
             }
         } catch (error) {
+            console.error('[Login] Error:', error.code, error.message);
             alert(error.message);
         } finally {
             setLoading(false);

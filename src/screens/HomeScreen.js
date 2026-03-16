@@ -204,7 +204,7 @@ export default function HomeScreen({ navigation }) {
                 >
                     <Image
                         source={{
-                            uri: (userData?.avatarUrl && userData.avatarUrl !== 'https://avatar.iran.liara.run/public')
+                            uri: (userData?.avatarUrl && !userData.avatarUrl.includes('iran.liara.run'))
                                 ? userData.avatarUrl
                                 : `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.name || user?.email?.split('@')[0] || 'User')}&background=random&color=fff`
                         }}
