@@ -19,13 +19,16 @@ export default function LoginScreen({ navigation }) {
     const [loading, setLoading] = useState(false);
 
     const handleLogin = async () => {
-        if (!email || !password) {
+        const trimmedEmail = email.trim();
+        const trimmedPassword = password.trim();
+
+        if (!trimmedEmail || !trimmedPassword) {
             alert('Please fill in all fields');
             return;
         }
         setLoading(true);
         try {
-            const cred = await login(email, password);
+            const cred = await login(trimmedEmail, trimmedPassword);
             const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
             const role = userDoc.exists() ? userDoc.data().role : 'student';
             if (role === 'admin' || role === 'organizer') {

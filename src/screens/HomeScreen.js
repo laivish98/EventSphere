@@ -204,12 +204,15 @@ export default function HomeScreen({ navigation }) {
                 >
                     <Image
                         source={{
-                            uri: hasImageError
-                                ? `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.name || 'User')}&background=random&color=fff`
-                                : (userData?.avatarUrl || 'https://avatar.iran.liara.run/public')
+                            uri: (userData?.avatarUrl && userData.avatarUrl !== 'https://avatar.iran.liara.run/public')
+                                ? userData.avatarUrl
+                                : `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.name || user?.email?.split('@')[0] || 'User')}&background=random&color=fff`
                         }}
                         style={styles.avatar}
-                        onError={() => setHasImageError(true)}
+                        onError={(e) => {
+                            console.log('Avatar load error, falling back to UI Avatars');
+                            setHasImageError(true);
+                        }}
                     />
                     <View>
                         <Text style={[styles.greeting, { color: colors.textSecondary }]}>Discover Events</Text>

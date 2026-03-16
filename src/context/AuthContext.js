@@ -53,13 +53,18 @@ export const AuthProvider = ({ children }) => {
 
         // Assign default avatar based on gender/name
         const nameForAvatar = metadata.name || email.split('@')[0];
-        let defaultAvatar = `https://ui-avatars.com/api/?name=${encodeURIComponent(nameForAvatar)}&background=random&color=fff`;
+        const uiAvatarBase = `https://ui-avatars.com/api/?name=${encodeURIComponent(nameForAvatar)}&background=random&color=fff`;
+
+        // Use ui-avatars as primary fallback, with gender-specific variants if available
+        let defaultAvatar = uiAvatarBase;
 
         if (metadata.gender === 'Male') {
             defaultAvatar = 'https://avatar.iran.liara.run/public/boy';
         } else if (metadata.gender === 'Female') {
             defaultAvatar = 'https://avatar.iran.liara.run/public/girl';
         }
+
+        // Final sanity check: if iran.liara.run is flaky, ui-avatars will be used in components
 
         const userDataToSave = {
             email: user.email,

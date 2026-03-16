@@ -195,9 +195,12 @@ export default function ScanTicketScreen({ navigation }) {
                 colors={['rgba(0,0,0,0.75)', 'transparent']}
                 style={styles.topBar}
             >
-                <TouchableOpacity style={styles.iconButton} onPress={() => navigation.goBack()}>
+                <Pressable
+                    style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.7 }]}
+                    onPress={() => navigation.goBack()}
+                >
                     <MaterialCommunityIcons name="arrow-left" size={24} color="white" />
-                </TouchableOpacity>
+                </Pressable>
                 <View style={styles.titleBlock}>
                     <Text style={styles.topBarTitle}>Scan Entry Ticket</Text>
                     <View style={styles.liveBadge}>
@@ -312,16 +315,29 @@ export default function ScanTicketScreen({ navigation }) {
                             </View>
                         </View>
 
-                        {/* Action buttons */}
                         <View style={styles.actionRow}>
-                            <TouchableOpacity style={[styles.secondaryBtn, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => setManualModalVisible(true)}>
+                            <Pressable
+                                style={({ pressed }) => [
+                                    styles.secondaryBtn,
+                                    { backgroundColor: colors.surface, borderColor: colors.border },
+                                    pressed && { opacity: 0.7 }
+                                ]}
+                                onPress={() => setManualModalVisible(true)}
+                            >
                                 <MaterialCommunityIcons name="keyboard" size={18} color={colors.text} />
                                 <Text style={[styles.secondaryBtnText, { color: colors.text }]}>Manual Entry</Text>
-                            </TouchableOpacity>
-                            <TouchableOpacity style={[styles.primaryBtn, { backgroundColor: colors.primary, shadowColor: colors.primary }]} onPress={handleScanNext}>
+                            </Pressable>
+                            <Pressable
+                                style={({ pressed }) => [
+                                    styles.primaryBtn,
+                                    { backgroundColor: colors.primary, shadowColor: colors.primary },
+                                    pressed && { opacity: 0.8 }
+                                ]}
+                                onPress={handleScanNext}
+                            >
                                 <MaterialCommunityIcons name="qrcode-scan" size={18} color="white" />
                                 <Text style={styles.primaryBtnText}>Scan Next</Text>
-                            </TouchableOpacity>
+                            </Pressable>
                         </View>
                     </View>
                 </Animated.View>

@@ -44,14 +44,17 @@ export default function SignupScreen({ navigation }) {
     const [showPassword, setShowPassword] = useState(false);
 
     const handleSignup = async () => {
-        if (!email || !password || !name) {
+        const trimmedEmail = email.trim();
+        const trimmedPassword = password.trim();
+
+        if (!trimmedEmail || !trimmedPassword || !name.trim()) {
             Alert.alert('Required Fields', 'Please fill in all fields to create your account.');
             return;
         }
         setLoading(true);
         try {
             const backendRole = role === 'organizer' ? 'admin' : role;
-            await signup(email, password, backendRole, { name, college, gender });
+            await signup(trimmedEmail, trimmedPassword, backendRole, { name: name.trim(), college, gender });
             if (backendRole === 'admin') {
                 navigation.replace('OrganizerDashboard');
             } else {

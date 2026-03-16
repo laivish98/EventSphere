@@ -17,6 +17,16 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 
+// Diagnostic Logging
+console.log('[Firebase] Initialized for platform:', Platform.OS);
+if (__DEV__) {
+  console.log('[Firebase] Config Check:', {
+    apiKey: firebaseConfig.apiKey ? `${firebaseConfig.apiKey.substring(0, 5)}...` : 'MISSING',
+    authDomain: firebaseConfig.authDomain || 'MISSING',
+    projectId: firebaseConfig.projectId || 'MISSING',
+  });
+}
+
 // Initialize Auth with persistence based on platform
 export const auth = Platform.OS === 'web'
   ? getAuth(app)
