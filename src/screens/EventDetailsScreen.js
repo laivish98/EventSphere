@@ -769,7 +769,10 @@ export default function EventDetailsScreen({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: {
+        flex: 1,
+        ...(Platform.OS === 'web' ? { overflow: 'hidden', height: '100vh' } : {})
+    },
     bgOrb: {
         position: 'absolute',
         width: width * 1.5,
@@ -874,7 +877,23 @@ const styles = StyleSheet.create({
     sponsorName: { fontSize: 12, marginTop: 10, textAlign: 'center', fontWeight: '700', letterSpacing: -0.2 },
     sponsorPlaceholder: { width: '100%', height: 120, borderRadius: 32, borderWidth: 2, borderStyle: 'dotted', alignItems: 'center', justifyContent: 'center', gap: 10 },
     sponsorPlaceholderText: { fontSize: 15, fontWeight: '600', opacity: 0.6 },
-    bottomNav: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 24, paddingVertical: 25, borderTopWidth: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: Platform.OS === 'ios' ? 44 : 25, zIndex: 1000 },
+    bottomNav: {
+        bottom: 0,
+        left: 0,
+        right: 0,
+        paddingHorizontal: 24,
+        paddingVertical: 25,
+        borderTopWidth: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingBottom: Platform.OS === 'ios' ? 44 : 25,
+        zIndex: 1000,
+        ...Platform.select({
+            web: { position: 'fixed' },
+            default: { position: 'absolute' }
+        })
+    },
     priceLabel: { fontSize: 11, fontWeight: '900', letterSpacing: 1.5, textTransform: 'uppercase', opacity: 0.6 },
     finalPrice: { fontSize: 28, fontWeight: 'bold', letterSpacing: -0.8 },
     actionButtons: { flexDirection: 'row', gap: 15 },

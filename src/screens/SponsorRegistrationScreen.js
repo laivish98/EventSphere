@@ -410,6 +410,7 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        ...(Platform.OS === 'web' ? { overflow: 'hidden', height: '100vh' } : {})
     },
     bgOrb: {
         position: 'absolute',
@@ -575,7 +576,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     stickyBar: {
-        position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
@@ -584,6 +584,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 24,
         borderTopWidth: 1,
         gap: 20,
+        ...Platform.select({
+            web: { position: 'fixed', zIndex: 1000 },
+            default: { position: 'absolute' }
+        })
     },
     stickyBarInner: {
         flexDirection: 'row',

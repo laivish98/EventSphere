@@ -215,6 +215,7 @@ export default function TicketScreen({ navigation }) {
 const styles = StyleSheet.create({
     container: {
         flex: 1,
+        ...(Platform.OS === 'web' ? { overflow: 'hidden', height: '100vh' } : {})
     },
     // Security dot pattern background via gradient
     header: {

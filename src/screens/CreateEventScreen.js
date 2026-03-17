@@ -438,7 +438,10 @@ export default function CreateEventScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: {
+        flex: 1,
+        ...(Platform.OS === 'web' ? { overflow: 'hidden', height: '100vh' } : {})
+    },
     header: {
         flexDirection: 'row',
         alignItems: 'center',

@@ -332,7 +332,10 @@ export default function ProfileScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: {
+        flex: 1,
+        ...(Platform.OS === 'web' ? { overflow: 'hidden', height: '100vh' } : {})
+    },
     profileHeader: { paddingHorizontal: 20, paddingBottom: 24, position: 'relative', overflow: 'hidden' },
     headerGradient: { position: 'absolute', top: 0, left: 0, right: 0, height: 260, borderBottomLeftRadius: 40, borderBottomRightRadius: 40, overflow: 'hidden' },
     backButton: {
