@@ -85,8 +85,8 @@ export default function TicketScreen({ navigation }) {
                         <Text style={[styles.eventVenue, { color: colors.textSecondary }]}>{reg.eventVenue || 'Venue Managed'}</Text>
                     </View>
 
-                    <View style={[styles.qrWrapper, { borderColor: isDarkMode ? 'rgba(19, 91, 236, 0.4)' : colors.border }]}>
-                        <View style={[styles.qrInner, { backgroundColor: isDarkMode ? 'white' : 'white' }]}>
+                    <View style={[styles.qrWrapper, { borderColor: colors.primary + '30', backgroundColor: colors.surface }]}>
+                        <View style={[styles.qrInner, { backgroundColor: 'white' }]}>
                             <QRCode
                                 value={qrValue}
                                 size={140}
@@ -94,20 +94,23 @@ export default function TicketScreen({ navigation }) {
                                 backgroundColor="white"
                             />
                         </View>
-                        <View style={[styles.liveCodeBadge, { backgroundColor: isDarkMode ? 'rgba(19, 91, 236, 0.1)' : 'rgba(19, 91, 236, 0.05)', borderColor: colors.primary }]}>
+                        <View style={[styles.liveCodeBadge, { backgroundColor: colors.background, borderColor: colors.primary + '40' }]}>
                             <Animated.View style={[styles.liveDot, { backgroundColor: colors.primary, opacity: pulseAnim }]} />
                             <Text style={[styles.liveCodeText, { color: colors.primary }]}>LIVE TICKET</Text>
                         </View>
                     </View>
 
                     <View style={styles.statusContainer}>
-                        <View style={[styles.statusBadge, { backgroundColor: reg.utilized ? (isDarkMode ? 'rgba(239, 68, 68, 0.1)' : 'rgba(239, 68, 68, 0.05)') : (isDarkMode ? 'rgba(5, 150, 105, 0.1)' : 'rgba(5, 150, 105, 0.05)'), borderColor: reg.utilized ? 'rgba(239, 68, 68, 0.2)' : 'rgba(5, 150, 105, 0.2)' }]}>
+                        <View style={[styles.statusBadge, {
+                            backgroundColor: reg.utilized ? colors.error + '10' : colors.success + '10',
+                            borderColor: reg.utilized ? colors.error + '30' : colors.success + '30'
+                        }]}>
                             <MaterialCommunityIcons
                                 name={reg.utilized ? "close-circle" : "check-circle"}
                                 size={18}
-                                color={reg.utilized ? colors.error || "#ef4444" : colors.success || "#059669"}
+                                color={reg.utilized ? colors.error : colors.success}
                             />
-                            <Text style={[styles.statusText, { color: reg.utilized ? (colors.error || "#ef4444") : (colors.success || "#059669") }]}>
+                            <Text style={[styles.statusText, { color: reg.utilized ? colors.error : colors.success }]}>
                                 {reg.utilized ? 'Ticket Used' : 'Ticket Active'}
                             </Text>
                         </View>
@@ -193,7 +196,7 @@ export default function TicketScreen({ navigation }) {
                 </ScrollView>
             ) : (
                 <View style={styles.center}>
-                    <MaterialCommunityIcons name="ticket-off-outline" size={64} color={colors.textSecondary} />
+                    <MaterialCommunityIcons name="ticket-outline" size={64} color={colors.textSecondary} />
                     <Text style={[styles.emptyTitle, { color: colors.text }]}>No Tickets Yet</Text>
                     <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>Events you register for will appear here.</Text>
                     <TouchableOpacity
@@ -311,33 +314,33 @@ const styles = StyleSheet.create({
     eventTitle: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: '#111827',
         textAlign: 'center',
         marginBottom: 4,
     },
     eventDate: {
         fontSize: 14,
-        color: '#6b7280',
-        fontWeight: '500',
+        fontWeight: '600',
     },
     eventVenue: {
         fontSize: 12,
-        color: '#9ca3af',
         marginTop: 2,
+        opacity: 0.7,
     },
     qrWrapper: {
         position: 'relative',
-        padding: 4,
-        borderRadius: 12,
-        borderWidth: 3,
-        borderColor: 'rgba(19, 91, 236, 0.4)',
-        marginBottom: 28,
+        padding: 6,
+        borderRadius: 20,
+        borderWidth: 1.5,
+        marginBottom: 32,
         alignItems: 'center',
+        elevation: 4,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
     },
     qrInner: {
-        backgroundColor: 'white',
-        padding: 8,
-        borderRadius: 8,
+        padding: 12,
+        borderRadius: 16,
     },
     liveCodeBadge: {
         position: 'absolute',
@@ -345,23 +348,20 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
-        backgroundColor: '#eff6ff',
-        paddingHorizontal: 12,
-        paddingVertical: 4,
+        paddingHorizontal: 16,
+        paddingVertical: 6,
         borderRadius: 100,
         borderWidth: 1,
-        borderColor: '#dbeafe',
+        elevation: 2,
     },
     liveDot: {
         width: 8,
         height: 8,
         borderRadius: 4,
-        backgroundColor: '#135bec',
     },
     liveCodeText: {
         fontSize: 10,
         fontWeight: 'bold',
-        color: '#135bec',
         letterSpacing: 1,
     },
     statusContainer: {
@@ -373,15 +373,12 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         gap: 8,
-        backgroundColor: '#d1fae5',
         paddingHorizontal: 16,
         paddingVertical: 6,
         borderRadius: 100,
         borderWidth: 1,
-        borderColor: '#a7f3d0',
     },
     statusText: {
-        color: '#065f46',
         fontWeight: 'bold',
         fontSize: 14,
     },
@@ -414,8 +411,7 @@ const styles = StyleSheet.create({
     },
     detailValue: {
         fontSize: 14,
-        fontWeight: '600',
-        color: '#111827',
+        fontWeight: 'bold',
     },
     cutoutLeft: {
         position: 'absolute',

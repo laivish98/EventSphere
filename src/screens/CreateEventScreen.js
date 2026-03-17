@@ -158,13 +158,15 @@ export default function CreateEventScreen({ navigation }) {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar style={isDarkMode ? "light" : "dark"} />
 
-            {/* Custom Header */}
+            {/* Premium Header */}
             <View style={[styles.header, { backgroundColor: colors.background }]}>
                 <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => navigation.goBack()}>
-                    <MaterialCommunityIcons name="arrow-left" size={24} color={isDarkMode ? "white" : colors.text} />
+                    <MaterialCommunityIcons name="chevron-left" size={28} color={isDarkMode ? "white" : colors.text} />
                 </TouchableOpacity>
-                <Text style={[styles.headerTitle, { color: colors.text }]}>Post New Event</Text>
-                <View style={{ width: 40 }} />{/* Spacer */}
+                <Text style={[styles.headerTitle, { color: colors.text }]}>New Event</Text>
+                <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => Alert.alert('Help', 'Fill in the details to create your event.')}>
+                    <MaterialCommunityIcons name="help-circle-outline" size={22} color={colors.primary} />
+                </TouchableOpacity>
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
@@ -177,8 +179,8 @@ export default function CreateEventScreen({ navigation }) {
                     outlineColor={colors.border}
                     activeOutlineColor={colors.primary}
                     textColor={colors.text}
-                    placeholderTextColor={colors.textSecondary}
-                    theme={{ colors: { text: colors.text, placeholder: colors.textSecondary, primary: colors.primary, outline: colors.border } }}
+                    placeholder="Enter a catchy title"
+                    theme={{ roundness: 16, colors: { primary: colors.primary } }}
                 />
                 <TextInput
                     label="Description"
@@ -191,37 +193,34 @@ export default function CreateEventScreen({ navigation }) {
                     outlineColor={colors.border}
                     activeOutlineColor={colors.primary}
                     textColor={colors.text}
-                    placeholderTextColor={colors.textSecondary}
-                    theme={{ colors: { text: colors.text, placeholder: colors.textSecondary, primary: colors.primary, outline: colors.border } }}
+                    placeholder="What's happening?"
+                    theme={{ roundness: 16, colors: { primary: colors.primary } }}
                 />
-                <TextInput
-                    label="Date (e.g., 25 OCT 2024)"
-                    value={date}
-                    onChangeText={setDate}
-                    style={[styles.input, { backgroundColor: colors.surface }]}
-                    mode="outlined"
-                    outlineColor={colors.border}
-                    activeOutlineColor={colors.primary}
-                    textColor={colors.text}
-                    placeholderTextColor={colors.textSecondary}
-                    theme={{ colors: { text: colors.text, placeholder: colors.textSecondary, primary: colors.primary, outline: colors.border } }}
-                />
-                <TextInput
-                    label="Venue / Location"
-                    value={venue}
-                    onChangeText={setVenue}
-                    style={[styles.input, { backgroundColor: colors.surface }]}
-                    mode="outlined"
-                    outlineColor={colors.border}
-                    activeOutlineColor={colors.primary}
-                    textColor={colors.text}
-                    placeholderTextColor={colors.textSecondary}
-                    theme={{ colors: { text: colors.text, placeholder: colors.textSecondary, primary: colors.primary, outline: colors.border } }}
-                />
+                <View style={styles.gridRow}>
+                    <TextInput
+                        label="Date"
+                        value={date}
+                        onChangeText={setDate}
+                        style={[styles.input, styles.flexInput, { backgroundColor: colors.surface }]}
+                        mode="outlined"
+                        placeholder="25 OCT"
+                        theme={{ roundness: 16, colors: { primary: colors.primary } }}
+                    />
+                    <View style={{ width: 12 }} />
+                    <TextInput
+                        label="Venue"
+                        value={venue}
+                        onChangeText={setVenue}
+                        style={[styles.input, styles.flexInput, { backgroundColor: colors.surface }]}
+                        mode="outlined"
+                        placeholder="Main Hall"
+                        theme={{ roundness: 16, colors: { primary: colors.primary } }}
+                    />
+                </View>
 
                 <TextInput
                     label="Department"
-                    placeholder="e.g. Computer Science, Cultural Committee"
+                    placeholder="e.g. Computer Science"
                     value={department}
                     onChangeText={setDepartment}
                     style={[styles.input, { backgroundColor: colors.surface }]}
@@ -229,8 +228,7 @@ export default function CreateEventScreen({ navigation }) {
                     outlineColor={colors.border}
                     activeOutlineColor={colors.primary}
                     textColor={colors.text}
-                    placeholderTextColor={colors.textSecondary}
-                    theme={{ colors: { text: colors.text, placeholder: colors.textSecondary, primary: colors.primary, outline: colors.border } }}
+                    theme={{ roundness: 16, colors: { primary: colors.primary } }}
                 />
 
                 <View style={styles.categorySection}>
@@ -393,125 +391,117 @@ export default function CreateEventScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
         paddingTop: 60,
         paddingHorizontal: 16,
-        paddingBottom: 20,
+        paddingBottom: 24,
     },
     backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 44,
+        height: 44,
+        borderRadius: 14,
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1,
+        borderWidth: 1.5,
     },
     headerTitle: {
-        color: 'white',
-        fontSize: 18,
+        fontSize: 20,
         fontWeight: 'bold',
+        letterSpacing: -0.5,
     },
     scrollContent: {
         paddingHorizontal: 20,
-        paddingBottom: 40,
+        paddingBottom: 120,
     },
     input: {
         marginBottom: 16,
     },
+    gridRow: {
+        flexDirection: 'row',
+        width: '100%',
+    },
+    flexInput: {
+        flex: 1,
+    },
     categorySection: {
-        marginBottom: 20,
-        marginTop: 4,
+        marginVertical: 12,
     },
     sectionLabel: {
-        color: '#94a3b8',
-        fontSize: 14,
-        fontWeight: '600',
-        marginBottom: 12,
+        fontSize: 12,
+        fontWeight: 'bold',
+        marginBottom: 16,
         marginLeft: 4,
+        letterSpacing: 1,
+        textTransform: 'uppercase',
     },
     categoryScroll: {
         paddingRight: 20,
-        gap: 10,
+        gap: 12,
     },
     categoryChip: {
         flexDirection: 'row',
         alignItems: 'center',
         paddingHorizontal: 8,
         paddingVertical: 8,
-        borderRadius: 30,
-        backgroundColor: 'rgba(25, 34, 51, 0.7)',
-        borderWidth: 1,
-        borderColor: 'rgba(35, 47, 72, 0.5)',
-        marginRight: 10,
-    },
-    categoryChipSelected: {
-        backgroundColor: '#135bec',
-        borderColor: '#135bec',
-        elevation: 6,
-        shadowColor: '#135bec',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 6,
+        borderRadius: 20,
+        borderWidth: 1.5,
+        marginRight: 8,
+        elevation: 2,
     },
     iconCircle: {
-        width: 30,
-        height: 30,
-        borderRadius: 15,
-        backgroundColor: 'rgba(15, 23, 42, 0.5)',
+        width: 32,
+        height: 32,
+        borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
         marginRight: 10,
     },
     iconCircleActive: {
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
+        backgroundColor: 'rgba(255, 255, 255, 0.25)',
     },
     categoryChipText: {
-        color: '#94a3b8',
         fontSize: 14,
         fontWeight: '600',
-        paddingRight: 12,
+        paddingRight: 8,
     },
     categoryChipTextSelected: {
         color: 'white',
-        fontWeight: '700',
+        fontWeight: 'bold',
     },
     postButton: {
-        marginTop: 30,
-        backgroundColor: '#135bec',
-        height: 56,
-        borderRadius: 14,
+        marginTop: 20,
+        height: 60,
+        borderRadius: 20,
         alignItems: 'center',
         justifyContent: 'center',
-        shadowColor: '#135bec',
+        elevation: 8,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
-        shadowRadius: 8,
-        elevation: 6,
+        shadowRadius: 10,
     },
     postButtonText: {
         color: 'white',
         fontSize: 18,
         fontWeight: 'bold',
+        letterSpacing: 0.5,
     },
-    thumbnailSection: { marginBottom: 30 },
-    thumbnailContainer: { height: 200, borderRadius: 24, overflow: 'hidden', borderWidth: 1, position: 'relative' },
+    thumbnailSection: { marginVertical: 24 },
+    thumbnailContainer: { height: 220, borderRadius: 28, overflow: 'hidden', borderWidth: 1.5, position: 'relative', elevation: 4 },
     thumbnailImage: { width: '100%', height: '100%' },
-    thumbnailOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 80 },
-    shuffleButton: { position: 'absolute', bottom: 16, right: 16, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 8, elevation: 4 },
+    thumbnailOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 100 },
+    shuffleButton: { position: 'absolute', bottom: 20, right: 20, paddingHorizontal: 18, paddingVertical: 12, borderRadius: 14, flexDirection: 'row', alignItems: 'center', gap: 8, elevation: 6 },
     shuffleText: { color: 'white', fontWeight: 'bold', fontSize: 13 },
-    suggestionSection: { marginTop: 16 },
-    suggestionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10, marginLeft: 4 },
-    suggestionLabel: { fontSize: 11, fontWeight: 'bold', letterSpacing: 1 },
-    suggestionScroll: { gap: 10, paddingRight: 20 },
-    suggestionItem: { width: 80, height: 80, borderRadius: 12, overflow: 'hidden', borderWeight: 1, borderColor: 'transparent' },
+    suggestionSection: { marginTop: 20 },
+    suggestionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 12, marginLeft: 4 },
+    suggestionLabel: { fontSize: 11, fontWeight: '900', letterSpacing: 1.5 },
+    suggestionScroll: { gap: 12, paddingRight: 20 },
+    suggestionItem: { width: 84, height: 84, borderRadius: 18, overflow: 'hidden', borderWidth: 2, borderColor: 'transparent' },
     suggestionImage: { width: '100%', height: '100%' },
-    checkBadge: { position: 'absolute', top: 4, right: 4, width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
-    hintContainer: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 12, paddingHorizontal: 8 },
-    thumbnailHint: { fontSize: 12, flex: 1 },
+    checkBadge: { position: 'absolute', top: 6, right: 6, width: 22, height: 22, borderRadius: 11, alignItems: 'center', justifyContent: 'center', elevation: 2 },
+    hintContainer: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 14, paddingHorizontal: 8, opacity: 0.7 },
+    thumbnailHint: { fontSize: 12, flex: 1, fontWeight: '500' },
 });

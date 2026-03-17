@@ -20,6 +20,7 @@ import FollowListScreen from '../screens/FollowListScreen';
 import AboutScreen from '../screens/AboutScreen';
 import HelpCenterScreen from '../screens/HelpCenterScreen';
 import SecurityScreen from '../screens/SecurityScreen';
+import OrganizerExportPortal from '../screens/OrganizerExportPortal';
 
 const Stack = createNativeStackNavigator();
 
@@ -50,6 +51,7 @@ const linking = {
             About: 'about',
             HelpCenter: 'help',
             Security: 'security',
+            OrganizerExportPortal: 'export-portal',
         },
     },
 };
@@ -80,6 +82,7 @@ export default function AppNavigator() {
                 <Stack.Screen name="About" component={AboutScreen} />
                 <Stack.Screen name="HelpCenter" component={HelpCenterScreen} />
                 <Stack.Screen name="Security" component={SecurityScreen} />
+                <Stack.Screen name="OrganizerExportPortal" component={OrganizerExportPortal} />
                 {/* Add more screens here */}
             </Stack.Navigator>
         </NavigationContainer>

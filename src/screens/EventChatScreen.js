@@ -105,6 +105,7 @@ export default function EventChatScreen({ route, navigation }) {
             text: inputText.trim(),
             senderId: user.uid,
             senderName: userData?.name || 'Anonymous',
+            senderEmail: user.email,
             timestamp: serverTimestamp(),
         };
 

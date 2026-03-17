@@ -10,19 +10,25 @@ const { width } = Dimensions.get('window');
 
 const RoleCard = ({ role, icon, label, selected, onSelect, colors, isDarkMode }) => (
     <TouchableOpacity
-        style={[styles.roleCard, { backgroundColor: colors.surface, borderColor: selected ? colors.primary : colors.border }, selected && { backgroundColor: isDarkMode ? 'rgba(19, 91, 236, 0.1)' : 'rgba(19, 91, 236, 0.05)' }]}
+        style={[styles.roleCard, { backgroundColor: colors.surface, borderColor: selected ? colors.primary : colors.border }]}
         onPress={() => onSelect(role)}
         activeOpacity={0.7}
     >
+        {selected && (
+            <LinearGradient
+                colors={[colors.primary + '15', colors.primary + '05']}
+                style={StyleSheet.absoluteFill}
+            />
+        )}
         <MaterialCommunityIcons
             name={icon}
-            size={28}
+            size={32}
             color={selected ? colors.primary : colors.textSecondary}
         />
-        <Text style={[styles.roleLabel, { color: selected ? (isDarkMode ? 'white' : colors.text) : colors.textSecondary }]}>{label}</Text>
+        <Text style={[styles.roleLabel, { color: selected ? colors.text : colors.textSecondary }]}>{label}</Text>
         {selected && (
             <View style={[styles.checkBadge, { backgroundColor: colors.primary }]}>
-                <MaterialCommunityIcons name="check" size={10} color="white" />
+                <MaterialCommunityIcons name="check" size={12} color="white" />
             </View>
         )}
     </TouchableOpacity>
@@ -125,16 +131,22 @@ export default function SignupScreen({ navigation }) {
 
     const GenderCard = ({ value, icon, selected, onSelect, colors, isDarkMode }) => (
         <TouchableOpacity
-            style={[styles.genderCard, { backgroundColor: colors.surface, borderColor: selected ? colors.primary : colors.border }, selected && { backgroundColor: isDarkMode ? 'rgba(19, 91, 236, 0.1)' : 'rgba(19, 91, 236, 0.05)' }]}
+            style={[styles.genderCard, { backgroundColor: colors.surface, borderColor: selected ? colors.primary : colors.border }]}
             onPress={() => onSelect(value)}
             activeOpacity={0.7}
         >
+            {selected && (
+                <LinearGradient
+                    colors={[colors.primary + '10', 'transparent']}
+                    style={StyleSheet.absoluteFill}
+                />
+            )}
             <MaterialCommunityIcons
                 name={icon}
-                size={24}
+                size={22}
                 color={selected ? colors.primary : colors.textSecondary}
             />
-            <Text style={[styles.genderLabel, { color: selected ? (isDarkMode ? 'white' : colors.text) : colors.textSecondary }]}>{value}</Text>
+            <Text style={[styles.genderLabel, { color: selected ? colors.text : colors.textSecondary }]}>{value}</Text>
         </TouchableOpacity>
     );
 
@@ -216,9 +228,9 @@ export default function SignupScreen({ navigation }) {
                 {/* Form Inputs */}
                 <View style={styles.formContainer}>
                     <View style={styles.inputGroup}>
-                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Full Name</Text>
+                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>FULL NAME</Text>
                         <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <MaterialCommunityIcons name="account-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                            <MaterialCommunityIcons name="account-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                             <TextInput
                                 style={[styles.input, { color: colors.text }]}
                                 placeholder="Jane Doe"
@@ -230,9 +242,9 @@ export default function SignupScreen({ navigation }) {
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Email Address</Text>
+                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>EMAIL ADDRESS</Text>
                         <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <MaterialCommunityIcons name="email-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                            <MaterialCommunityIcons name="email-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                             <TextInput
                                 style={[styles.input, { color: colors.text }]}
                                 placeholder="jane@college.edu"
@@ -246,9 +258,9 @@ export default function SignupScreen({ navigation }) {
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Password</Text>
+                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>PASSWORD</Text>
                         <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <MaterialCommunityIcons name="lock-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                            <MaterialCommunityIcons name="lock-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                             <TextInput
                                 style={[styles.input, { color: colors.text }]}
                                 placeholder="••••••••"
@@ -258,15 +270,15 @@ export default function SignupScreen({ navigation }) {
                                 secureTextEntry={!showPassword}
                             />
                             <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-                                <MaterialCommunityIcons name={showPassword ? "eye" : "eye-off"} size={20} color={colors.textSecondary} />
+                                <MaterialCommunityIcons name={showPassword ? "eye-outline" : "eye-off-outline"} size={20} color={colors.textSecondary} />
                             </TouchableOpacity>
                         </View>
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>College / University</Text>
+                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>COLLEGE / UNIVERSITY</Text>
                         <TouchableOpacity style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => setShowCollegeModal(true)}>
-                            <View style={[styles.collegeIconBadge, { backgroundColor: isDarkMode ? 'rgba(19, 91, 236, 0.1)' : 'rgba(19, 91, 236, 0.05)' }]}>
+                            <View style={[styles.collegeIconBadge, { backgroundColor: colors.primary + '10' }]}>
                                 <MaterialCommunityIcons name="bank-outline" size={18} color={colors.primary} />
                             </View>
                             <Text style={[styles.input, { textAlignVertical: 'center', paddingTop: Platform.OS === 'android' ? 14 : 0, color: college ? colors.text : colors.textSecondary }]} numberOfLines={1}>
@@ -287,8 +299,14 @@ export default function SignupScreen({ navigation }) {
             {/* Bottom Actions */}
             <View style={[styles.bottomActionContainer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
                 <TouchableOpacity onPress={handleSignup} disabled={loading} activeOpacity={0.9}>
-                    <View style={[styles.primaryButton, { backgroundColor: colors.primary }]}>
-                        <Text style={styles.primaryButtonText}>{loading ? 'Creating...' : 'Create Account'}</Text>
+                    <View style={[styles.primaryButton, { shadowColor: colors.primary, elevation: 8 }]}>
+                        <LinearGradient
+                            colors={[colors.primary, colors.primaryLight]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={StyleSheet.absoluteFill}
+                        />
+                        <Text style={styles.primaryButtonText}>{loading ? 'Creating Account...' : 'Join EventSphere'}</Text>
                     </View>
                 </TouchableOpacity>
 
@@ -358,53 +376,47 @@ export default function SignupScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#101622' },
-    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 50, paddingHorizontal: 16, paddingBottom: 16 },
-    backButton: { width: 44, height: 44, borderRadius: 12, backgroundColor: '#1a2233', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#232f48' },
-    headerTitle: { fontSize: 13, fontWeight: 'bold', color: '#94a3b8', letterSpacing: 2 },
-    scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
-    titleContainer: { marginBottom: 32, marginTop: 10 },
-    screenTitle: { fontSize: 32, fontWeight: 'bold', color: 'white', letterSpacing: -0.5 },
-    screenSubtitle: { fontSize: 16, color: '#94a3b8', marginTop: 8 },
-    section: { marginBottom: 32 },
-    sectionLabel: { fontSize: 12, fontWeight: 'bold', color: '#135bec', marginBottom: 16, letterSpacing: 1 },
-    roleContainer: { flexDirection: 'row', gap: 12 },
-    roleCard: { flex: 1, aspectRatio: 1, borderRadius: 20, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
-    roleCardSelected: { borderColor: '#135bec', backgroundColor: 'rgba(19, 91, 236, 0.1)' },
-    roleLabel: { marginTop: 10, fontSize: 12, fontWeight: '600', color: '#94a3b8' },
-    roleLabelSelected: { color: 'white' },
-    checkBadge: { position: 'absolute', top: 10, right: 10, width: 18, height: 18, borderRadius: 9, backgroundColor: '#135bec', alignItems: 'center', justifyContent: 'center' },
-    genderContainer: { flexDirection: 'row', gap: 12 },
-    genderCard: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: 16, height: 48, borderWidth: 1, gap: 8 },
-    genderCardSelected: { borderColor: '#135bec', backgroundColor: 'rgba(19, 91, 236, 0.1)' },
-    genderLabel: { fontSize: 13, fontWeight: '600', color: '#94a3b8' },
-    genderLabelSelected: { color: 'white' },
-    formContainer: { gap: 20 },
-    inputGroup: { gap: 8 },
-    inputLabel: { fontSize: 14, fontWeight: '600', color: '#cbd5e1', marginLeft: 4 },
-    inputWrapper: { flexDirection: 'row', alignItems: 'center', borderRadius: 16, height: 56, borderWidth: 1 },
-    inputIcon: { marginLeft: 16, marginRight: 12 },
-    input: { flex: 1, height: '100%', fontSize: 15, color: 'white' },
-    eyeIcon: { padding: 12, marginRight: 6 },
-    collegeIconBadge: { width: 36, height: 36, borderRadius: 10, backgroundColor: 'rgba(19, 91, 236, 0.1)', alignItems: 'center', justifyContent: 'center', marginLeft: 10, marginRight: 10 },
-    termsText: { textAlign: 'center', fontSize: 12, color: '#64748b', marginTop: 32, lineHeight: 20 },
     container: { flex: 1 },
-    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 50, paddingHorizontal: 16, paddingBottom: 16 },
-    backButton: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
-    primaryButton: { height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center', backgroundColor: '#135bec' },
-    primaryButtonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 60, paddingHorizontal: 16, paddingBottom: 16 },
+    backButton: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', borderWidth: 1.5 },
+    headerTitle: { fontSize: 13, fontWeight: '900', letterSpacing: 2 },
+    scrollContent: { paddingHorizontal: 24, paddingBottom: 140 },
+    titleContainer: { marginBottom: 32, marginTop: 10 },
+    screenTitle: { fontSize: 34, fontWeight: 'bold', letterSpacing: -1 },
+    screenSubtitle: { fontSize: 16, marginTop: 8, opacity: 0.7 },
+    section: { marginBottom: 32 },
+    sectionLabel: { fontSize: 12, fontWeight: '900', marginBottom: 16, letterSpacing: 1.5, textTransform: 'uppercase' },
+    roleContainer: { flexDirection: 'row', gap: 12 },
+    roleCard: { flex: 1, aspectRatio: 1, borderRadius: 24, alignItems: 'center', justifyContent: 'center', borderWidth: 2, overflow: 'hidden' },
+    roleLabel: { marginTop: 12, fontSize: 14, fontWeight: 'bold' },
+    checkBadge: { position: 'absolute', top: 12, right: 12, width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+    genderContainer: { flexDirection: 'row', gap: 12 },
+    genderCard: { flex: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', borderRadius: 18, height: 52, borderWidth: 1.5, gap: 8, overflow: 'hidden' },
+    genderLabel: { fontSize: 14, fontWeight: 'bold' },
+    formContainer: { gap: 24 },
+    inputGroup: { gap: 8 },
+    inputLabel: { fontSize: 11, fontWeight: 'bold', marginLeft: 4, letterSpacing: 1, textTransform: 'uppercase' },
+    inputWrapper: { flexDirection: 'row', alignItems: 'center', borderRadius: 20, height: 60, borderWidth: 1.5 },
+    inputIcon: { marginLeft: 16, marginRight: 12 },
+    input: { flex: 1, height: '100%', fontSize: 16, fontWeight: '500' },
+    eyeIcon: { padding: 12, marginRight: 6 },
+    collegeIconBadge: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginLeft: 10, marginRight: 10 },
+    termsText: { textAlign: 'center', fontSize: 12, marginTop: 32, lineHeight: 20, opacity: 0.6 },
+    bottomActionContainer: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 24, paddingBottom: 40, borderTopWidth: 1 },
+    primaryButton: { height: 60, borderRadius: 20, alignItems: 'center', justifyContent: 'center', overflow: 'hidden', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 12 },
+    primaryButtonText: { color: 'white', fontSize: 18, fontWeight: 'bold', letterSpacing: 0.2 },
     loginLinkContainer: { flexDirection: 'row', justifyContent: 'center', marginTop: 20 },
-    loginText: { color: '#94a3b8', fontSize: 14 },
-    loginLink: { color: '#135bec', fontWeight: 'bold', fontSize: 14 },
+    loginText: { fontSize: 14, opacity: 0.7 },
+    loginLink: { fontWeight: 'bold', fontSize: 14 },
     modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'flex-end' },
-    modalContent: { backgroundColor: '#1a2233', borderTopLeftRadius: 30, borderTopRightRadius: 30, padding: 24, maxHeight: '80%' },
+    modalContent: { borderTopLeftRadius: 32, borderTopRightRadius: 32, padding: 24, maxHeight: '85%' },
     modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-    modalTitle: { fontSize: 20, fontWeight: 'bold', color: 'white' },
-    cancelText: { color: '#135bec', fontWeight: 'bold' },
-    collegeItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 16, borderBottomWidth: 1, borderBottomColor: '#232f48' },
-    collegeInitialBadge: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#232f48', alignItems: 'center', justifyContent: 'center', marginRight: 16 },
-    collegeInitial: { fontWeight: 'bold', fontSize: 16 },
-    collegeName: { flex: 1, fontSize: 16, color: '#cbd5e1' },
-    searchWrapper: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, paddingHorizontal: 12, height: 44, borderWidth: 1, marginBottom: 16 },
-    searchInput: { flex: 1, marginLeft: 8, fontSize: 14, height: '100%' },
+    modalTitle: { fontSize: 22, fontWeight: 'bold' },
+    cancelText: { fontWeight: 'bold' },
+    collegeItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 18, borderBottomWidth: 1 },
+    collegeInitialBadge: { width: 44, height: 44, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
+    collegeInitial: { fontWeight: '900', fontSize: 18 },
+    collegeName: { flex: 1, fontSize: 16, fontWeight: '600' },
+    searchWrapper: { flexDirection: 'row', alignItems: 'center', borderRadius: 16, paddingHorizontal: 16, height: 52, borderWidth: 1.5, marginBottom: 16 },
+    searchInput: { flex: 1, marginLeft: 10, fontSize: 15, height: '100%' },
 });

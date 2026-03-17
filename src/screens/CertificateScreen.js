@@ -136,7 +136,7 @@ export default function CertificateScreen({ route, navigation }) {
                                 <View style={styles.bottomSection}>
                                     <View style={styles.divider} />
                                     <Text style={styles.certDate}>{date}</Text>
-                                    <View pointerEvents="none">
+                                    <View style={{ pointerEvents: 'none' }}>
                                         <View style={styles.verifiedBadge}>
                                             <MaterialCommunityIcons name="check-decagram" size={16} color={colors.primary} />
                                             <Text style={[styles.verifiedText, { color: colors.primary }]}>EventSphere Verified</Text>

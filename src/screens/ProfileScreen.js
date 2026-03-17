@@ -21,10 +21,14 @@ const MenuButton = ({ icon, label, onPress, colors, showBadge, badgeCount, color
     <TouchableOpacity
         style={[styles.menuButton, !isLast && { borderBottomWidth: 1, borderBottomColor: colors.border }]}
         onPress={onPress}
+        activeOpacity={0.6}
     >
-        <View style={[styles.menuIconContainer, { backgroundColor: color + '15' }]}>
+        <LinearGradient
+            colors={[color + '15', color + '05']}
+            style={styles.menuIconContainer}
+        >
             <MaterialCommunityIcons name={icon} size={22} color={color} />
-        </View>
+        </LinearGradient>
         <Text style={[styles.menuLabel, { color: colors.text }]}>{label}</Text>
         {showBadge && (
             <View style={[styles.badgeContainer, { backgroundColor: colors.primary }]}>
@@ -117,36 +121,43 @@ export default function ProfileScreen({ navigation }) {
 
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Header Profile Section */}
-                <View style={[styles.profileHeader, { paddingTop: Platform.OS === 'ios' ? 60 : 40 }]}>
+                <View style={styles.profileHeader}>
+                    <LinearGradient
+                        colors={[colors.primary, colors.primary + '80']}
+                        style={styles.headerGradient}
+                    />
+
                     {/* Back Button */}
                     <TouchableOpacity
-                        style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
+                        style={[styles.backButton, { backgroundColor: 'rgba(255,255,255,0.15)' }]}
                         onPress={() => navigation.goBack()}
                     >
-                        <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
+                        <MaterialCommunityIcons name="chevron-left" size={28} color="white" />
                     </TouchableOpacity>
 
                     <View style={styles.profileInfoMain}>
-                        <View style={styles.avatarWrapper}>
-                            <Image
-                                source={{
-                                    uri: (userData?.avatarUrl && !userData.avatarUrl.includes('iran.liara.run'))
-                                        ? userData.avatarUrl
-                                        : `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'User')}&background=random&color=fff`
-                                }}
-                                style={[styles.avatar, { borderColor: colors.primary + '30' }]}
-                                onError={() => {
-                                    console.log('Profile avatar load error, falling back');
-                                }}
-                            />
+                        <View style={styles.avatarContainer}>
+                            <View style={[styles.avatarWrapper, { borderColor: 'rgba(255,255,255,0.3)', backgroundColor: 'rgba(255,255,255,0.1)' }]}>
+                                <Image
+                                    source={{
+                                        uri: (userData?.avatarUrl && !userData.avatarUrl.includes('iran.liara.run'))
+                                            ? userData.avatarUrl
+                                            : `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'User')}&background=random&color=fff`
+                                    }}
+                                    style={styles.avatar}
+                                />
+                            </View>
+                            <TouchableOpacity style={[styles.editAvatarButton, { backgroundColor: colors.primary }]}>
+                                <MaterialCommunityIcons name="camera" size={16} color="white" />
+                            </TouchableOpacity>
                         </View>
 
-                        <Text style={[styles.userName, { color: colors.text }]}>{userData.name || 'User'}</Text>
-                        <Text style={[styles.userEmail, { color: colors.textSecondary }]}>{user.email}</Text>
+                        <Text style={styles.userNameText}>{userData.name || 'User'}</Text>
+                        <Text style={styles.userEmailText}>{user.email}</Text>
 
-                        <View style={[styles.roleBadge, { backgroundColor: colors.primary + '15' }]}>
-                            <MaterialCommunityIcons name={userData.role === 'admin' ? "shield-check" : "school"} size={14} color={colors.primary} />
-                            <Text style={[styles.roleText, { color: colors.primary }]}>
+                        <View style={styles.roleBadgeContainer}>
+                            <MaterialCommunityIcons name={userData.role === 'admin' ? "shield-check" : "school"} size={14} color="white" />
+                            <Text style={styles.roleBadgeText}>
                                 {userData.role === 'admin' ? 'Event Organizer' : 'Student Pro'}
                             </Text>
                         </View>
@@ -261,41 +272,41 @@ export default function ProfileScreen({ navigation }) {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    profileHeader: { alignItems: 'center', paddingHorizontal: 24, paddingBottom: 24, position: 'relative' },
+    profileHeader: { paddingHorizontal: 24, paddingBottom: 24, position: 'relative', overflow: 'hidden' },
+    headerGradient: { position: 'absolute', top: 0, left: 0, right: 0, height: 280, borderBottomLeftRadius: 40, borderBottomRightRadius: 40 },
     backButton: {
-        position: 'absolute',
-        top: Platform.OS === 'ios' ? 60 : 40,
-        left: 20,
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        marginTop: Platform.OS === 'ios' ? 60 : 40,
+        marginBottom: 20,
+        width: 44,
+        height: 44,
+        borderRadius: 22,
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 1,
         zIndex: 10,
     },
-    profileInfoMain: { alignItems: 'center' },
-    avatarWrapper: { position: 'relative', marginBottom: 16 },
-    avatar: { width: 100, height: 100, borderRadius: 50, borderWidth: 3 },
-    editAvatarButton: { position: 'absolute', bottom: 0, right: 0, width: 32, height: 32, borderRadius: 16, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: '#101622' },
-    userName: { fontSize: 24, fontWeight: 'bold', marginBottom: 4 },
-    userEmail: { fontSize: 14, marginBottom: 16, opacity: 0.7 },
-    roleBadge: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 20, gap: 6 },
-    roleText: { fontSize: 12, fontWeight: 'bold' },
-    statsRow: { flexDirection: 'row', marginTop: 32, width: '100%', borderRadius: 24, padding: 20, borderWidth: 1, justifyContent: 'space-around', alignItems: 'center' },
+    profileInfoMain: { alignItems: 'center', marginTop: 10 },
+    avatarContainer: { position: 'relative', marginBottom: 16 },
+    avatarWrapper: { padding: 4, borderRadius: 52, borderWidth: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.2, shadowRadius: 16 },
+    avatar: { width: 92, height: 92, borderRadius: 46 },
+    editAvatarButton: { position: 'absolute', bottom: 0, right: 0, width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'white', elevation: 4 },
+    userNameText: { fontSize: 28, fontWeight: 'bold', color: 'white', letterSpacing: -1 },
+    userEmailText: { fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 20 },
+    roleBadgeContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, gap: 6, backgroundColor: 'rgba(255,255,255,0.15)' },
+    roleBadgeText: { fontSize: 13, fontWeight: 'bold', color: 'white' },
+    statsRow: { flexDirection: 'row', marginTop: 32, width: '100%', borderRadius: 28, padding: 22, borderWidth: 1.5, justifyContent: 'space-around', alignItems: 'center', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.1, shadowRadius: 20 },
     statItem: { alignItems: 'center' },
-    statValue: { fontSize: 18, fontWeight: 'bold', marginBottom: 2 },
-    statLabel: { fontSize: 12, fontWeight: '500' },
-    statDivider: { width: 1, height: 30 },
-    contentSections: { paddingHorizontal: 20, marginTop: 10 },
-    sectionHeading: { fontSize: 12, fontWeight: 'bold', letterSpacing: 1, marginLeft: 4, marginBottom: 12 },
-    menuCard: { borderRadius: 24, borderWidth: 1, overflow: 'hidden' },
-    menuButton: { flexDirection: 'row', alignItems: 'center', padding: 16 },
-    menuIconContainer: { width: 40, height: 40, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
-    menuLabel: { flex: 1, fontSize: 15, fontWeight: '600' },
-    badgeContainer: { backgroundColor: '#3b82f6', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 10, marginRight: 8 },
-    badgeText: { color: 'white', fontSize: 11, fontWeight: 'bold' },
-    logoutButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 32, padding: 18, borderRadius: 24, gap: 12 },
-    logoutText: { color: '#ef4444', fontSize: 16, fontWeight: 'bold' },
-    versionText: { textAlign: 'center', fontSize: 12, marginTop: 24, opacity: 0.5 },
+    statValue: { fontSize: 20, fontWeight: 'bold', marginBottom: 2 },
+    statLabel: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, opacity: 0.6 },
+    statDivider: { width: 1.5, height: 36, opacity: 0.3 },
+    contentSections: { paddingHorizontal: 20, marginTop: 40 },
+    sectionHeading: { fontSize: 12, fontWeight: '900', letterSpacing: 1.5, marginLeft: 8, marginBottom: 16 },
+    menuCard: { borderRadius: 32, borderWidth: 1.5, overflow: 'hidden', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 12 },
+    menuButton: { flexDirection: 'row', alignItems: 'center', padding: 20 },
+    menuIconContainer: { width: 46, height: 46, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginRight: 18 },
+    menuLabel: { flex: 1, fontSize: 16, fontWeight: '600' },
+    badgeContainer: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 12, marginRight: 10 },
+    badgeText: { color: 'white', fontSize: 11, fontWeight: '900' },
+    logoutButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 32, padding: 22, borderRadius: 32, gap: 12 },
+    logoutText: { color: '#ef4444', fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 },
+    versionText: { textAlign: 'center', fontSize: 12, marginVertical: 32, opacity: 0.5, letterSpacing: 1.5 },
 });

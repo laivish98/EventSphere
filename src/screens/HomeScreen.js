@@ -21,7 +21,8 @@ const dummyFeatured = [
         date: '24',
         month: 'OCT',
         location: 'Central Park Arena',
-        price: 45
+        price: 45,
+        createdBy: 'dummy_organizer_1'
     },
     {
         id: '2',
@@ -31,7 +32,8 @@ const dummyFeatured = [
         date: '12',
         month: 'NOV',
         location: 'Silicon Valley Hub',
-        price: 0
+        price: 0,
+        createdBy: 'dummy_organizer_2'
     }
 ];
 
@@ -84,20 +86,23 @@ export default function HomeScreen({ navigation }) {
                 style={styles.featuredImage}
             />
             <LinearGradient
-                colors={['transparent', 'rgba(16, 22, 34, 0.95)']}
+                colors={['transparent', 'rgba(15, 23, 42, 0.5)', 'rgba(15, 23, 42, 0.95)']}
                 style={StyleSheet.absoluteFill}
             />
             <View style={styles.featuredContent}>
-                <View style={styles.featuredTextContainer}>
-                    <View style={styles.categoryBadge}>
-                        <Text style={styles.categoryText}>{item.category || 'Event'}</Text>
+                <BlurView intensity={20} style={styles.featuredBlur}>
+                    <View style={[styles.categoryBadge, { backgroundColor: colors.primary + '30', borderColor: colors.primary + '50' }]}>
+                        <Text style={[styles.categoryText, { color: colors.primaryLight }]}>{item.category || 'Event'}</Text>
                     </View>
-                    <Text style={styles.featuredTitle} numberOfLines={2}>{item.title}</Text>
+                    <Text style={[styles.featuredTitle, { color: 'white' }]} numberOfLines={2}>{item.title}</Text>
                     <View style={styles.featuredMeta}>
-                        <MaterialCommunityIcons name="clock-outline" size={14} color="#94a3b8" />
-                        <Text style={styles.featuredSubtitle}>{item.date}</Text>
+                        <MaterialCommunityIcons name="calendar-month" size={16} color="rgba(255,255,255,0.7)" />
+                        <Text style={[styles.featuredSubtitle, { color: 'rgba(255,255,255,0.7)' }]}>{item.date}</Text>
+                        <View style={{ width: 4, height: 4, borderRadius: 2, backgroundColor: 'rgba(255,255,255,0.3)', marginHorizontal: 8 }} />
+                        <MaterialCommunityIcons name="map-marker" size={16} color="rgba(255,255,255,0.7)" />
+                        <Text style={[styles.featuredSubtitle, { color: 'rgba(255,255,255,0.7)' }]} numberOfLines={1}>{item.location || 'TBA'}</Text>
                     </View>
-                </View>
+                </BlurView>
             </View>
         </TouchableOpacity>
     );
@@ -250,23 +255,25 @@ export default function HomeScreen({ navigation }) {
                             key={cat.id}
                             style={[
                                 styles.categoryChip,
-                                activeCategory === cat.id && styles.categoryChipActive
+                                { backgroundColor: colors.surface, borderColor: colors.border },
+                                activeCategory === cat.id && { backgroundColor: colors.primary, borderColor: colors.primary }
                             ]}
                             onPress={() => setActiveCategory(cat.id)}
                         >
                             <View style={[
                                 styles.iconCircle,
-                                activeCategory === cat.id && styles.iconCircleActive
+                                activeCategory === cat.id && { backgroundColor: 'rgba(255,255,255,0.2)' }
                             ]}>
                                 <MaterialCommunityIcons
                                     name={cat.icon}
                                     size={18}
-                                    color={activeCategory === cat.id ? 'white' : '#94a3b8'}
+                                    color={activeCategory === cat.id ? 'white' : colors.textSecondary}
                                 />
                             </View>
                             <Text style={[
                                 styles.categoryLabel,
-                                activeCategory === cat.id && styles.categoryLabelActive
+                                { color: colors.textSecondary },
+                                activeCategory === cat.id && { color: 'white' }
                             ]}>
                                 {cat.label}
                             </Text>
@@ -285,13 +292,15 @@ export default function HomeScreen({ navigation }) {
                             key={filter}
                             style={[
                                 styles.dateFilterChip,
-                                activeDateFilter === filter && styles.dateFilterChipActive
+                                { backgroundColor: colors.surfaceLight, borderColor: colors.border },
+                                activeDateFilter === filter && { backgroundColor: colors.primary + '20', borderColor: colors.primary }
                             ]}
                             onPress={() => setActiveDateFilter(filter)}
                         >
                             <Text style={[
                                 styles.dateFilterLabel,
-                                activeDateFilter === filter && styles.dateFilterLabelActive
+                                { color: colors.textSecondary },
+                                activeDateFilter === filter && { color: colors.primary, fontWeight: 'bold' }
                             ]}>
                                 {filter}
                             </Text>
@@ -440,7 +449,6 @@ const styles = StyleSheet.create({
     username: {
         fontSize: 16,
         fontWeight: 'bold',
-        color: 'white',
     },
     iconButton: {
         width: 40,
@@ -466,7 +474,6 @@ const styles = StyleSheet.create({
     },
     searchInput: {
         flex: 1,
-        color: 'white',
         fontSize: 15,
         marginLeft: 10,
     },
@@ -486,7 +493,6 @@ const styles = StyleSheet.create({
     sectionTitle: {
         fontSize: 20,
         fontWeight: 'bold',
-        color: 'white',
     },
     featuredList: {
         paddingLeft: 20,
@@ -514,10 +520,16 @@ const styles = StyleSheet.create({
         bottom: 0,
         left: 0,
         right: 0,
-        padding: 20,
+        padding: 16,
+    },
+    featuredBlur: {
+        borderRadius: 20,
+        padding: 16,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
     },
     featuredTextContainer: {
-        flexDirection: 'column',
         gap: 8,
     },
     dateBadge: {
@@ -545,24 +557,22 @@ const styles = StyleSheet.create({
     },
     categoryBadge: {
         alignSelf: 'flex-start',
-        backgroundColor: '#135bec',
-        paddingHorizontal: 12,
+        paddingHorizontal: 10,
         paddingVertical: 4,
-        borderRadius: 100,
+        borderRadius: 8,
+        borderWidth: 1,
+        marginBottom: 10,
     },
     categoryText: {
-        color: 'white',
         fontSize: 10,
         fontWeight: 'bold',
         textTransform: 'uppercase',
+        letterSpacing: 1,
     },
     featuredTitle: {
         fontSize: 22,
         fontWeight: 'bold',
-        color: 'white',
-        textShadowColor: 'rgba(0, 0, 0, 0.75)',
-        textShadowOffset: { width: -1, height: 1 },
-        textShadowRadius: 10,
+        marginBottom: 8,
     },
     featuredMeta: {
         flexDirection: 'row',
@@ -594,10 +604,7 @@ const styles = StyleSheet.create({
         marginRight: 4,
     },
     categoryChipActive: {
-        backgroundColor: '#135bec',
-        borderColor: '#135bec',
         elevation: 8,
-        shadowColor: '#135bec',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.3,
         shadowRadius: 8,
@@ -634,8 +641,7 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(35, 47, 72, 0.3)',
     },
     dateFilterChipActive: {
-        backgroundColor: 'rgba(19, 91, 236, 0.2)',
-        borderColor: '#135bec',
+        backgroundColor: 'rgba(59, 130, 246, 0.2)',
     },
     dateFilterLabel: {
         fontSize: 12,
@@ -643,7 +649,6 @@ const styles = StyleSheet.create({
         fontWeight: '500',
     },
     dateFilterLabelActive: {
-        color: '#135bec',
         fontWeight: 'bold',
     },
     eventList: {
@@ -768,18 +773,15 @@ const styles = StyleSheet.create({
     },
     navLabelActive: {
         fontSize: 10,
-        color: '#135bec',
         fontWeight: 'bold',
     },
     fab: {
         width: 56,
         height: 56,
         borderRadius: 28,
-        backgroundColor: '#135bec',
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: -30,
-        shadowColor: '#135bec',
         shadowOffset: { width: 0, height: 4 },
         shadowOpacity: 0.5,
         shadowRadius: 10,

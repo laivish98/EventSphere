@@ -55,25 +55,25 @@ export default function LoginScreen({ navigation }) {
                 {/* Hero Section */}
                 <View style={styles.heroContainer}>
                     <ImageBackground
-                        source={{ uri: 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=2670&auto=format&fit=crop' }} // Concert/Event Crowd Image
+                        source={{ uri: 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2670&auto=format&fit=crop' }} // Premium Event Crowd
                         style={styles.heroImage}
                         resizeMode="cover"
                     >
                         <LinearGradient
-                            colors={isDarkMode ? ['transparent', 'rgba(16, 22, 34, 0.4)', '#101622'] : ['transparent', 'rgba(255, 255, 255, 0.4)', colors.background]}
+                            colors={isDarkMode ? ['transparent', colors.background + '80', colors.background] : ['transparent', 'rgba(255, 255, 255, 0.4)', colors.background]}
                             style={StyleSheet.absoluteFill}
                         />
 
                         <View style={styles.heroContent}>
                             <View style={styles.logoRow}>
-                                <View style={[styles.logoIcon, { backgroundColor: colors.primary }]}>
+                                <View style={[styles.logoIcon, { backgroundColor: colors.primary, shadowColor: colors.primary }]}>
                                     <MaterialCommunityIcons name="ticket-confirmation" size={24} color="white" />
                                 </View>
-                                <Text style={[styles.brandName, { color: isDarkMode ? 'white' : colors.text }]}>EventSphere</Text>
+                                <Text style={[styles.brandName, { color: colors.text }]}>EventSphere</Text>
                             </View>
-                            <Text style={[styles.heroTitle, { color: isDarkMode ? 'white' : colors.text }]}>
+                            <Text style={[styles.heroTitle, { color: colors.text }]}>
                                 Experience{'\n'}
-                                <Text style={[styles.heroHighlight, { color: colors.primary }]}>Campus Life.</Text>
+                                <Text style={{ color: colors.primary }}>Campus Life.</Text>
                             </Text>
                         </View>
                     </ImageBackground>
@@ -86,7 +86,7 @@ export default function LoginScreen({ navigation }) {
                     <View style={styles.inputGroup}>
                         <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>EMAIL ADDRESS</Text>
                         <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <MaterialCommunityIcons name="email" size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                            <MaterialCommunityIcons name="email-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                             <TextInput
                                 style={[styles.input, { color: colors.text }]}
                                 placeholder="student@university.edu"
@@ -102,7 +102,7 @@ export default function LoginScreen({ navigation }) {
                     <View style={styles.inputGroup}>
                         <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>PASSWORD</Text>
                         <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <MaterialCommunityIcons name="lock" size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                            <MaterialCommunityIcons name="lock-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                             <TextInput
                                 style={[styles.input, { color: colors.text }]}
                                 placeholder="••••••••"
@@ -112,7 +112,7 @@ export default function LoginScreen({ navigation }) {
                                 secureTextEntry={!showPassword}
                             />
                             <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-                                <MaterialCommunityIcons name={showPassword ? "eye" : "eye-off"} size={20} color={colors.textSecondary} />
+                                <MaterialCommunityIcons name={showPassword ? "eye-outline" : "eye-off-outline"} size={20} color={colors.textSecondary} />
                             </TouchableOpacity>
                         </View>
                     </View>
@@ -124,20 +124,27 @@ export default function LoginScreen({ navigation }) {
                     <View style={styles.spacer} />
 
                     <TouchableOpacity
-                        style={[styles.loginButton, { backgroundColor: colors.primary }]}
+                        style={[styles.loginButton, { shadowColor: colors.primary, elevation: 8 }]}
                         onPress={handleLogin}
                         disabled={loading}
                         activeOpacity={0.9}
                     >
-                        <Text style={styles.loginButtonText}>{loading ? 'Logging in...' : 'Secure Login'}</Text>
-                        <MaterialCommunityIcons name="arrow-right" size={16} color="white" />
+                        <LinearGradient
+                            colors={[colors.primary, colors.primaryLight]}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={StyleSheet.absoluteFill}
+                        />
+                        <View style={styles.buttonContent}>
+                            <Text style={styles.loginButtonText}>{loading ? 'Authenticating...' : 'Secure Login'}</Text>
+                            <MaterialCommunityIcons name="arrow-right" size={20} color="white" />
+                        </View>
                     </TouchableOpacity>
-
 
                     <View style={styles.footer}>
                         <Text style={[styles.footerText, { color: colors.textSecondary }]}>Don't have an account? </Text>
                         <TouchableOpacity onPress={() => navigation.navigate('Signup')}>
-                            <Text style={[styles.signupText, { color: isDarkMode ? 'white' : colors.text, textDecorationColor: colors.primary }]}>Sign Up</Text>
+                            <Text style={[styles.signupText, { color: colors.text, textDecorationColor: colors.primary }]}>Sign Up</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -154,143 +161,28 @@ const styles = StyleSheet.create({
     scrollContent: {
         flexGrow: 1,
     },
-    heroContainer: {
-        height: 320,
-        width: '100%',
-        position: 'relative',
-    },
-    heroImage: {
-        width: '100%',
-        height: '100%',
-        justifyContent: 'flex-end',
-    },
-    heroContent: {
-        padding: 24,
-        paddingBottom: 10, // Adjusted as the gradient handles blend
-    },
-    logoRow: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        marginBottom: 16,
-    },
-    logoIcon: {
-        width: 40,
-        height: 40,
-        borderRadius: 12,
-        backgroundColor: '#135bec',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: 12,
-        shadowColor: '#135bec',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.4,
-        shadowRadius: 8,
-    },
-    brandName: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        color: 'white',
-        letterSpacing: 0.5,
-    },
-    heroTitle: {
-        fontSize: 36,
-        fontWeight: 'bold',
-        color: 'white',
-        lineHeight: 42,
-    },
-    heroHighlight: {
-        color: '#135bec',
-    },
-    formContainer: {
-        flex: 1,
-        padding: 24,
-        paddingTop: 24,
-        gap: 20,
-    },
-    formSubtitle: {
-        fontSize: 14,
-        color: '#94a3b8',
-        fontWeight: '500',
-    },
-    inputGroup: {
-        gap: 8,
-    },
-    inputLabel: {
-        fontSize: 12,
-        fontWeight: 'bold',
-        color: '#94a3b8',
-        marginLeft: 4,
-        letterSpacing: 0.5,
-    },
-    inputWrapper: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderRadius: 16,
-        height: 56,
-        borderWidth: 1,
-    },
-    inputIcon: {
-        marginLeft: 16,
-        marginRight: 12,
-    },
-    input: {
-        flex: 1,
-        height: '100%',
-        fontSize: 16,
-        color: 'white',
-    },
-    eyeIcon: {
-        padding: 10,
-        marginRight: 6,
-    },
-    forgotPassword: {
-        alignSelf: 'flex-end',
-    },
-    forgotPasswordText: {
-        color: '#135bec',
-        fontSize: 14,
-        fontWeight: '500',
-    },
-    spacer: {
-        flex: 1,
-        minHeight: 20,
-    },
-    loginButton: {
-        height: 56,
-        backgroundColor: '#135bec',
-        borderRadius: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        shadowColor: '#135bec',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 10,
-        elevation: 6,
-        marginBottom: 16,
-    },
-    loginButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: 'bold',
-        marginRight: 8,
-    },
-    footer: {
-        marginTop: 8,
-        flexDirection: 'row',
-        justifyContent: 'center',
-        alignItems: 'center',
-        paddingBottom: 20,
-    },
-    footerText: {
-        color: '#94a3b8',
-        fontSize: 14,
-    },
-    signupText: {
-        color: 'white',
-        fontSize: 14,
-        fontWeight: '600',
-        textDecorationLine: 'underline',
-        textDecorationColor: '#135bec',
-    },
+    heroContainer: { height: 340, width: '100%' },
+    heroImage: { width: '100%', height: '100%', justifyContent: 'flex-end' },
+    heroContent: { padding: 24 },
+    logoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+    logoIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginRight: 12, elevation: 8, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 10 },
+    brandName: { fontSize: 26, fontWeight: 'bold', letterSpacing: -0.5 },
+    heroTitle: { fontSize: 38, fontWeight: '900', lineHeight: 44, letterSpacing: -1 },
+    formContainer: { flex: 1, padding: 24, gap: 24 },
+    formSubtitle: { fontSize: 14, fontWeight: '500', opacity: 0.7 },
+    inputGroup: { gap: 8 },
+    inputLabel: { fontSize: 11, fontWeight: 'bold', marginLeft: 4, letterSpacing: 1, textTransform: 'uppercase' },
+    inputWrapper: { flexDirection: 'row', alignItems: 'center', borderRadius: 20, height: 60, borderWidth: 1.5 },
+    inputIcon: { marginLeft: 16, marginRight: 12, opacity: 0.8 },
+    input: { flex: 1, height: '100%', fontSize: 16, fontWeight: '500' },
+    eyeIcon: { padding: 12, marginRight: 6 },
+    forgotPassword: { alignSelf: 'flex-end' },
+    forgotPasswordText: { fontSize: 13, fontWeight: 'bold' },
+    spacer: { flex: 1, minHeight: 12 },
+    loginButton: { height: 60, borderRadius: 20, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 12, marginBottom: 12 },
+    buttonContent: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+    loginButtonText: { color: 'white', fontSize: 17, fontWeight: 'bold', letterSpacing: 0.2 },
+    footer: { marginTop: 8, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingBottom: 20 },
+    footerText: { fontSize: 14, opacity: 0.6 },
+    signupText: { fontSize: 14, fontWeight: 'bold', textDecorationLine: 'underline' },
 });

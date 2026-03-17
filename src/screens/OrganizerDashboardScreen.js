@@ -224,25 +224,35 @@ export default function OrganizerDashboardScreen({ navigation }) {
                     <Text style={[styles.greeting, { color: colors.textSecondary }]}>{getGreeting()}</Text>
                     <Text style={[styles.collegeName, { color: colors.text }]}>{userData?.name || "Admin Panel"}</Text>
                 </TouchableOpacity>
-                <TouchableOpacity style={[styles.profileBtn, { backgroundColor: colors.surface, borderColor: colors.border, marginRight: 10 }]} onPress={() => navigation.navigate('Ticket')}>
-                    <MaterialCommunityIcons name="ticket-outline" size={24} color={colors.primary} />
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.profileBtn, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => navigation.navigate('Profile')}>
-                    <MaterialCommunityIcons name="account-circle" size={28} color={colors.primary} />
-                </TouchableOpacity>
+                <View style={styles.headerRight}>
+                    <TouchableOpacity style={[styles.profileBtn, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => navigation.navigate('Ticket')}>
+                        <MaterialCommunityIcons name="ticket-outline" size={24} color={colors.primary} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.profileBtn, { backgroundColor: colors.primary + '10', borderColor: colors.primary + '20' }]} onPress={() => navigation.navigate('OrganizerExportPortal')}>
+                        <MaterialCommunityIcons name="file-download-outline" size={24} color={colors.primary} />
+                    </TouchableOpacity>
+                    <TouchableOpacity style={[styles.profileBtn, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => navigation.navigate('Profile')}>
+                        <MaterialCommunityIcons name="account-circle-outline" size={24} color={colors.primary} />
+                    </TouchableOpacity>
+                </View>
             </View>
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 {/* Stats Summary Area */}
                 <View style={styles.statsOverview}>
-                    <View style={[styles.mainStat, { backgroundColor: colors.primary, shadowColor: colors.primary }]}>
-                        <Text style={[styles.mainStatLabel, { color: isDarkMode ? 'rgba(255, 255, 255, 0.7)' : 'rgba(255, 255, 255, 0.8)' }]}>Total Revenue</Text>
-                        <Text style={[styles.mainStatValue, { color: 'white' }]}>₹{totalRevenue.toLocaleString()}</Text>
+                    <LinearGradient
+                        colors={[colors.primary, colors.primaryLight]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.mainStat}
+                    >
+                        <Text style={styles.mainStatLabel}>Total Revenue</Text>
+                        <Text style={styles.mainStatValue}>₹{totalRevenue.toLocaleString()}</Text>
                         <View style={styles.trendContainer}>
-                            <MaterialCommunityIcons name="trending-up" size={16} color={colors.success} />
-                            <Text style={[styles.trendText, { color: colors.success }]}>+12.5% this month</Text>
+                            <MaterialCommunityIcons name="trending-up" size={16} color="white" />
+                            <Text style={styles.trendText}>+12.5% this month</Text>
                         </View>
-                    </View>
+                    </LinearGradient>
 
                     <View style={styles.gridStats}>
                         <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -418,318 +428,72 @@ const styles = StyleSheet.create({
         paddingTop: 60,
         paddingBottom: 24,
     },
-    greeting: {
-        color: '#94a3b8',
-        fontSize: 14,
-        fontWeight: '500',
-    },
-    collegeName: {
-        color: 'white',
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginTop: 4,
-    },
+    headerRight: { flexDirection: 'row', gap: 10 },
+    greeting: { fontSize: 13, fontWeight: '600', opacity: 0.7 },
+    collegeName: { fontSize: 22, fontWeight: 'bold', marginTop: 2, letterSpacing: -0.5 },
     profileBtn: {
-        width: 44,
-        height: 44,
-        borderRadius: 12,
+        width: 42,
+        height: 42,
+        borderRadius: 14,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
     },
-    headerLeft: {
-        flex: 1,
-    },
-    scrollContent: {
-        paddingHorizontal: 20,
-        paddingBottom: 100,
-    },
-    statsOverview: {
-        gap: 16,
-        marginBottom: 24,
-    },
+    headerLeft: { flex: 1 },
+    scrollContent: { paddingHorizontal: 20, paddingBottom: 120 },
     mainStat: {
-        backgroundColor: '#135bec',
         padding: 24,
-        borderRadius: 24,
-        shadowColor: '#135bec',
+        borderRadius: 28,
+        elevation: 8,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
+        shadowOpacity: 0.2,
         shadowRadius: 20,
-        elevation: 10,
     },
-    mainStatLabel: {
-        color: 'rgba(255, 255, 255, 0.7)',
-        fontSize: 14,
-        fontWeight: '500',
-    },
-    mainStatValue: {
-        color: 'white',
-        fontSize: 32,
-        fontWeight: 'bold',
-        marginVertical: 8,
-    },
-    trendContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 6,
-    },
-    trendText: {
-        color: '#06d6a0',
-        fontSize: 12,
-        fontWeight: '600',
-    },
-    gridStats: {
-        flexDirection: 'row',
-        gap: 16,
-    },
-    statCard: {
-        flex: 1,
-        padding: 16,
-        borderRadius: 20,
-        borderWidth: 1,
-    },
-    statLabel: {
-        color: '#94a3b8',
-        fontSize: 12,
-        fontWeight: '500',
-        marginBottom: 8,
-    },
-    statValue: {
-        color: 'white',
-        fontSize: 20,
-        fontWeight: 'bold',
-    },
-    statSubValue: {
-        color: '#64748b',
-        fontSize: 10,
-        marginTop: 4,
-    },
-    liveIndicatorContainer: {
-        width: 12,
-        height: 12,
-        borderRadius: 6,
-        backgroundColor: 'rgba(11, 218, 94, 0.2)',
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    liveIndicator: {
-        width: 6,
-        height: 6,
-        borderRadius: 3,
-        backgroundColor: '#0bda5e',
-    },
-    categoryStatsRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        padding: 20,
-        borderRadius: 24,
-        marginTop: 12,
-        borderWidth: 1,
-        height: 150,
-        alignItems: 'flex-end',
-    },
-    categoryStatItem: {
-        alignItems: 'center',
-        flex: 1,
-    },
-    categoryStatBarContainer: {
-        height: 80,
-        width: 12,
-        backgroundColor: '#111722',
-        borderRadius: 6,
-        justifyContent: 'flex-end',
-        overflow: 'hidden',
-        marginBottom: 8,
-    },
-    categoryStatBar: {
-        width: '100%',
-        backgroundColor: '#135bec',
-        borderRadius: 6,
-    },
-    categoryStatLabel: {
-        color: '#94a3b8',
-        fontSize: 10,
-        fontWeight: 'bold',
-        marginTop: 4,
-    },
-    categoryStatCount: {
-        color: 'white',
-        fontSize: 12,
-        fontWeight: 'bold',
-    },
-    section: {
-        marginBottom: 24,
-    },
-    sectionHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 16,
-    },
-    sectionTitle: {
-        color: 'white',
-        fontSize: 18,
-        fontWeight: 'bold',
-    },
-    seeAll: {
-        color: '#135bec',
-        fontSize: 14,
-        fontWeight: '600',
-    },
-    sectionSubtitle: {
-        color: '#64748b',
-        fontSize: 12,
-        marginTop: 4,
-    },
-    filterChip: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: 'rgba(19, 91, 236, 0.1)',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 12,
-        gap: 4,
-    },
-    filterChipText: {
-        color: '#135bec',
-        fontSize: 12,
-        fontWeight: '600',
-    },
-    eventCard: {
-        flexDirection: 'row',
-        borderRadius: 20,
-        padding: 12,
-        marginBottom: 16,
-        borderWidth: 1,
-        alignItems: 'center',
-    },
-    eventThumb: {
-        width: 60,
-        height: 60,
-        borderRadius: 12,
-        marginRight: 16,
-    },
-    eventInfo: {
-        flex: 1,
-    },
-    eventInfoTop: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 4,
-    },
-    eventName: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: 'white',
-        flex: 1,
-        marginRight: 8,
-    },
-    chatIconBtn: {
-        width: 32,
-        height: 32,
-        borderRadius: 8,
-        backgroundColor: 'rgba(19, 91, 236, 0.1)',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: 8,
-    },
-    eventMeta: {
-        fontSize: 12,
-        color: '#94a3b8',
-        marginBottom: 8,
-    },
-    statusBadge: {
-        paddingHorizontal: 8,
-        paddingVertical: 4,
-        borderRadius: 8,
-    },
-    statusText: {
-        fontSize: 10,
-        fontWeight: 'bold',
-    },
-    soldText: {
-        fontSize: 11,
-        color: '#94a3b8',
-    },
-    eventStatsRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginTop: 8,
-        alignItems: 'center',
-    },
-    checkInText: {
-        fontSize: 11,
-        color: '#0bda5e',
-        fontWeight: '600',
-    },
-    percentText: {
-        fontSize: 11,
-        color: '#0bda5e',
-        fontWeight: 'bold',
-    },
-    sponsorItem: {
-        borderRadius: 20,
-        padding: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        borderWidth: 1,
-        minWidth: 160,
-    },
-    sponsorLogo: {
-        width: 44,
-        height: 44,
-        borderRadius: 12,
-        backgroundColor: 'rgba(19, 91, 236, 0.1)',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: 12,
-    },
-    sponsorCardTop: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-    sponsorLogoContainer: { width: 40, height: 40, borderRadius: 10, backgroundColor: 'white', overflow: 'hidden', alignItems: 'center', justifyContent: 'center' },
-    sponsorLogoPlaceholder: { width: '100%', height: '100%', backgroundColor: '#135bec', alignItems: 'center', justifyContent: 'center' },
-    sponsorLogoText: { color: 'white', fontWeight: 'bold', fontSize: 18 },
-    sponsorInfo: { flex: 1 },
-    sponsorName: { fontSize: 14, fontWeight: 'bold', color: 'white' },
-    sponsorTier: { fontSize: 12, color: '#92a4c9' },
-    timeChip: { backgroundColor: '#111722', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 8 },
-    timeChipText: { fontSize: 10, color: '#92a4c9', fontWeight: '500' },
-    sponsorActions: { flexDirection: 'row', gap: 12 },
-    declineButton: {
-        flex: 1, backgroundColor: '#111722', borderRadius: 10,
-        paddingVertical: 10, alignItems: 'center',
-        borderWidth: 1, borderColor: '#232f48',
-    },
-    declineText: { fontSize: 12, color: '#92a4c9', fontWeight: '600' },
-    approveButton: { flex: 1, backgroundColor: 'white', borderRadius: 10, paddingVertical: 10, alignItems: 'center' },
-    approveText: { fontSize: 12, color: '#000', fontWeight: 'bold' },
-    bottomNav: {
-        position: 'absolute', bottom: 0, left: 0, right: 0,
-        flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-end',
-        paddingBottom: 28, paddingTop: 12, paddingHorizontal: 16,
-        borderTopWidth: 1,
-    },
+    mainStatLabel: { color: 'rgba(255, 255, 255, 0.8)', fontSize: 13, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
+    mainStatValue: { color: 'white', fontSize: 36, fontWeight: 'bold', marginVertical: 6, letterSpacing: -1 },
+    trendContainer: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,0.2)', alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 100 },
+    trendText: { color: 'white', fontSize: 11, fontWeight: 'bold' },
+    gridStats: { flexDirection: 'row', gap: 16 },
+    statCard: { flex: 1, padding: 18, borderRadius: 24, borderWidth: 1, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8 },
+    statLabel: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 },
+    statValue: { fontSize: 22, fontWeight: 'bold', letterSpacing: -0.5 },
+    statSubValue: { fontSize: 10, marginTop: 4, opacity: 0.6 },
+    liveIndicatorContainer: { width: 14, height: 14, borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
+    liveIndicator: { width: 6, height: 6, borderRadius: 3 },
+    categoryStatsRow: { flexDirection: 'row', justifyContent: 'space-around', padding: 24, borderRadius: 28, marginTop: 12, borderWidth: 1, height: 160, alignItems: 'flex-end', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 10 },
+    categoryStatItem: { alignItems: 'center', flex: 1 },
+    categoryStatBarContainer: { height: 80, width: 14, borderRadius: 7, justifyContent: 'flex-end', overflow: 'hidden', marginBottom: 10 },
+    categoryStatBar: { width: '100%', borderRadius: 7 },
+    categoryStatLabel: { fontSize: 9, fontWeight: 'bold', marginTop: 4, textTransform: 'uppercase' },
+    categoryStatCount: { fontSize: 12, fontWeight: 'bold' },
+    section: { marginBottom: 32 },
+    sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
+    sectionTitle: { fontSize: 18, fontWeight: 'bold', letterSpacing: -0.2 },
+    sectionSubtitle: { fontSize: 12, marginTop: 2, opacity: 0.6 },
+    filterChip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, gap: 4 },
+    filterChipText: { fontSize: 12, fontWeight: 'bold' },
+    eventCard: { flexDirection: 'row', borderRadius: 24, padding: 12, marginBottom: 16, borderWidth: 1, alignItems: 'center', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8 },
+    eventThumb: { width: 64, height: 64, borderRadius: 16, marginRight: 16 },
+    eventInfo: { flex: 1 },
+    eventInfoTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+    eventName: { fontSize: 16, fontWeight: 'bold', flex: 1, marginRight: 8, letterSpacing: -0.2 },
+    chatIconBtn: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginLeft: 8 },
+    eventMeta: { fontSize: 12, marginBottom: 8, opacity: 0.7 },
+    statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 100 },
+    statusText: { fontSize: 9, fontWeight: '900', letterSpacing: 0.5 },
+    eventStatsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, alignItems: 'center' },
+    checkInText: { fontSize: 11, fontWeight: 'bold' },
+    percentText: { fontSize: 11, fontWeight: '800' },
+    sponsorItem: { borderRadius: 24, padding: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, minWidth: 180, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8 },
+    sponsorLogo: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
+    sponsorName: { fontSize: 14, fontWeight: 'bold' },
+    sponsorTier: { fontSize: 12, opacity: 0.7 },
+    bottomNav: { position: 'absolute', bottom: 0, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-end', paddingBottom: 32, paddingTop: 12, paddingHorizontal: 16, borderTopWidth: 1, elevation: 20 },
     navItem: { flex: 1, alignItems: 'center', gap: 4 },
-    navLabel: { fontSize: 10, color: '#92a4c9', fontWeight: '500' },
-    navLabelActive: { fontSize: 10, color: '#135bec', fontWeight: '700' },
-    fab: {
-        width: 52, height: 52, borderRadius: 26,
-        backgroundColor: '#135bec', alignItems: 'center', justifyContent: 'center',
-        shadowColor: '#135bec', shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.5, shadowRadius: 10, elevation: 8,
-        marginBottom: 8,
-    },
-    badgeTextCount: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        marginLeft: 8,
-    },
-    emptyCard: {
-        padding: 24,
-        borderRadius: 20,
-        borderWidth: 1,
-        borderStyle: 'dashed',
-        alignItems: 'center',
-    }
+    navLabel: { fontSize: 10, fontWeight: '600' },
+    navLabelActive: { fontSize: 10, fontWeight: 'bold' },
+    fab: { width: 56, height: 56, borderRadius: 20, alignItems: 'center', justifyContent: 'center', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 10, marginBottom: 12 },
+    badgeTextCount: { fontSize: 14, fontWeight: 'bold', marginLeft: 8 },
+    emptyCard: { padding: 32, borderRadius: 24, borderWidth: 1, borderStyle: 'dashed', alignItems: 'center', opacity: 0.6 }
 });
