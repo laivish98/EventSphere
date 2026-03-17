@@ -13,7 +13,7 @@ import { useAuth } from '../context/AuthContext';
 export default function CertificateScreen({ route, navigation }) {
     const { colors, isDarkMode } = useTheme();
     const { user } = useAuth();
-    const { eventTitle, userName, date, university } = route.params;
+    const { eventTitle, userName, date, university, certificateTemplateUrl } = route.params;
     const [sending, setSending] = React.useState(false);
 
     const viewShotRef = useRef();
@@ -117,8 +117,15 @@ export default function CertificateScreen({ route, navigation }) {
                                 colors={['#ffffff', '#f8fafc']}
                                 style={styles.certificateCard}
                             >
-                                {/* Decorative Border */}
                                 <View style={styles.borderInner} />
+
+                                {certificateTemplateUrl ? (
+                                    <Image
+                                        source={{ uri: certificateTemplateUrl }}
+                                        style={[StyleSheet.absoluteFill, { zIndex: -1 }]}
+                                        resizeMode="cover"
+                                    />
+                                ) : null}
 
                                 <View style={styles.topSection}>
                                     <MaterialCommunityIcons name="seal-variant" size={60} color={colors.primary} />
@@ -222,6 +229,7 @@ const styles = StyleSheet.create({
                 shadowRadius: 10,
                 elevation: 10,
             }),
+        overflow: 'hidden',
     },
     borderInner: {
         position: 'absolute',

@@ -302,6 +302,7 @@ export default function EventDetailsScreen({ route, navigation }) {
                 eventDate: event.date,
                 eventVenue: event.venue,
                 eventImage: event.imageUrl || event.image,
+                certificateTemplateUrl: event.certificateTemplateUrl || null,
                 userId: user.uid,
                 userName: studentData.name || userData?.name || user.displayName || 'Attendee',
                 userEmail: studentData.email || user.email || 'N/A',

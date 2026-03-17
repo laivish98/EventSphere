@@ -202,9 +202,6 @@ export default function ProfileScreen({ navigation }) {
                                         style={styles.avatar}
                                         onError={() => setFallbackLevel(prev => Math.min(prev + 1, 2))}
                                     />
-                                    <BlurView intensity={30} tint="dark" style={styles.editAvatarOverlay}>
-                                        <MaterialCommunityIcons name="camera-outline" size={16} color="white" />
-                                    </BlurView>
                                 </View>
                             </View>
 
