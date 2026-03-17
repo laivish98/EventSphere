@@ -9,7 +9,7 @@ import { db } from '../services/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { suggestImages } from '../services/ImageSearchService';
+import { suggestImages, searchImages } from '../services/ImageSearchService';
 
 export default function CreateEventScreen({ navigation }) {
     const { colors, isDarkMode } = useTheme();
@@ -26,6 +26,8 @@ export default function CreateEventScreen({ navigation }) {
     const [loading, setLoading] = useState(false);
     const [selectedImage, setSelectedImage] = useState('https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2670&auto=format&fit=crop');
     const [suggestedImages, setSuggestedImages] = useState([]);
+    const [imageSearchQuery, setImageSearchQuery] = useState('');
+    const [isSearching, setIsSearching] = useState(false);
 
     const CATEGORY_IMAGE_POOLS = {
         music: [
@@ -85,10 +87,24 @@ export default function CreateEventScreen({ navigation }) {
 
     useEffect(() => {
         // Smart Suggestions based on title and description
-        const combinedText = `${title} ${description}`;
-        const suggestions = suggestImages(combinedText);
-        setSuggestedImages(suggestions);
-    }, [title, description]);
+        if (imageSearchQuery.trim() === '') {
+            const combinedText = `${title} ${description}`;
+            const suggestions = suggestImages(combinedText);
+            setSuggestedImages(suggestions);
+        }
+    }, [title, description, imageSearchQuery]);
+
+    useEffect(() => {
+        if (imageSearchQuery.trim() !== '') {
+            setIsSearching(true);
+            const timeoutId = setTimeout(() => {
+                const results = searchImages(imageSearchQuery);
+                setSuggestedImages(results);
+                setIsSearching(false);
+            }, 300);
+            return () => clearTimeout(timeoutId);
+        }
+    }, [imageSearchQuery]);
 
     const handleShuffle = () => {
         setSelectedImage(getRandomImage(category));
@@ -298,8 +314,28 @@ export default function CreateEventScreen({ navigation }) {
 
                     {/* Thumbnail Section */}
                     <BlurView intensity={isDarkMode ? 25 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.formPanel, { borderColor: colors.glassBorder, padding: 0 }]}>
-                        <View style={{ padding: 20, paddingBottom: 10 }}>
+                        <View style={{ padding: 20, paddingBottom: 0 }}>
                             <Text style={[styles.sectionLabel, { color: colors.textSecondary, marginLeft: 0 }]}>VISUAL IDENTITY</Text>
+
+                            {/* NEW: Search Bar for Images */}
+                            <View style={[styles.imageSearchContainer, { backgroundColor: colors.surface + '40', borderColor: colors.glassBorder }]}>
+                                <MaterialCommunityIcons name="magnify" size={20} color={colors.primary} />
+                                <TextInput
+                                    placeholder="Search posters (e.g. 'coding', 'neon', 'beach')"
+                                    placeholderTextColor={colors.textSecondary + '80'}
+                                    value={imageSearchQuery}
+                                    onChangeText={setImageSearchQuery}
+                                    style={styles.imageSearchInput}
+                                    underlineColor="transparent"
+                                    activeUnderlineColor="transparent"
+                                    dense
+                                />
+                                {imageSearchQuery !== '' && (
+                                    <TouchableOpacity onPress={() => setImageSearchQuery('')}>
+                                        <MaterialCommunityIcons name="close-circle" size={18} color={colors.textSecondary} />
+                                    </TouchableOpacity>
+                                )}
+                            </View>
                         </View>
                         <View style={[styles.thumbnailSection, { marginTop: 0 }]}>
                             <View style={[styles.thumbnailContainer, { borderColor: colors.glassBorder }]}>
@@ -329,7 +365,9 @@ export default function CreateEventScreen({ navigation }) {
                                 <View style={styles.suggestionSection}>
                                     <View style={styles.suggestionHeader}>
                                         <MaterialCommunityIcons name="sparkles" size={16} color="#fbbf24" />
-                                        <Text style={[styles.suggestionLabel, { color: colors.textSecondary }]}>MAGIC SUGGESTIONS</Text>
+                                        <Text style={[styles.suggestionLabel, { color: colors.textSecondary }]}>
+                                            {imageSearchQuery ? 'SEARCH RESULTS' : 'AI SUGGESTIONS'}
+                                        </Text>
                                     </View>
                                     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionScroll}>
                                         {suggestedImages.map((img, index) => (
@@ -553,6 +591,21 @@ const styles = StyleSheet.create({
     checkBadge: { position: 'absolute', top: 6, right: 6, width: 20, height: 20, borderRadius: 10, alignItems: 'center', justifyContent: 'center', elevation: 4 },
     hintContainer: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 16, paddingHorizontal: 8, opacity: 0.5 },
     thumbnailHint: { fontSize: 11, flex: 1, fontWeight: '700' },
+    imageSearchContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        height: 50,
+        borderRadius: 16,
+        borderWidth: 1.5,
+        paddingHorizontal: 15,
+        marginBottom: 10,
+    },
+    imageSearchInput: {
+        flex: 1,
+        backgroundColor: 'transparent',
+        fontSize: 14,
+        height: 40,
+    },
     switchRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, borderRadius: 20, borderWidth: 1.5, marginBottom: 12 },
     postButton: {
         height: 64,

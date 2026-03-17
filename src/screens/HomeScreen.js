@@ -82,7 +82,7 @@ export default function HomeScreen({ navigation }) {
             onPress={() => navigation.navigate('EventDetails', { event: item })}
         >
             <Image
-                source={{ uri: item.image || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000&auto=format&fit=crop' }}
+                source={{ uri: item.imageUrl || item.image || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000&auto=format&fit=crop' }}
                 style={styles.featuredImage}
             />
             <ExpoGradient
