@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
     View, Text, StyleSheet, ScrollView, TouchableOpacity,
-    Image, Dimensions, FlatList
+    Image, Dimensions, FlatList, Platform
 } from 'react-native';
 import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -149,6 +149,8 @@ export default function OrganizerDashboardScreen({ navigation }) {
     const ticketRevenue = registrations.reduce((sum, r) => sum + (r.ticketPrice || 0), 0);
     const totalRevenue = sponsorshipRevenue + ticketRevenue;
     const totalRegistrations = registrations.length;
+    const totalTicketsSold = registrations.length;
+    const activeSponsors = sponsorships.length;
     const liveCheckIns = registrations.filter(r => r.utilized).length;
 
     // Category Insights
@@ -181,17 +183,18 @@ export default function OrganizerDashboardScreen({ navigation }) {
                 onPress={() => navigation.navigate('EventDetails', { event })}
             >
                 <BlurView
-                    intensity={isDarkMode ? 20 : 40}
+                    intensity={isDarkMode ? 35 : 25}
                     tint={isDarkMode ? "dark" : "light"}
-                    style={[styles.glassCard, styles.eventCard, { borderColor: colors.border }]}
+                    style={[styles.glassCard, styles.eventCard, { borderColor: colors.glassBorder }]}
                 >
+                    <ExpoGradient colors={colors.iridescent} style={StyleSheet.absoluteFill} />
                     <View style={styles.eventImageContainer}>
                         <Image
                             source={{ uri: event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=400&auto=format&fit=crop' }}
                             style={styles.eventThumb}
                         />
                         {!isPast && (
-                            <View style={styles.livePulseContainer}>
+                            <View style={[styles.livePulseContainer, { backgroundColor: colors.surface }]}>
                                 <View style={[styles.livePulse, { backgroundColor: colors.success }]} />
                             </View>
                         )}
@@ -201,13 +204,13 @@ export default function OrganizerDashboardScreen({ navigation }) {
                             <Text style={[styles.eventName, { color: colors.text }]} numberOfLines={1}>{event.title}</Text>
                             <View style={[
                                 styles.premiumStatusBadge,
-                                { backgroundColor: !isPast ? colors.success + '15' : colors.error + '15' }
+                                { backgroundColor: !isPast ? colors.success + '20' : colors.error + '20' }
                             ]}>
                                 <Text style={[
                                     styles.premiumStatusText,
                                     { color: !isPast ? colors.success : colors.error }
                                 ]}>
-                                    {!isPast ? 'LIVE' : 'FINISHED'}
+                                    {!isPast ? 'ACTIVE' : 'FINISHED'}
                                 </Text>
                             </View>
                         </View>
@@ -216,26 +219,26 @@ export default function OrganizerDashboardScreen({ navigation }) {
                         <View style={styles.eventStatsRow}>
                             <View style={styles.miniStatItem}>
                                 <Text style={[styles.miniStatValue, { color: colors.text }]}>{eventRegs}</Text>
-                                <Text style={[styles.miniStatLabel, { color: colors.textSecondary }]}>Sales</Text>
+                                <Text style={[styles.miniStatLabel, { color: colors.textSecondary }]}>Sold</Text>
                             </View>
-                            <View style={styles.miniStatDivider} />
+                            <View style={[styles.miniStatDivider, { backgroundColor: colors.border }]} />
                             <View style={styles.miniStatItem}>
                                 <Text style={[styles.miniStatValue, { color: colors.text }]}>{percent}%</Text>
-                                <Text style={[styles.miniStatLabel, { color: colors.textSecondary }]}>Capacity</Text>
+                                <Text style={[styles.miniStatLabel, { color: colors.textSecondary }]}>Cap.</Text>
                             </View>
                             <View style={{ flex: 1 }} />
                             <View style={styles.actionRow}>
                                 <TouchableOpacity
                                     onPress={() => navigation.navigate('EditEvent', { event })}
-                                    style={[styles.iconButtonSmall, { backgroundColor: colors.surface }]}
+                                    style={[styles.iconButtonSmall, { backgroundColor: colors.surface, borderColor: colors.glassBorder, borderWidth: 1 }]}
                                 >
-                                    <MaterialCommunityIcons name="pencil" size={16} color={colors.primary} />
+                                    <MaterialCommunityIcons name="pencil-outline" size={16} color={colors.primary} />
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     onPress={() => navigation.navigate('EventChat', { eventId: event.id, eventTitle: event.title })}
-                                    style={[styles.iconButtonSmall, { backgroundColor: colors.primary + '15' }]}
+                                    style={[styles.iconButtonSmall, { backgroundColor: colors.primary + '20', borderColor: colors.primary + '30', borderWidth: 1 }]}
                                 >
-                                    <MaterialCommunityIcons name="chat-processing" size={16} color={colors.primary} />
+                                    <MaterialCommunityIcons name="chat-outline" size={16} color={colors.primary} />
                                 </TouchableOpacity>
                             </View>
                         </View>
@@ -263,28 +266,34 @@ export default function OrganizerDashboardScreen({ navigation }) {
             <StatusBar style={isDarkMode ? "light" : "dark"} />
 
             {/* Super Premium Background Gradient */}
+            {/* Ambient Background Structure */}
             <ExpoGradient
                 colors={isDarkMode
-                    ? [colors.background, '#1e1b4b', '#0f172a']
+                    ? [colors.background, colors.surfaceDeep, colors.background]
                     : ['#f8fafc', '#f1f5f9', '#e2e8f0']}
                 style={StyleSheet.absoluteFill}
             />
 
+            {/* Ambient Accent Glows */}
+            <View style={[styles.bgOrb, { top: -100, right: -100, backgroundColor: isDarkMode ? 'rgba(19, 91, 236, 0.15)' : 'rgba(19, 91, 236, 0.05)' }]} />
+            <View style={[styles.bgOrb, { bottom: 200, left: -150, backgroundColor: isDarkMode ? 'rgba(139, 92, 246, 0.1)' : 'rgba(139, 92, 246, 0.04)' }]} />
+
             {/* Header */}
-            <View style={[styles.header, { backgroundColor: colors.background }]}>
+            <View style={[styles.header, { borderBottomColor: colors.glassBorder, borderBottomWidth: 1 }]}>
+                <BlurView intensity={isDarkMode ? 35 : 20} tint={isDarkMode ? "dark" : "light"} style={StyleSheet.absoluteFill} />
                 <View style={styles.headerLeft}>
                     <Text style={[styles.greeting, { color: colors.textSecondary }]}>{getGreeting()}</Text>
                     <Text style={[styles.collegeName, { color: colors.text }]}>{userData?.name || "Organizer"}</Text>
                 </View>
                 <View style={styles.headerRight}>
-                    <TouchableOpacity style={[styles.premiumIconBtn, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('Ticket')}>
-                        <MaterialCommunityIcons name="ticket-confirmation-outline" size={22} color={colors.primary} />
+                    <TouchableOpacity style={[styles.premiumIconBtn, { backgroundColor: colors.surface + '80', borderColor: colors.glassBorder, borderWidth: 1 }]} onPress={() => navigation.navigate('Ticket')}>
+                        <MaterialCommunityIcons name="ticket-confirmation-outline" size={20} color={colors.primary} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.premiumIconBtn, { backgroundColor: colors.primary + '15' }]} onPress={() => navigation.navigate('OrganizerExportPortal')}>
-                        <MaterialCommunityIcons name="export-variant" size={22} color={colors.primary} />
+                    <TouchableOpacity style={[styles.premiumIconBtn, { backgroundColor: colors.primary + '20', borderColor: colors.primary + '30', borderWidth: 1 }]} onPress={() => navigation.navigate('OrganizerExportPortal')}>
+                        <MaterialCommunityIcons name="export-variant" size={20} color={colors.primary} />
                     </TouchableOpacity>
                     <TouchableOpacity
-                        style={[styles.profileCircle, { borderColor: colors.primary + '30' }]}
+                        style={[styles.profileCircle, { borderColor: colors.primary + '40', borderWidth: 2 }]}
                         onPress={() => navigation.navigate('Profile')}
                     >
                         <Image
@@ -302,62 +311,41 @@ export default function OrganizerDashboardScreen({ navigation }) {
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 {/* Stats Summary Area */}
                 <View style={styles.statsOverview}>
-                    <TouchableOpacity activeOpacity={0.9}>
-                        <ExpoGradient
-                            colors={[colors.primary, colors.primaryLight || '#8b5cf6', '#a855f7']}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 1 }}
-                            style={styles.mainStatCard}
-                        >
-                            <View style={styles.mainStatGloss} />
-                            <View style={styles.mainStatContent}>
-                                <View style={styles.mainStatLabelRow}>
-                                    <Text style={styles.mainStatLabel}>Gross Revenue</Text>
-                                    <View style={styles.premiumBadge}>
-                                        <MaterialCommunityIcons name="crown" size={12} color="#FFD700" />
-                                        <Text style={styles.premiumBadgeText}>PRO</Text>
-                                    </View>
-                                </View>
-                                <Text style={styles.mainStatValue}>₹{totalRevenue.toLocaleString()}</Text>
-                                <View style={styles.trendContainer}>
-                                    <MaterialCommunityIcons name="trending-up" size={14} color="white" />
-                                    <Text style={styles.trendText}>+12.5% vs last month</Text>
-                                </View>
-                            </View>
-                        </ExpoGradient>
-                    </TouchableOpacity>
-
                     <View style={styles.gridStats}>
-                        <BlurView intensity={isDarkMode ? 30 : 50} tint={isDarkMode ? "dark" : "light"} style={[styles.glassCard, styles.statCard, { borderColor: colors.border }]}>
-                            <View style={[styles.statIconBox, { backgroundColor: colors.primary + '20' }]}>
-                                <MaterialCommunityIcons name="ticket" size={20} color={colors.primary} />
+                        <BlurView intensity={isDarkMode ? 40 : 25} tint={isDarkMode ? "dark" : "light"} style={[styles.glassCard, styles.statCard, { borderColor: colors.glassBorder }]}>
+                            <ExpoGradient colors={colors.iridescent} style={StyleSheet.absoluteFill} />
+                            <View style={[styles.statIconBox, { backgroundColor: colors.primary + '25' }]}>
+                                <MaterialCommunityIcons name="ticket-outline" size={20} color={colors.primary} />
                             </View>
-                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Sales</Text>
-                            <Text style={[styles.statValue, { color: colors.text }]}>₹{ticketRevenue.toLocaleString()}</Text>
+                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Tickets Sold</Text>
+                            <Text style={[styles.statValue, { color: colors.text }]}>{totalTicketsSold || 0}</Text>
                         </BlurView>
-                        <BlurView intensity={isDarkMode ? 30 : 50} tint={isDarkMode ? "dark" : "light"} style={[styles.glassCard, styles.statCard, { borderColor: colors.border }]}>
-                            <View style={[styles.statIconBox, { backgroundColor: colors.success + '20' }]}>
-                                <MaterialCommunityIcons name="handshake" size={20} color={colors.success} />
+                        <BlurView intensity={isDarkMode ? 40 : 25} tint={isDarkMode ? "dark" : "light"} style={[styles.glassCard, styles.statCard, { borderColor: colors.glassBorder }]}>
+                            <ExpoGradient colors={colors.iridescent} style={StyleSheet.absoluteFill} />
+                            <View style={[styles.statIconBox, { backgroundColor: colors.success + '25' }]}>
+                                <MaterialCommunityIcons name="handshake-outline" size={20} color={colors.success} />
                             </View>
                             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Sponsors</Text>
-                            <Text style={[styles.statValue, { color: colors.text }]}>₹{sponsorshipRevenue.toLocaleString()}</Text>
+                            <Text style={[styles.statValue, { color: colors.text }]}>{activeSponsors || 0}</Text>
                         </BlurView>
                     </View>
 
                     <View style={styles.gridStats}>
-                        <BlurView intensity={isDarkMode ? 30 : 50} tint={isDarkMode ? "dark" : "light"} style={[styles.glassCard, styles.statCard, { borderColor: colors.border }]}>
-                            <View style={[styles.statIconBox, { backgroundColor: colors.accent + '20' }]}>
-                                <MaterialCommunityIcons name="account-group" size={20} color={colors.accent || colors.primary} />
+                        <BlurView intensity={isDarkMode ? 40 : 25} tint={isDarkMode ? "dark" : "light"} style={[styles.glassCard, styles.statCard, { borderColor: colors.glassBorder }]}>
+                            <ExpoGradient colors={colors.iridescent} style={StyleSheet.absoluteFill} />
+                            <View style={[styles.statIconBox, { backgroundColor: colors.accent + '25' }]}>
+                                <MaterialCommunityIcons name="account-group-outline" size={20} color={colors.accent || colors.primary} />
                             </View>
-                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Users</Text>
+                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Registrations</Text>
                             <Text style={[styles.statValue, { color: colors.text }]}>{totalRegistrations}</Text>
                         </BlurView>
-                        <BlurView intensity={isDarkMode ? 30 : 50} tint={isDarkMode ? "dark" : "light"} style={[styles.glassCard, styles.statCard, { borderColor: colors.border }]}>
+                        <BlurView intensity={isDarkMode ? 40 : 25} tint={isDarkMode ? "dark" : "light"} style={[styles.glassCard, styles.statCard, { borderColor: colors.glassBorder }]}>
+                            <ExpoGradient colors={colors.iridescent} style={StyleSheet.absoluteFill} />
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <View style={[styles.statIconBox, { backgroundColor: colors.success + '20' }]}>
-                                    <MaterialCommunityIcons name="check-decagram" size={20} color={colors.success} />
+                                <View style={[styles.statIconBox, { backgroundColor: colors.success + '25' }]}>
+                                    <MaterialCommunityIcons name="calendar-check-outline" size={20} color={colors.success} />
                                 </View>
-                                <View style={styles.liveIndicatorContainer}>
+                                <View style={[styles.liveIndicatorContainer, { backgroundColor: colors.success + '20' }]}>
                                     <View style={[styles.liveIndicator, { backgroundColor: colors.success }]} />
                                 </View>
                             </View>
@@ -376,14 +364,16 @@ export default function OrganizerDashboardScreen({ navigation }) {
                                 <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>Registration volume by event type</Text>
                             </View>
                         </View>
-                        <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.categoryStatsRow, { borderColor: colors.border, overflow: 'hidden' }]}>
+                        <BlurView intensity={isDarkMode ? 25 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.categoryStatsRow, { borderColor: colors.glassBorder, overflow: 'hidden' }]}>
+                            <ExpoGradient colors={colors.iridescent} style={StyleSheet.absoluteFill} />
                             {categoryStats.slice(0, 4).map(([cat, count]) => (
                                 <View key={cat} style={styles.categoryStatItem}>
-                                    <View style={[styles.categoryStatBarContainer, { backgroundColor: colors.background + '50' }]}>
-                                        <View
+                                    <View style={[styles.categoryStatBarContainer, { backgroundColor: colors.surface + '60' }]}>
+                                        <ExpoGradient
+                                            colors={[colors.primary, colors.primaryLight]}
                                             style={[
                                                 styles.categoryStatBar,
-                                                { height: `${Math.max(10, (count / Math.max(1, totalRegistrations)) * 100)}%`, backgroundColor: colors.success }
+                                                { height: `${Math.max(10, (count / Math.max(1, totalRegistrations)) * 100)}%` }
                                             ]}
                                         />
                                     </View>
@@ -469,35 +459,79 @@ export default function OrganizerDashboardScreen({ navigation }) {
                     )}
                 </View>
 
+                {/* Financial Recap at the Bottom */}
+                <View style={[styles.section, { marginTop: 20 }]}>
+                    <View style={styles.sectionHeader}>
+                        <View>
+                            <Text style={[styles.sectionTitle, { color: colors.text }]}>Earnings Recap</Text>
+                            <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>Summary of total revenue</Text>
+                        </View>
+                    </View>
+
+                    <TouchableOpacity activeOpacity={0.9} style={styles.mainStatWrapper}>
+                        <ExpoGradient
+                            colors={[colors.primary, '#6366f1', '#a855f7']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.mainStatCard}
+                        >
+                            <View style={styles.mainStatGloss} />
+                            <ExpoGradient
+                                colors={['rgba(255,255,255,0.15)', 'transparent']}
+                                style={styles.iridescentOverlay}
+                            />
+                            <View style={styles.mainStatContent}>
+                                <View style={styles.mainStatLabelRow}>
+                                    <View style={styles.statIconBadge}>
+                                        <MaterialCommunityIcons name="wallet-outline" size={16} color="white" />
+                                    </View>
+                                    <Text style={styles.mainStatLabel}>Gross Revenue</Text>
+                                    <View style={styles.premiumBadge}>
+                                        <MaterialCommunityIcons name="crown" size={12} color="#FFD700" />
+                                        <Text style={styles.premiumBadgeText}>PREMIUM</Text>
+                                    </View>
+                                </View>
+                                <Text style={styles.mainStatValue}>₹{totalRevenue.toLocaleString()}</Text>
+                                <View style={styles.trendContainer}>
+                                    <MaterialCommunityIcons name="trending-up" size={14} color="#10b981" />
+                                    <Text style={styles.trendText}>+12.5% <Text style={{ fontWeight: 'normal', opacity: 0.8 }}>vs last month</Text></Text>
+                                </View>
+                            </View>
+                        </ExpoGradient>
+                    </TouchableOpacity>
+                </View>
+
                 <View style={{ height: 120 }} />
             </ScrollView>
 
             {/* Bottom Navigation */}
-            <View style={[styles.floatingBottomNav, { backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)' }]}>
-                <TouchableOpacity style={styles.navItem}>
-                    <MaterialCommunityIcons name="view-dashboard" size={26} color={colors.primary} />
-                    <Text style={[styles.navLabel, { color: colors.primary, fontWeight: '700' }]}>Dash</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
-                    <MaterialCommunityIcons name="compass-outline" size={26} color={colors.textSecondary} />
-                    <Text style={[styles.navLabel, { color: colors.textSecondary }]}>Discover</Text>
-                </TouchableOpacity>
+            <View style={styles.bottomNavContainer}>
+                <BlurView intensity={isDarkMode ? 80 : 50} tint="dark" style={styles.bottomNav}>
+                    <TouchableOpacity style={styles.navItem}>
+                        <MaterialCommunityIcons name="view-dashboard" size={24} color={colors.primary} />
+                        <Text style={[styles.navLabel, { color: colors.primary, fontWeight: '700' }]}>Dash</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
+                        <MaterialCommunityIcons name="compass-outline" size={24} color="#94a3b8" />
+                        <Text style={[styles.navLabel, { color: '#94a3b8' }]}>Explore</Text>
+                    </TouchableOpacity>
 
-                <TouchableOpacity
-                    style={[styles.floatingFab, { backgroundColor: colors.primary, shadowColor: colors.primary }]}
-                    onPress={() => navigation.navigate('CreateEvent')}
-                >
-                    <MaterialCommunityIcons name="plus" size={32} color="white" />
-                </TouchableOpacity>
+                    <TouchableOpacity
+                        style={[styles.floatingFab, { backgroundColor: colors.primary, shadowColor: isDarkMode ? 'transparent' : colors.primary }]}
+                        onPress={() => navigation.navigate('CreateEvent')}
+                    >
+                        <MaterialCommunityIcons name="plus" size={28} color="white" />
+                    </TouchableOpacity>
 
-                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('ScanTicket')}>
-                    <MaterialCommunityIcons name="qrcode-scan" size={24} color={colors.textSecondary} />
-                    <Text style={[styles.navLabel, { color: colors.textSecondary }]}>Scan</Text>
-                </TouchableOpacity>
-                <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}>
-                    <MaterialCommunityIcons name="account-outline" size={26} color={colors.textSecondary} />
-                    <Text style={[styles.navLabel, { color: colors.textSecondary }]}>Profile</Text>
-                </TouchableOpacity>
+                    <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('ScanTicket')}>
+                        <MaterialCommunityIcons name="qrcode-scan" size={24} color="#94a3b8" />
+                        <Text style={[styles.navLabel, { color: '#94a3b8' }]}>Scan</Text>
+                    </TouchableOpacity>
+                    <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}>
+                        <MaterialCommunityIcons name="account-outline" size={24} color="#94a3b8" />
+                        <Text style={[styles.navLabel, { color: '#94a3b8' }]}>Profile</Text>
+                    </TouchableOpacity>
+                </BlurView>
             </View>
         </View>
     );
@@ -506,12 +540,12 @@ export default function OrganizerDashboardScreen({ navigation }) {
 const styles = StyleSheet.create({
     container: { flex: 1 },
     header: {
+        paddingTop: Platform.OS === 'ios' ? 60 : 40,
+        paddingHorizontal: 24,
+        paddingBottom: 20,
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingHorizontal: 24,
-        paddingTop: 60,
-        paddingBottom: 20,
     },
     headerLeft: { flex: 1 },
     headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
@@ -529,11 +563,16 @@ const styles = StyleSheet.create({
         borderRadius: 32,
         overflow: 'hidden',
         position: 'relative',
-        elevation: 12,
-        shadowColor: '#6366f1',
-        shadowOffset: { width: 0, height: 8 },
-        shadowOpacity: 0.4,
-        shadowRadius: 16,
+        ...Platform.select({
+            web: { boxShadow: '0 8px 16px rgba(99, 102, 241, 0.4)' },
+            default: {
+                shadowColor: '#6366f1',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.4,
+                shadowRadius: 16,
+                elevation: 12,
+            }
+        })
     },
     mainStatGloss: {
         position: 'absolute',
@@ -569,12 +608,16 @@ const styles = StyleSheet.create({
 
     // Glass & Content
     glassCard: {
-        borderWidth: 1,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.05,
-        shadowRadius: 12,
-        elevation: 2,
+        ...Platform.select({
+            web: { boxShadow: '0 4px 12px rgba(0,0,0,0.05)' },
+            default: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.05,
+                shadowRadius: 12,
+                elevation: 2,
+            }
+        })
     },
     eventCard: { flexDirection: 'row', padding: 14, borderRadius: 28, marginBottom: 16, alignItems: 'center' },
     eventImageContainer: { position: 'relative' },
@@ -611,39 +654,87 @@ const styles = StyleSheet.create({
     filterChip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 14, gap: 6 },
     filterChipText: { fontSize: 13, fontWeight: '800' },
 
-    floatingBottomNav: {
+    bottomNavContainer: {
         position: 'absolute',
-        bottom: 30,
-        left: 24,
-        right: 24,
-        height: 76,
-        borderRadius: 28,
+        bottom: 24,
+        left: 20,
+        right: 20,
+        height: 72,
+        borderRadius: 36,
+        overflow: 'hidden',
+        borderWidth: 1.5,
+        borderColor: 'rgba(255,255,255,0.15)',
+        elevation: 20,
+        ...Platform.select({
+            web: { boxShadow: '0 12px 24px rgba(0,0,0,0.5)' },
+            default: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 12 },
+                shadowOpacity: 0.5,
+                shadowRadius: 24,
+            }
+        })
+    },
+    bottomNav: {
+        flex: 1,
         flexDirection: 'row',
-        justifyContent: 'space-around',
         alignItems: 'center',
-        paddingHorizontal: 12,
-        elevation: 15,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.2,
-        shadowRadius: 20,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        justifyContent: 'space-around',
+        paddingHorizontal: 10,
     },
     navItem: { alignItems: 'center', gap: 2 },
-    navLabel: { fontSize: 11, fontWeight: '600' },
+    navLabel: { fontSize: 10, fontWeight: '600' },
     floatingFab: {
         width: 60,
         height: 60,
         borderRadius: 22,
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: -40,
+        marginTop: -36,
         elevation: 10,
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.3,
-        shadowRadius: 12,
+        ...Platform.select({
+            web: { boxShadow: '0 6px 12px rgba(19, 91, 236, 0.3)' },
+            default: {
+                shadowOffset: { width: 0, height: 6 },
+                shadowOpacity: 0.3,
+                shadowRadius: 12,
+            }
+        })
     },
+    bgOrb: {
+        position: 'absolute',
+        width: 300,
+        height: 300,
+        borderRadius: 150,
+    },
+    mainStatWrapper: {
+        borderRadius: 32,
+        overflow: 'hidden',
+        elevation: 12,
+        ...Platform.select({
+            web: { boxShadow: '0 12px 20px rgba(19, 91, 236, 0.4)' },
+            default: {
+                shadowColor: '#135bec',
+                shadowOffset: { width: 0, height: 12 },
+                shadowOpacity: 0.4,
+                shadowRadius: 20,
+            }
+        })
+    },
+    iridescentOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        opacity: 0.3,
+    },
+    statIconBadge: {
+        width: 32,
+        height: 32,
+        borderRadius: 10,
+        backgroundColor: 'rgba(255,255,255,0.2)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginRight: 4,
+    },
+    trendText: { color: 'white', fontSize: 12, fontWeight: '900' },
     emptyCard: { padding: 40, borderRadius: 32, borderWidth: 2, borderStyle: 'dashed', alignItems: 'center', opacity: 0.4 },
     emptyText: { fontWeight: '700', letterSpacing: 0.5 }
 });

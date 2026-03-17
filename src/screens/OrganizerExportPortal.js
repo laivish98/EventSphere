@@ -68,7 +68,7 @@ const StatCard = ({ def, count, selected, onToggle, index, colors, isDarkMode })
         <Animated.View style={[
             styles.statCard,
             { transform: [{ scale: scaleAnim }], backgroundColor: colors.surface, borderColor: selected ? colors.primary : colors.border },
-            { shadowColor: colors.primary, shadowOpacity: selected ? 0.2 : 0 },
+            Platform.select({ web: { boxShadow: isDarkMode || !selected ? 'none' : `0 4px 12px ${colors.primary}33` }, default: { shadowColor: isDarkMode ? 'transparent' : colors.primary, shadowOpacity: selected ? 0.2 : 0 } }),
         ]}>
             <TouchableOpacity onPress={handlePress} activeOpacity={0.7} style={styles.statCardInner}>
                 <View style={styles.statCardIconRow}>
@@ -703,7 +703,7 @@ export default function OrganizerExportPortal({ navigation }) {
                                     <TouchableOpacity
                                         style={[
                                             styles.downloadBtn,
-                                            { backgroundColor: colors.primary, shadowColor: colors.primary },
+                                            Platform.select({ web: { boxShadow: isDarkMode ? 'none' : `0 4px 12px ${colors.primary}66` }, default: { backgroundColor: colors.primary, shadowColor: isDarkMode ? 'transparent' : colors.primary } }),
                                             !SHEET_DEFS.some(d => sheetSelection[d.key]) && styles.downloadBtnDisabled
                                         ]}
                                         onPress={handleExport}
@@ -945,10 +945,15 @@ const styles = StyleSheet.create({
     },
     statCardGlow: {
         ...StyleSheet.absoluteFillObject,
-        shadowColor: GOLD.primary,
-        shadowOffset: { width: 0, height: 0 },
-        shadowRadius: 20,
-        elevation: 8,
+        ...Platform.select({
+            web: { boxShadow: `0 0 20px ${GOLD.primary}` },
+            default: {
+                shadowColor: GOLD.primary,
+                shadowOffset: { width: 0, height: 0 },
+                shadowRadius: 20,
+                elevation: 8,
+            }
+        }),
     },
     statCardIconRow: {
         flexDirection: 'row',
@@ -1017,11 +1022,16 @@ const styles = StyleSheet.create({
         paddingVertical: 18,
         borderRadius: 14,
         backgroundColor: GOLD.primary,
-        shadowColor: GOLD.primary,
-        shadowOffset: { width: 0, height: 6 },
-        shadowOpacity: 0.4,
-        shadowRadius: 16,
-        elevation: 10,
+        ...Platform.select({
+            web: { boxShadow: `0 6px 16px ${GOLD.primary}66` },
+            default: {
+                shadowColor: GOLD.primary,
+                shadowOffset: { width: 0, height: 6 },
+                shadowOpacity: 0.4,
+                shadowRadius: 16,
+                elevation: 10,
+            }
+        }),
     },
     downloadBtnDisabled: {
         opacity: 0.4,

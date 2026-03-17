@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Platform } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 const EventMap = ({ event, openMaps, colors }) => {
@@ -45,10 +45,15 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         gap: 6,
         elevation: 5,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
+        ...Platform.select({
+            web: { boxShadow: '0 2px 10px rgba(0,0,0,0.25)' },
+            default: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.25,
+                shadowRadius: 3.84,
+            }
+        })
     },
     buttonText: {
         color: 'white',

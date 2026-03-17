@@ -1,7 +1,8 @@
 import React, { useRef, useState, useEffect } from 'react';
 import {
     View, StyleSheet, Text, TouchableOpacity, ScrollView,
-    ImageBackground, Image, Dimensions, Animated, ActivityIndicator
+    ImageBackground, Image, Dimensions, Animated, ActivityIndicator,
+    Platform
 } from 'react-native';
 import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -244,13 +245,18 @@ const styles = StyleSheet.create({
         width: CARD_WIDTH,
         borderRadius: 24,
         overflow: 'hidden',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
-        shadowRadius: 20,
         elevation: 12,
         position: 'relative',
         marginBottom: 30, // Spacing between tickets
+        ...Platform.select({
+            web: { boxShadow: '0 10px 20px rgba(0,0,0,0.3)' },
+            default: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.3,
+                shadowRadius: 20,
+            }
+        })
     },
     center: {
         flex: 1,
@@ -334,9 +340,14 @@ const styles = StyleSheet.create({
         marginBottom: 32,
         alignItems: 'center',
         elevation: 4,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
+        ...(Platform.OS === 'web'
+            ? { boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }
+            : {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+            })
     },
     qrInner: {
         padding: 12,
@@ -452,10 +463,14 @@ const styles = StyleSheet.create({
         gap: 12,
         borderWidth: 1,
         borderColor: '#1f2937',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
+        ...(Platform.OS === 'web'
+            ? { boxShadow: '0 4px 8px rgba(0,0,0,0.2)' }
+            : {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 8,
+            })
     },
     walletButtonText: {
         color: 'white',

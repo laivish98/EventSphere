@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, StyleSheet, TouchableOpacity, Text, Dimensions } from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text, Dimensions, Platform } from 'react-native';
 import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -22,67 +22,80 @@ export default function WelcomeScreen({ navigation }) {
             />
 
             {/* Ambient Orbs */}
-            <View style={[styles.orb, styles.orbTop, { backgroundColor: isDarkMode ? 'rgba(19, 91, 236, 0.2)' : 'rgba(19, 91, 236, 0.1)' }]} />
-            <View style={[styles.orb, styles.orbBottom, { backgroundColor: isDarkMode ? 'rgba(19, 91, 236, 0.1)' : 'rgba(19, 91, 236, 0.05)' }]} />
+            <View style={[styles.orb, styles.orbTop, { backgroundColor: isDarkMode ? 'rgba(19, 91, 236, 0.25)' : 'rgba(19, 91, 236, 0.12)' }]} />
+            <View style={[styles.orb, styles.orbBottom, { backgroundColor: isDarkMode ? 'rgba(99, 102, 241, 0.15)' : 'rgba(99, 102, 241, 0.08)' }]} />
+            <View style={[styles.orb, styles.orbCenter, { backgroundColor: isDarkMode ? 'rgba(139, 92, 246, 0.1)' : 'rgba(139, 92, 246, 0.05)' }]} />
 
             {/* Content Container */}
             <View style={styles.content}>
 
                 {/* Logo Section */}
                 <View style={styles.logoContainer}>
-                    <BlurView intensity={20} tint={isDarkMode ? "dark" : "light"} style={[styles.glassPanel, { backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : 'rgba(19, 91, 236, 0.05)', borderColor: colors.glassBorder }]}>
+                    <BlurView intensity={isDarkMode ? 40 : 25} tint={isDarkMode ? "dark" : "light"} style={[styles.glassPanel, { backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.04)' : 'rgba(19, 91, 236, 0.06)', borderColor: colors.glassBorder }]}>
                         <ExpoGradient
-                            colors={isDarkMode ? ['rgba(255,255,255,0.1)', 'transparent'] : ['rgba(19, 91, 236, 0.1)', 'transparent']}
+                            colors={colors.iridescent}
                             style={styles.innerGlow}
                         />
-                        <MaterialCommunityIcons name="ticket-confirmation" size={68} color={colors.primary} style={styles.iconShadow} />
-                        <View style={[styles.decorativeDot, { backgroundColor: colors.primary, shadowColor: colors.primary }]} />
+                        <MaterialCommunityIcons name="ticket-confirmation" size={72} color={colors.primary} style={styles.iconShadow} />
+                        <View style={[styles.decorativeDot, {
+                            backgroundColor: colors.accent,
+                            ...(Platform.OS === 'web'
+                                ? { boxShadow: `0 0 15px ${colors.accent}` }
+                                : {
+                                    shadowColor: Platform.OS === 'web' ? 'transparent' : colors.accent,
+                                    shadowOpacity: 0.8,
+                                    shadowRadius: 15
+                                })
+                        }]} />
                     </BlurView>
                 </View>
 
                 {/* Text Content */}
                 <View style={styles.textContainer}>
                     <Text style={[styles.title, { color: colors.text }]}>EventSphere</Text>
-                    <View style={[styles.titleUnderline, { backgroundColor: colors.primary }]} />
+                    <ExpoGradient
+                        colors={[colors.primary, colors.accent]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={styles.titleUnderline}
+                    />
                     <Text style={[styles.subtitle, { color: colors.textSecondary }]}>
-                        Discover and organize the best campus experiences with ease and style.
+                        Experience campus life like never before. Discover, connect, and celebrate in style.
                     </Text>
                 </View>
 
                 {/* Actions */}
                 <View style={styles.actionContainer}>
-                    {/* Sign Up Button (Primary) */}
                     <TouchableOpacity
-                        style={[styles.primaryButton, { shadowColor: colors.primary }]}
+                        style={[styles.primaryButton, { shadowColor: Platform.OS === 'web' ? 'transparent' : colors.primary }]}
                         activeOpacity={0.8}
                         onPress={() => navigation.navigate('Signup')}
                     >
                         <ExpoGradient
                             colors={[colors.primary, colors.primaryLight]}
                             start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 0 }}
+                            end={{ x: 1, y: 1 }}
                             style={StyleSheet.absoluteFill}
                         />
                         <View style={styles.buttonContent}>
                             <Text style={styles.primaryButtonText}>Get Started</Text>
-                            <MaterialCommunityIcons name="chevron-right" size={22} color="white" />
+                            <MaterialCommunityIcons name="arrow-right" size={20} color="white" />
                         </View>
                     </TouchableOpacity>
 
-                    {/* Log In Button (Secondary) */}
                     <TouchableOpacity
-                        style={[styles.secondaryButton, { borderColor: colors.border }]}
+                        style={[styles.secondaryButton, { backgroundColor: colors.surface, borderColor: colors.border }]}
                         activeOpacity={0.8}
                         onPress={() => navigation.navigate('Login')}
                     >
-                        <Text style={[styles.secondaryButtonText, { color: isDarkMode ? 'white' : colors.text }]}>Log In</Text>
+                        <Text style={[styles.secondaryButtonText, { color: colors.text }]}>Already a member? <Text style={{ color: colors.primary }}>Log In</Text></Text>
                     </TouchableOpacity>
                 </View>
 
                 {/* Footer */}
                 <View style={styles.footer}>
                     <Text style={[styles.footerText, { color: colors.textSecondary }]}>
-                        By continuing, you agree to our <Text style={[styles.link, { color: colors.primary }]}>Terms</Text> & <Text style={[styles.link, { color: colors.primary }]}>Privacy Policy</Text>
+                        Crafted for the next generation of campus leaders.
                     </Text>
                 </View>
 
@@ -100,91 +113,102 @@ const styles = StyleSheet.create({
         borderRadius: 1000,
     },
     orbTop: {
-        top: -height * 0.1,
-        left: -width * 0.1,
-        width: 500,
-        height: 500,
-        backgroundColor: 'rgba(19, 91, 236, 0.2)', // Primary with opacity
-        // Using shadow as poor man's blur if needed, currently reliant on design
+        top: -height * 0.15,
+        left: -width * 0.2,
+        width: width * 1.2,
+        height: width * 1.2,
     },
     orbBottom: {
-        bottom: -height * 0.1,
-        right: -width * 0.1,
-        width: 400,
-        height: 400,
-        backgroundColor: 'rgba(19, 91, 236, 0.1)',
+        bottom: -height * 0.2,
+        right: -width * 0.2,
+        width: width,
+        height: width,
+    },
+    orbCenter: {
+        top: height * 0.3,
+        left: width * 0.1,
+        width: 300,
+        height: 300,
     },
     content: {
         flex: 1,
         justifyContent: 'center',
-        paddingHorizontal: 24,
+        paddingHorizontal: 32,
         alignItems: 'center',
     },
-    logoContainer: { marginBottom: 56, alignItems: 'center' },
+    logoContainer: { marginBottom: 64, alignItems: 'center' },
     glassPanel: {
-        width: 140,
-        height: 140,
-        borderRadius: 36,
+        width: 160,
+        height: 160,
+        borderRadius: 48,
         alignItems: 'center',
         justifyContent: 'center',
         overflow: 'hidden',
         borderWidth: 1.5,
+        elevation: 10,
     },
     innerGlow: { ...StyleSheet.absoluteFillObject },
     iconShadow: {
-        textShadowColor: 'rgba(19, 91, 236, 0.3)',
-        textShadowOffset: { width: 0, height: 8 },
-        textShadowRadius: 20,
+        ...(Platform.OS === 'web'
+            ? { textShadow: '0 12px 25px rgba(19, 91, 236, 0.4)' }
+            : {
+                textShadowColor: 'rgba(19, 91, 236, 0.4)',
+                textShadowOffset: { width: 0, height: 12 },
+                textShadowRadius: 25,
+            })
     },
     decorativeDot: {
         position: 'absolute',
-        bottom: 16,
-        right: 16,
-        width: 10,
-        height: 10,
-        borderRadius: 5,
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.8,
-        shadowRadius: 10,
+        top: 24,
+        right: 24,
+        width: 14,
+        height: 14,
+        borderRadius: 7,
+        elevation: 10,
     },
-    textContainer: { alignItems: 'center', marginBottom: 56, paddingHorizontal: 20 },
+    textContainer: { alignItems: 'center', marginBottom: 64 },
     title: {
-        fontSize: 48,
+        fontSize: 52,
         fontWeight: '900',
         textAlign: 'center',
-        marginBottom: 4,
-        letterSpacing: -1.5,
+        marginBottom: 8,
+        letterSpacing: -2,
     },
     titleUnderline: {
-        width: 60,
-        height: 5,
+        width: 80,
+        height: 6,
         borderRadius: 3,
-        marginBottom: 24,
+        marginBottom: 28,
     },
     subtitle: {
         fontSize: 18,
         textAlign: 'center',
         lineHeight: 28,
-        opacity: 0.8,
+        opacity: 0.9,
         fontWeight: '500',
+        paddingHorizontal: 10,
     },
-    actionContainer: { width: '100%', gap: 16, maxWidth: 320 },
+    actionContainer: { width: '100%', gap: 16, maxWidth: 340 },
     primaryButton: {
-        height: 64,
-        borderRadius: 20,
+        height: 68,
+        borderRadius: 24,
         overflow: 'hidden',
         justifyContent: 'center',
         alignItems: 'center',
-        elevation: 8,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 12,
+        ...Platform.select({
+            web: { boxShadow: '0 8px 15px rgba(0,0,0,0.3)' },
+            default: {
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.4,
+                shadowRadius: 16,
+                elevation: 12,
+            }
+        })
     },
-    buttonContent: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-    primaryButtonText: { color: 'white', fontSize: 18, fontWeight: 'bold', letterSpacing: 0.5 },
-    secondaryButton: { height: 60, borderRadius: 20, borderWidth: 1.5, justifyContent: 'center', alignItems: 'center' },
-    secondaryButtonText: { fontSize: 16, fontWeight: 'bold' },
-    footer: { marginTop: 40, alignItems: 'center' },
-    footerText: { fontSize: 12, textAlign: 'center', opacity: 0.6 },
-    link: { fontWeight: '600' },
+    buttonContent: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    primaryButtonText: { color: 'white', fontSize: 19, fontWeight: 'bold', letterSpacing: 0.5 },
+    secondaryButton: { height: 64, borderRadius: 24, borderWidth: 1.5, justifyContent: 'center', alignItems: 'center' },
+    secondaryButtonText: { fontSize: 16, fontWeight: '600' },
+    footer: { position: 'absolute', bottom: 40, width: '100%', alignItems: 'center' },
+    footerText: { fontSize: 13, textAlign: 'center', opacity: 0.5, fontWeight: '600', letterSpacing: 0.3 },
 });

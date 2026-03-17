@@ -101,12 +101,41 @@ const styles = StyleSheet.create({
     backBtn: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', borderWidth: 1.5 },
     scrollContent: { paddingHorizontal: 24, paddingBottom: 60 },
     heroSection: { alignItems: 'center', marginVertical: 32 },
-    logoOuter: { padding: 14, borderRadius: 44, borderWidth: 2, marginBottom: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.1, shadowRadius: 20 },
+    logoOuter: {
+        padding: 14,
+        borderRadius: 44,
+        borderWidth: 2,
+        marginBottom: 24,
+        ...Platform.select({
+            web: { boxShadow: '0 10px 20px rgba(0,0,0,0.1)' },
+            default: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.1,
+                shadowRadius: 20,
+            }
+        })
+    },
     logoGradient: { width: 100, height: 100, borderRadius: 32, alignItems: 'center', justifyContent: 'center' },
     appName: { fontSize: 36, fontWeight: 'bold', letterSpacing: -1.5, marginBottom: 8 },
     versionBadge: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 100 },
     versionText: { fontSize: 11, fontWeight: '900', letterSpacing: 1.5 },
-    card: { padding: 28, borderRadius: 32, borderWidth: 1.5, marginBottom: 40, elevation: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 15 },
+    card: {
+        padding: 28,
+        borderRadius: 32,
+        borderWidth: 1.5,
+        marginBottom: 40,
+        elevation: 6,
+        ...Platform.select({
+            web: { boxShadow: '0 4px 15px rgba(0,0,0,0.05)' },
+            default: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.05,
+                shadowRadius: 15,
+            }
+        })
+    },
     cardTitle: { fontSize: 12, fontWeight: '900', marginBottom: 16, letterSpacing: 2, textTransform: 'uppercase' },
     cardBody: { fontSize: 16, lineHeight: 26, opacity: 0.8, fontWeight: '500' },
     sectionTitle: { fontSize: 11, fontWeight: '900', letterSpacing: 2, marginBottom: 32, marginLeft: 8 },

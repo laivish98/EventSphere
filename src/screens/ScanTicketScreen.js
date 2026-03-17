@@ -2,9 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import {
     Text, View, StyleSheet, TouchableOpacity,
     Animated, Easing, Dimensions, TextInput, Modal,
-    Pressable
+    Pressable, Platform
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
+import { BlurView } from 'expo-blur';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
@@ -158,103 +159,128 @@ export default function ScanTicketScreen({ navigation }) {
                 enableTorch={torchOn}
             />
 
-            {/* Overlay mask — 4 dark quadrants + central clear window */}
+            {/* Premium Scanner Overlay */}
             <View style={styles.overlay}>
-                {/* Top dark */}
-                <View style={styles.overlayTop} />
-                {/* Middle row */}
+                {/* Top Cinematic Mask */}
+                <ExpoGradient
+                    colors={['rgba(0,0,0,0.85)', 'rgba(0,0,0,0.6)', 'transparent']}
+                    style={styles.overlayTop}
+                />
+
                 <View style={styles.overlayMiddle}>
                     <View style={styles.overlaySide} />
-                    {/* Scan window */}
-                    <View style={styles.scanWindow}>
-                        {/* Corner markers */}
-                        <View style={[styles.corner, styles.cornerTL]} />
-                        <View style={[styles.corner, styles.cornerTR]} />
-                        <View style={[styles.corner, styles.cornerBL]} />
-                        <View style={[styles.corner, styles.cornerBR]} />
-                        {/* Animated scan line */}
+                    {/* High-Tech Scan Window */}
+                    <View style={[styles.scanWindow, { borderColor: colors.glassBorder }]}>
+                        <BlurView intensity={isDarkMode ? 10 : 0} tint="dark" style={StyleSheet.absoluteFill} />
+
+                        {/* Precision Corner Markers */}
+                        <View style={[styles.corner, styles.cornerTL, { borderColor: colors.primary }]} />
+                        <View style={[styles.corner, styles.cornerTR, { borderColor: colors.primary }]} />
+                        <View style={[styles.corner, styles.cornerBL, { borderColor: colors.primary }]} />
+                        <View style={[styles.corner, styles.cornerBR, { borderColor: colors.primary }]} />
+
+                        {/* Atmospheric Scan Line */}
                         <Animated.View
                             style={[
                                 styles.scanLine,
-                                { transform: [{ translateY: scanLineAnim }] },
+                                {
+                                    transform: [{ translateY: scanLineAnim }],
+                                    backgroundColor: colors.primary,
+                                    ...Platform.select({ web: { boxShadow: `0 0 15px ${colors.primary}80` }, default: { shadowColor: colors.primary } }),
+                                },
                             ]}
-                        />
+                        >
+                            <ExpoGradient
+                                colors={['transparent', colors.primary, 'transparent']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={StyleSheet.absoluteFill}
+                            />
+                        </Animated.View>
                     </View>
                     <View style={styles.overlaySide} />
                 </View>
-                {/* Bottom dark */}
-                <View style={styles.overlayBottom}>
-                    <View style={styles.alignHint}>
-                        <Text style={styles.alignHintText}>Align QR code within frame</Text>
+
+                {/* Bottom Cinematic Mask */}
+                <ExpoGradient
+                    colors={['transparent', 'rgba(0,0,0,0.6)', 'rgba(0,0,0,0.9)']}
+                    style={styles.overlayBottom}
+                >
+                    <View style={[styles.alignHint, { backgroundColor: 'rgba(255,255,255,0.08)', borderColor: colors.glassBorder }]}>
+                        <MaterialCommunityIcons name="target" size={16} color="rgba(255,255,255,0.7)" style={{ marginRight: 8 }} />
+                        <Text style={styles.alignHintText}>ALIGN VALID QR CODE</Text>
                     </View>
-                </View>
+                </ExpoGradient>
             </View>
 
-            {/* Top header */}
+            {/* Premium Header Control Bar */}
             <ExpoGradient
-                colors={['rgba(0,0,0,0.75)', 'transparent']}
+                colors={['rgba(0,0,0,0.85)', 'transparent']}
                 style={styles.topBar}
             >
-                <Pressable
-                    style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.7 }]}
-                    onPress={() => navigation.goBack()}
-                >
-                    <MaterialCommunityIcons name="arrow-left" size={24} color="white" />
-                </Pressable>
-                <View style={styles.titleBlock}>
-                    <Text style={styles.topBarTitle}>Scan Entry Ticket</Text>
-                    <View style={styles.liveBadge}>
-                        <Animated.View style={styles.liveDot} />
-                        <Text style={styles.liveText}>Live Camera</Text>
+                <BlurView intensity={20} tint="dark" style={styles.headerGlassBacking}>
+                    <Pressable
+                        style={({ pressed }) => [styles.iconButton, pressed && { opacity: 0.7 }]}
+                        onPress={() => navigation.goBack()}
+                    >
+                        <MaterialCommunityIcons name="chevron-left" size={28} color="white" />
+                    </Pressable>
+                    <View style={styles.titleBlock}>
+                        <Text style={styles.topBarTitle}>VALIDATION PORTAL</Text>
+                        <View style={styles.liveBadge}>
+                            <View style={[styles.liveDot, { backgroundColor: '#4ade80' }]} />
+                            <Text style={styles.liveText}>NEURAL SCAN ACTIVE</Text>
+                        </View>
                     </View>
-                </View>
-                <Pressable
-                    style={({ pressed }) => [
-                        styles.iconButton,
-                        torchOn && styles.iconButtonActive,
-                        pressed && { opacity: 0.7 }
-                    ]}
-                    onPress={async () => {
-                        const newTorchState = !torchOn;
-                        setTorchOn(newTorchState);
+                    <Pressable
+                        style={({ pressed }) => [
+                            styles.iconButton,
+                            torchOn && styles.iconButtonActive,
+                            pressed && { opacity: 0.7 }
+                        ]}
+                        onPress={async () => {
+                            const newTorchState = !torchOn;
+                            setTorchOn(newTorchState);
 
-                        // Mobile Browser Fallback: Direct MediaStream manipulation
-                        if (Platform.OS === 'web') {
-                            try {
-                                const videoElements = document.getElementsByTagName('video');
-                                for (let i = 0; i < videoElements.length; i++) {
-                                    const stream = videoElements[i].srcObject;
-                                    if (stream) {
-                                        const tracks = stream.getVideoTracks();
-                                        for (const track of tracks) {
-                                            const capabilities = track.getCapabilities?.() || {};
-                                            if (capabilities.torch) {
-                                                await track.applyConstraints({
-                                                    advanced: [{ torch: newTorchState }]
-                                                });
-                                                console.log(`Torch successfully ${newTorchState ? 'enabled' : 'disabled'} via MediaStream`);
+                            // Mobile Browser Fallback: Direct MediaStream manipulation
+                            if (Platform.OS === 'web') {
+                                try {
+                                    const videoElements = document.getElementsByTagName('video');
+                                    for (let i = 0; i < videoElements.length; i++) {
+                                        const stream = videoElements[i].srcObject;
+                                        if (stream) {
+                                            const tracks = stream.getVideoTracks();
+                                            for (const track of tracks) {
+                                                const capabilities = track.getCapabilities?.() || {};
+                                                if (capabilities.torch) {
+                                                    await track.applyConstraints({
+                                                        advanced: [{ torch: newTorchState }]
+                                                    });
+                                                    console.log(`Torch successfully ${newTorchState ? 'enabled' : 'disabled'} via MediaStream`);
+                                                }
                                             }
                                         }
                                     }
+                                } catch (e) {
+                                    console.warn("Mobile browser torch fallback failed:", e);
                                 }
-                            } catch (e) {
-                                console.warn("Mobile browser torch fallback failed:", e);
                             }
-                        }
-                    }}
-                >
-                    <MaterialCommunityIcons name={torchOn ? 'flash' : 'flash-outline'} size={24} color="white" />
-                </Pressable>
+                        }}
+                    >
+                        <MaterialCommunityIcons name={torchOn ? 'flash' : 'flash-outline'} size={24} color="white" />
+                    </Pressable>
+                </BlurView>
             </ExpoGradient>
 
-            {/* Bottom Result Sheet */}
+            {/* High-Performance Result Sheet */}
             {scanResult && (
                 <Animated.View style={[styles.resultSheet, {
-                    backgroundColor: isDarkMode ? 'rgba(28, 28, 30, 0.95)' : 'rgba(255, 255, 255, 0.98)',
-                    borderColor: colors.border,
+                    borderColor: colors.glassBorder,
                     transform: [{ translateY: cardSlide }]
                 }]}>
-                    {/* Top color bar */}
+                    <BlurView intensity={90} tint={isDarkMode ? "dark" : "light"} style={StyleSheet.absoluteFill} />
+
+                    {/* Visual Feedback Bar */}
                     <ExpoGradient
                         colors={scanResult.type === 'success'
                             ? ['#4ade80', '#059669']
@@ -263,80 +289,99 @@ export default function ScanTicketScreen({ navigation }) {
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                     />
+
                     <View style={styles.resultContent}>
                         <View style={styles.resultRow}>
-                            {/* Status icon */}
+                            {/* Cinematic Status Icon */}
                             <View style={[
                                 styles.resultIcon,
                                 {
                                     backgroundColor: scanResult.type === 'success'
-                                        ? 'rgba(74, 222, 128, 0.15)'
+                                        ? 'rgba(74, 222, 128, 0.1)'
                                         : scanResult.type === 'used'
-                                            ? 'rgba(245, 158, 11, 0.15)'
-                                            : 'rgba(239, 68, 68, 0.15)'
+                                            ? 'rgba(245, 158, 11, 0.1)'
+                                            : 'rgba(239, 68, 68, 0.1)',
+                                    borderColor: scanResult.type === 'success' ? 'rgba(74, 222, 128, 0.2)' : 'rgba(239, 68, 68, 0.2)',
+                                    borderWidth: 1,
                                 }
                             ]}>
                                 <MaterialCommunityIcons
-                                    name={scanResult.type === 'success' ? 'check-circle' : scanResult.type === 'used' ? 'alert-circle' : 'close-circle'}
-                                    size={32}
-                                    color={scanResult.type === 'success' ? '#4ade80' : scanResult.type === 'used' ? '#f59e0b' : '#ef4444'}
+                                    name={scanResult.type === 'success' ? 'shield-check' : scanResult.type === 'used' ? 'alert-decagram' : 'shield-alert'}
+                                    size={36}
+                                    color={scanResult.type === 'success' ? '#10b981' : scanResult.type === 'used' ? '#f59e0b' : '#ef4444'}
                                 />
                             </View>
+
                             <View style={{ flex: 1 }}>
                                 <View style={styles.resultTitleRow}>
                                     <View>
                                         <Text style={[styles.resultTitle, { color: colors.text }]}>
-                                            {scanResult.type === 'success' ? 'Verified' : scanResult.type === 'used' ? 'Already Used' : 'Entry Denied'}
+                                            {scanResult.type === 'success' ? 'IDENTITY VERIFIED' : scanResult.type === 'used' ? 'SECURITY ALERT' : 'ACCESS DENIED'}
                                         </Text>
                                         <Text style={[
                                             styles.resultSubtitle,
-                                            { color: scanResult.type === 'success' ? '#4ade80' : scanResult.type === 'used' ? '#f59e0b' : '#ef4444' }
+                                            { color: scanResult.type === 'success' ? '#10b981' : scanResult.type === 'used' ? '#f59e0b' : '#ef4444' }
                                         ]}>
-                                            {scanResult.message}
+                                            {scanResult.message.toUpperCase()}
                                         </Text>
                                     </View>
-                                    <Text style={styles.resultTime}>{scanResult.time}</Text>
+                                    <View style={[styles.timeBadge, { backgroundColor: colors.surface + '60' }]}>
+                                        <Text style={[styles.resultTime, { color: colors.textSecondary }]}>{scanResult.time}</Text>
+                                    </View>
                                 </View>
+
                                 {scanResult.name && (
-                                    <View style={[styles.attendeeCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                                        <View style={[styles.attendeeAvatar, { backgroundColor: colors.primary }]}>
-                                            <Text style={styles.attendeeInitials}>{initials(scanResult.name)}</Text>
+                                    <BlurView intensity={20} tint={isDarkMode ? "dark" : "light"} style={[styles.attendeeCard, { backgroundColor: colors.surface + '30', borderColor: colors.glassBorder }]}>
+                                        <ExpoGradient
+                                            colors={isDarkMode ? ['rgba(255,255,255,0.05)', 'transparent'] : ['rgba(19, 91, 236, 0.05)', 'transparent']}
+                                            style={StyleSheet.absoluteFill}
+                                        />
+                                        <View style={[styles.attendeeAvatar, { backgroundColor: colors.primary }, Platform.select({ web: { boxShadow: `0 4px 12px ${colors.primary}40` }, default: { shadowColor: colors.primary } })]}>
+                                            <MaterialCommunityIcons name="account" size={24} color="white" />
                                         </View>
                                         <View>
                                             <Text style={[styles.attendeeName, { color: colors.text }]}>{scanResult.name}</Text>
-                                            <Text style={[styles.attendeePass, { color: colors.textSecondary }]}>{scanResult.passType}</Text>
+                                            <Text style={[styles.attendeePass, { color: colors.textSecondary }]}>{scanResult.passType.toUpperCase()}</Text>
                                         </View>
-                                    </View>
+                                    </BlurView>
                                 )}
                                 {!scanResult.name && (
-                                    <Text style={styles.errorMessage}>{scanResult.message}</Text>
+                                    <View style={[styles.errorAlert, { backgroundColor: 'rgba(239, 68, 68, 0.1)', borderColor: 'rgba(239, 68, 68, 0.2)' }]}>
+                                        <Text style={styles.errorMessage}>{scanResult.message}</Text>
+                                    </View>
                                 )}
                             </View>
                         </View>
 
                         <View style={styles.actionRow}>
-                            <Pressable
-                                style={({ pressed }) => [
+                            <TouchableOpacity
+                                style={[
                                     styles.secondaryBtn,
-                                    { backgroundColor: colors.surface, borderColor: colors.border },
-                                    pressed && { opacity: 0.7 }
+                                    { backgroundColor: colors.surface + '40', borderColor: colors.glassBorder }
                                 ]}
                                 onPress={() => setManualModalVisible(true)}
+                                activeOpacity={0.7}
                             >
-                                <MaterialCommunityIcons name="keyboard" size={18} color={colors.text} />
-                                <Text style={[styles.secondaryBtnText, { color: colors.text }]}>Manual Entry</Text>
-                            </Pressable>
-                            <Pressable
-                                style={({ pressed }) => [
+                                <MaterialCommunityIcons name="form-textbox" size={20} color={colors.text} />
+                                <Text style={[styles.secondaryBtnText, { color: colors.text }]}>MANUAL OVERRIDE</Text>
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                style={[
                                     styles.primaryBtn,
-                                    { backgroundColor: colors.primary, shadowColor: colors.primary },
-                                    pressed && { opacity: 0.8 }
+                                    Platform.select({ web: { boxShadow: `0 8px 24px ${colors.primary}40` }, default: { shadowColor: colors.primary } })
                                 ]}
                                 onPress={handleScanNext}
+                                activeOpacity={0.8}
                             >
-                                <MaterialCommunityIcons name="qrcode-scan" size={18} color="white" />
-                                <Text style={styles.primaryBtnText}>Scan Next</Text>
-                            </Pressable>
+                                <ExpoGradient
+                                    colors={[colors.primary, '#6366f1']}
+                                    start={{ x: 0, y: 0 }}
+                                    end={{ x: 1, y: 0 }}
+                                    style={StyleSheet.absoluteFill}
+                                />
+                                <MaterialCommunityIcons name="qrcode-scan" size={20} color="white" />
+                                <Text style={styles.primaryBtnText}>NEXT SCAN</Text>
+                            </TouchableOpacity>
                         </View>
                     </View>
                 </Animated.View>
@@ -421,60 +466,68 @@ const styles = StyleSheet.create({
         width: CORNER_SIZE,
         height: CORNER_SIZE,
     },
-    cornerTL: { top: 0, left: 0, borderTopWidth: CORNER_THICKNESS, borderLeftWidth: CORNER_THICKNESS, borderColor: '#135bec', borderTopLeftRadius: 12 },
-    cornerTR: { top: 0, right: 0, borderTopWidth: CORNER_THICKNESS, borderRightWidth: CORNER_THICKNESS, borderColor: '#135bec', borderTopRightRadius: 12 },
-    cornerBL: { bottom: 0, left: 0, borderBottomWidth: CORNER_THICKNESS, borderLeftWidth: CORNER_THICKNESS, borderColor: '#135bec', borderBottomLeftRadius: 12 },
-    cornerBR: { bottom: 0, right: 0, borderBottomWidth: CORNER_THICKNESS, borderRightWidth: CORNER_THICKNESS, borderColor: '#135bec', borderBottomRightRadius: 12 },
+    cornerTL: { top: 0, left: 0, borderTopWidth: CORNER_THICKNESS, borderLeftWidth: CORNER_THICKNESS, borderTopLeftRadius: 16 },
+    cornerTR: { top: 0, right: 0, borderTopWidth: CORNER_THICKNESS, borderRightWidth: CORNER_THICKNESS, borderTopRightRadius: 16 },
+    cornerBL: { bottom: 0, left: 0, borderBottomWidth: CORNER_THICKNESS, borderLeftWidth: CORNER_THICKNESS, borderBottomLeftRadius: 16 },
+    cornerBR: { bottom: 0, right: 0, borderBottomWidth: CORNER_THICKNESS, borderRightWidth: CORNER_THICKNESS, borderBottomRightRadius: 16 },
     scanLine: {
         position: 'absolute',
         top: 0, left: 0, right: 0,
-        height: 3,
-        backgroundColor: '#135bec',
+        height: 4,
         opacity: 0.8,
-        shadowColor: '#135bec',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: 0.8,
-        shadowRadius: 8,
+        ...Platform.select({
+            web: { boxShadow: '0 0 15px currentColor' },
+            default: {
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0.8,
+                shadowRadius: 12,
+            }
+        })
     },
 
     // Top bar
     topBar: {
         position: 'absolute', top: 0, left: 0, right: 0,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingTop: 56,
+        paddingTop: Platform.OS === 'ios' ? 60 : 40,
         paddingHorizontal: 16,
-        paddingBottom: 32,
+        paddingBottom: 40,
+    },
+    headerGlassBacking: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: 12,
+        borderRadius: 24,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
     },
     iconButton: {
-        width: 40, height: 40, borderRadius: 20,
-        backgroundColor: 'rgba(0,0,0,0.25)',
+        width: 48, height: 48, borderRadius: 16,
+        backgroundColor: 'rgba(255,255,255,0.12)',
         alignItems: 'center', justifyContent: 'center',
     },
-    iconButtonActive: { backgroundColor: 'rgba(255,255,100,0.2)' },
+    iconButtonActive: { backgroundColor: 'rgba(255,255,100,0.3)' },
     titleBlock: { alignItems: 'center' },
-    topBarTitle: { fontSize: 15, fontWeight: '600', letterSpacing: 0.4 },
-    liveBadge: { flexDirection: 'row', alignItems: 'center', gap: 5, marginTop: 3 },
-    liveDot: { width: 7, height: 7, borderRadius: 4, backgroundColor: '#4ade80' },
-    liveText: { fontSize: 11 },
+    topBarTitle: { fontSize: 13, fontWeight: '900', letterSpacing: 2, color: 'white' },
+    liveBadge: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 },
+    liveDot: { width: 6, height: 6, borderRadius: 3 },
+    liveText: { fontSize: 10, fontWeight: '800', color: 'rgba(255,255,255,0.6)', letterSpacing: 1 },
 
     // Result sheet
     resultSheet: {
         position: 'absolute',
         bottom: 0, left: 0, right: 0,
-        backgroundColor: 'rgba(28, 28, 30, 0.92)',
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.08)',
+        borderTopLeftRadius: 40,
+        borderTopRightRadius: 40,
+        borderWidth: 1.5,
         overflow: 'hidden',
     },
-    resultTopBar: { height: 4, width: '100%' },
-    resultContent: { padding: 20, paddingBottom: 40 },
-    resultRow: { flexDirection: 'row', gap: 16, marginBottom: 20 },
+    resultTopBar: { height: 6, width: '100%' },
+    resultContent: { padding: 24, paddingBottom: 48 },
+    resultRow: { flexDirection: 'row', gap: 20, marginBottom: 24 },
     resultIcon: {
-        width: 52, height: 52, borderRadius: 26,
+        width: 64, height: 64, borderRadius: 24,
         alignItems: 'center', justifyContent: 'center',
         flexShrink: 0,
     },
@@ -482,98 +535,110 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'flex-start',
-        marginBottom: 12,
+        marginBottom: 16,
     },
-    resultTitle: { fontSize: 20, fontWeight: 'bold', color: 'white' },
-    resultSubtitle: { fontSize: 13, fontWeight: '500', marginTop: 2 },
-    resultTime: { fontSize: 11, color: 'rgba(255,255,255,0.35)', fontFamily: 'monospace' },
+    resultTitle: { fontSize: 13, fontWeight: '900', letterSpacing: 1.5 },
+    resultSubtitle: { fontSize: 18, fontWeight: '900', marginTop: 4, letterSpacing: -0.5 },
+    timeBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
+    resultTime: { fontSize: 11, fontWeight: '800', letterSpacing: 1 },
     attendeeCard: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 12,
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        borderRadius: 12,
-        padding: 12,
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.06)',
+        gap: 16,
+        borderRadius: 20,
+        padding: 16,
+        borderWidth: 1.5,
+        overflow: 'hidden',
     },
     attendeeAvatar: {
-        width: 40, height: 40, borderRadius: 20,
-        backgroundColor: '#4c1d95',
+        width: 48, height: 48, borderRadius: 16,
         alignItems: 'center', justifyContent: 'center',
+        ...Platform.select({
+            web: { boxShadow: '0 4px 12px rgba(0,0,0,0.2)' },
+            default: {
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+            }
+        })
     },
-    attendeeInitials: { color: 'white', fontWeight: 'bold', fontSize: 14 },
-    attendeeName: { color: 'white', fontWeight: '600', fontSize: 14 },
-    attendeePass: { color: 'rgba(255,255,255,0.45)', fontSize: 12, marginTop: 1 },
-    errorMessage: { color: 'rgba(255,255,255,0.5)', fontSize: 13, marginTop: 4 },
+    attendeeName: { fontWeight: '900', fontSize: 16, letterSpacing: -0.3 },
+    attendeePass: { fontSize: 10, fontWeight: '800', marginTop: 4, letterSpacing: 1 },
+    errorAlert: { padding: 16, borderRadius: 16, borderWidth: 1, marginTop: 8 },
+    errorMessage: { fontSize: 13, fontWeight: '700', textAlign: 'center' },
 
     // Action buttons
-    actionRow: { flexDirection: 'row', gap: 12 },
+    actionRow: { flexDirection: 'row', gap: 16 },
     secondaryBtn: {
-        flex: 1, height: 48, borderRadius: 14,
-        backgroundColor: 'rgba(255,255,255,0.07)',
-        borderWidth: 1, borderColor: 'rgba(255,255,255,0.07)',
-        flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
+        flex: 1, height: 60, borderRadius: 20,
+        borderWidth: 1.5,
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
     },
-    secondaryBtnText: { color: 'white', fontSize: 14, fontWeight: '500' },
+    secondaryBtnText: { fontSize: 12, fontWeight: '900', letterSpacing: 1 },
     primaryBtn: {
-        flex: 1, height: 48, borderRadius: 14,
-        backgroundColor: '#135bec',
-        flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8,
-        shadowColor: '#135bec', shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.35, shadowRadius: 8, elevation: 6,
+        flex: 1, height: 60, borderRadius: 20,
+        flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
+        overflow: 'hidden',
+        ...Platform.select({
+            web: { boxShadow: '0 8px 15px rgba(0,0,0,0.3)' },
+            default: {
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.4,
+                shadowRadius: 15,
+                elevation: 8,
+            }
+        })
     },
-    primaryBtnText: { color: 'white', fontSize: 14, fontWeight: 'bold' },
+    primaryBtnText: { color: 'white', fontSize: 13, fontWeight: '900', letterSpacing: 1 },
 
     // Bottom helper (no result state)
     bottomHelper: {
-        position: 'absolute', bottom: 32, left: 0, right: 0,
-        alignItems: 'center', gap: 16,
+        position: 'absolute', bottom: 48, left: 0, right: 0,
+        alignItems: 'center', gap: 20,
     },
     manualEntryChip: {
-        flexDirection: 'row', alignItems: 'center', gap: 8,
-        backgroundColor: 'rgba(0,0,0,0.35)',
-        paddingHorizontal: 20, paddingVertical: 10, borderRadius: 100,
-        borderWidth: 1, borderColor: 'rgba(255,255,255,0.1)',
+        flexDirection: 'row', alignItems: 'center', gap: 10,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        paddingHorizontal: 24, paddingVertical: 14, borderRadius: 100,
+        borderWidth: 1.5, borderColor: 'rgba(255,255,255,0.15)',
     },
-    manualEntryChipText: { color: 'rgba(255,255,255,0.7)', fontSize: 13, fontWeight: '500' },
-    versionText: { color: 'rgba(255,255,255,0.2)', fontSize: 11 },
+    manualEntryChipText: { color: 'rgba(255,255,255,0.9)', fontSize: 12, fontWeight: '900', letterSpacing: 1.5 },
+    versionText: { color: 'rgba(255,255,255,0.3)', fontSize: 10, fontWeight: '800', letterSpacing: 2 },
 
     // Grant permission
     grantButton: {
-        backgroundColor: '#135bec', paddingHorizontal: 24, paddingVertical: 14,
-        borderRadius: 14,
+        height: 56, paddingHorizontal: 32,
+        borderRadius: 18, alignItems: 'center', justifyContent: 'center',
     },
-    grantButtonText: { color: 'white', fontWeight: 'bold', fontSize: 15 },
+    grantButtonText: { color: 'white', fontWeight: '900', fontSize: 14, letterSpacing: 1 },
 
     // Manual modal
     modalOverlay: {
         flex: 1, justifyContent: 'flex-end',
-        backgroundColor: 'rgba(0,0,0,0.6)',
+        backgroundColor: 'rgba(0,0,0,0.7)',
     },
     modalSheet: {
-        backgroundColor: '#1c2333', borderTopLeftRadius: 20, borderTopRightRadius: 20,
-        padding: 24, paddingBottom: 40, gap: 16,
-        borderTopWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+        borderTopLeftRadius: 40, borderTopRightRadius: 40,
+        padding: 32, paddingBottom: 60, gap: 24,
+        borderTopWidth: 1.5, overflow: 'hidden',
     },
-    modalTitle: { fontSize: 17, fontWeight: 'bold', color: 'white' },
+    modalTitle: { fontSize: 22, fontWeight: '900', letterSpacing: -0.5 },
     modalInput: {
-        backgroundColor: '#111722', borderRadius: 12,
-        borderWidth: 1, borderColor: 'rgba(75,85,99,0.5)',
-        paddingHorizontal: 16, paddingVertical: 14,
-        fontSize: 15, color: 'white',
+        borderRadius: 20,
+        borderWidth: 1.5,
+        paddingHorizontal: 20, paddingVertical: 18,
+        fontSize: 16, fontWeight: '700',
     },
-    modalActions: { flexDirection: 'row', gap: 12 },
+    modalActions: { flexDirection: 'row', gap: 16 },
     modalCancelBtn: {
-        flex: 1, height: 48, borderRadius: 12,
-        backgroundColor: 'rgba(255,255,255,0.05)',
+        flex: 1, height: 60, borderRadius: 20,
         alignItems: 'center', justifyContent: 'center',
-        borderWidth: 1, borderColor: 'rgba(255,255,255,0.08)',
+        borderWidth: 1.5,
     },
-    modalCancelText: { color: 'rgba(255,255,255,0.6)', fontWeight: '500' },
+    modalCancelText: { fontWeight: '900', letterSpacing: 1, fontSize: 13 },
     modalConfirmBtn: {
-        flex: 1, height: 48, borderRadius: 12,
-        backgroundColor: '#135bec', alignItems: 'center', justifyContent: 'center',
+        flex: 1, height: 60, borderRadius: 20,
+        alignItems: 'center', justifyContent: 'center',
     },
-    modalConfirmText: { color: 'white', fontWeight: 'bold' },
+    modalConfirmText: { color: 'white', fontWeight: '900', letterSpacing: 1, fontSize: 13 },
 });

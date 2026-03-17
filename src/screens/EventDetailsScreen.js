@@ -367,154 +367,168 @@ export default function EventDetailsScreen({ route, navigation }) {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar style="light" />
 
+            {/* Cinematic Background Elements for Content */}
+            <View style={StyleSheet.absoluteFill}>
+                <ExpoGradient
+                    colors={isDarkMode ? ['#0f172a', '#1e1b4b', '#000000'] : ['#f8fafc', '#e2e8f0', '#cbd5e1']}
+                    style={StyleSheet.absoluteFill}
+                />
+                <View style={[styles.bgOrb, styles.orb1, { backgroundColor: colors.primaryGlow }]} />
+                <View style={[styles.bgOrb, styles.orb2, { backgroundColor: (colors.secondaryGlow || '#8b5cf630') }]} />
+            </View>
+
             <ScrollView showsVerticalScrollIndicator={false}>
-                {/* Hero Image */}
+                {/* Immersive Hero Section */}
                 <View style={styles.imageContainer}>
                     <Image source={{ uri: event.imageUrl || event.image }} style={styles.image} />
                     <ExpoGradient
-                        colors={['transparent', 'rgba(0,0,0,0.8)']}
+                        colors={['rgba(0,0,0,0.6)', 'transparent', 'rgba(0,0,0,0.95)']}
+                        locations={[0, 0.4, 1]}
                         style={styles.imageOverlay}
                     />
 
-                    {/* Header Overlay */}
+                    {/* Premium Header Overlay */}
                     <View style={styles.headerOverlay}>
                         <TouchableOpacity
                             onPress={() => navigation.canGoBack() ? navigation.goBack() : navigation.navigate('Home')}
-                            style={[styles.roundButton, { backgroundColor: 'rgba(255,255,255,0.2)' }]}
+                            style={styles.premiumRoundBtn}
                         >
-                            <BlurView intensity={20} style={StyleSheet.absoluteFill} />
+                            <BlurView intensity={30} tint="light" style={StyleSheet.absoluteFill} />
                             <MaterialCommunityIcons name="chevron-left" size={28} color="white" />
                         </TouchableOpacity>
 
                         <View style={styles.headerActions}>
-                            <TouchableOpacity style={[styles.roundButton, { backgroundColor: 'rgba(255,255,255,0.2)' }]} onPress={onShare}>
-                                <BlurView intensity={20} style={StyleSheet.absoluteFill} />
-                                <MaterialCommunityIcons name="share-variant" size={22} color="white" />
+                            <TouchableOpacity style={styles.premiumRoundBtn} onPress={onShare}>
+                                <BlurView intensity={30} tint="light" style={StyleSheet.absoluteFill} />
+                                <MaterialCommunityIcons name="share-variant" size={20} color="white" />
                             </TouchableOpacity>
-                            <TouchableOpacity style={[styles.roundButton, { marginLeft: 12, backgroundColor: 'rgba(255,255,255,0.2)' }]}>
-                                <BlurView intensity={20} style={StyleSheet.absoluteFill} />
-                                <MaterialCommunityIcons name="heart-outline" size={22} color="white" />
+                            <TouchableOpacity style={[styles.premiumRoundBtn, { marginLeft: 12 }]}>
+                                <BlurView intensity={30} tint="light" style={StyleSheet.absoluteFill} />
+                                <MaterialCommunityIcons name="heart-outline" size={20} color="white" />
                             </TouchableOpacity>
                         </View>
                     </View>
 
-                    {/* Quick Info */}
-                    <View style={styles.quickInfoContainer}>
-                        <ExpoGradient
-                            colors={['transparent', 'rgba(0,0,0,0.6)']}
-                            style={styles.heroShadow}
-                        />
-                        <View style={[styles.categoryBadge, { backgroundColor: colors.primary + '30', borderColor: colors.primary + '60' }]}>
-                            <Text style={[styles.categoryText, { color: 'white' }]}>{event.category}</Text>
-                        </View>
-                        <Text style={[styles.title, { color: 'white' }]}>{event.title}</Text>
-                        <View style={styles.locationContainer}>
-                            <MaterialCommunityIcons name="map-marker-radius" size={18} color="rgba(255,255,255,0.9)" />
-                            <Text style={styles.locationText}>{event.venue || event.location}</Text>
+                    {/* Hero Title & Context */}
+                    <View style={styles.heroTextContent}>
+                        <BlurView intensity={20} tint="light" style={styles.glassBadge}>
+                            <Text style={styles.glassBadgeText}>{event.category}</Text>
+                        </BlurView>
+                        <Text style={styles.titleText}>{event.title}</Text>
+                        <View style={styles.heroLocationRow}>
+                            <View style={styles.locationIconGlow}>
+                                <MaterialCommunityIcons name="map-marker-radius" size={18} color="#fff" />
+                            </View>
+                            <Text style={styles.heroLocationText}>{event.venue || event.location}</Text>
                         </View>
                     </View>
                 </View>
 
                 <View style={styles.contentContainer}>
-                    {/* Basic Info Cards */}
-                    <View style={styles.infoGrid}>
-                        <View style={[styles.infoCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <View style={[styles.iconBox, { backgroundColor: colors.primary + '15' }]}>
-                                <MaterialCommunityIcons name="calendar" size={24} color={colors.primary} />
-                            </View>
-                            <View>
-                                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Date & Time</Text>
-                                <Text style={[styles.infoValue, { color: colors.text }]}>{event.date}</Text>
-                            </View>
-                        </View>
+                    <View style={styles.dragIndicator} />
 
-                        <View style={[styles.infoCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <View style={[styles.iconBox, { backgroundColor: colors.primary + '15' }]}>
-                                <MaterialCommunityIcons name="cash" size={24} color={colors.primary} />
+
+                    {/* Glass Info Cards */}
+                    <View style={styles.infoGrid}>
+                        <BlurView intensity={20} tint={isDarkMode ? 'dark' : 'light'} style={[styles.premiumInfoCard, { borderColor: colors.glassBorder }]}>
+                            <View style={[styles.premiumIconBox, { backgroundColor: colors.primary + '20' }]}>
+                                <MaterialCommunityIcons name="calendar-multiselect" size={20} color={colors.primary} />
                             </View>
                             <View>
-                                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Price</Text>
-                                <Text style={[styles.infoValue, { color: event.price > 0 ? '#10b981' : colors.primary }]}>
-                                    {event.price > 0 ? `₹${event.price}` : 'FREE'}
+                                <Text style={[styles.premiumInfoLabel, { color: colors.textSecondary }]}>SCHEDULE</Text>
+                                <Text style={[styles.premiumInfoValue, { color: colors.text }]}>{event.date}</Text>
+                            </View>
+                        </BlurView>
+
+                        <BlurView intensity={20} tint={isDarkMode ? 'dark' : 'light'} style={[styles.premiumInfoCard, { borderColor: colors.glassBorder }]}>
+                            <View style={[styles.premiumIconBox, { backgroundColor: '#10b98120' }]}>
+                                <MaterialCommunityIcons name="ticket-confirmation-outline" size={20} color="#10b981" />
+                            </View>
+                            <View>
+                                <Text style={[styles.premiumInfoLabel, { color: colors.textSecondary }]}>ENTRY FEE</Text>
+                                <Text style={[styles.premiumInfoValue, { color: event.price > 0 ? colors.text : '#10b981' }]}>
+                                    {event.price > 0 ? `₹${event.price}` : 'COMPLIMENTARY'}
                                 </Text>
                             </View>
-                        </View>
+                        </BlurView>
                     </View>
 
-                    {/* Additional Info (Department) */}
                     <View style={styles.infoGrid}>
-                        <View style={[styles.infoCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <View style={[styles.iconBox, { backgroundColor: 'rgba(245, 158, 11, 0.1)' }]}>
-                                <MaterialCommunityIcons name="office-building" size={24} color="#f59e0b" />
+                        <BlurView intensity={20} tint={isDarkMode ? 'dark' : 'light'} style={[styles.premiumInfoCard, { borderColor: colors.glassBorder }]}>
+                            <View style={[styles.premiumIconBox, { backgroundColor: '#f59e0b20' }]}>
+                                <MaterialCommunityIcons name="office-building-marker-outline" size={20} color="#f59e0b" />
                             </View>
                             <View>
-                                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Department</Text>
-                                <Text style={[styles.infoValue, { color: colors.text }]}>{event.department || 'General'}</Text>
+                                <Text style={[styles.premiumInfoLabel, { color: colors.textSecondary }]}>DEPARTMENT</Text>
+                                <Text style={[styles.premiumInfoValue, { color: colors.text }]}>{event.department || 'All Domains'}</Text>
                             </View>
-                        </View>
-                        <View style={[styles.infoCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <View style={[styles.iconBox, { backgroundColor: 'rgba(139, 92, 246, 0.1)' }]}>
-                                <MaterialCommunityIcons name="account-group" size={24} color="#8b5cf6" />
+                        </BlurView>
+
+                        <BlurView intensity={20} tint={isDarkMode ? 'dark' : 'light'} style={[styles.premiumInfoCard, { borderColor: colors.glassBorder }]}>
+                            <View style={[styles.premiumIconBox, { backgroundColor: '#8b5cf620' }]}>
+                                <MaterialCommunityIcons name="account-group-outline" size={20} color="#8b5cf6" />
                             </View>
                             <View>
-                                <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Capacity</Text>
-                                <Text style={[styles.infoValue, { color: colors.text }]}>{(event.capacity || 'Unlimited')}</Text>
+                                <Text style={[styles.premiumInfoLabel, { color: colors.textSecondary }]}>CAPACITY</Text>
+                                <Text style={[styles.premiumInfoValue, { color: colors.text }]}>{event.capacity || 'Open Access'}</Text>
                             </View>
-                        </View>
+                        </BlurView>
                     </View>
+
 
                     {/* Organizer Section */}
                     {organizer && (
-                        <View style={[styles.organizerCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                        <BlurView intensity={10} tint={isDarkMode ? 'dark' : 'light'} style={[styles.organizerPanel, { borderColor: colors.glassBorder }]}>
                             <View style={styles.organizerInfo}>
-                                <Image
-                                    source={{
-                                        uri: (organizer.avatarUrl &&
-                                            !organizer.avatarUrl.includes('iran.liara.run') &&
-                                            !hasImageError)
-                                            ? organizer.avatarUrl
-                                            : getDefaultAvatar(organizer.name || 'Organizer', organizer.gender)
-                                    }}
-                                    style={styles.organizerAvatar}
-                                    onError={() => setHasImageError(true)}
-                                />
+                                <View style={styles.avatarGlowContainer}>
+                                    <Image
+                                        source={{
+                                            uri: (organizer.avatarUrl &&
+                                                !organizer.avatarUrl.includes('iran.liara.run') &&
+                                                !hasImageError)
+                                                ? organizer.avatarUrl
+                                                : getDefaultAvatar(organizer.name || 'Organizer', organizer.gender)
+                                        }}
+                                        style={styles.premiumAvatar}
+                                        onError={() => setHasImageError(true)}
+                                    />
+                                    <View style={[styles.verifiedBadge, { backgroundColor: colors.primary }]}>
+                                        <MaterialCommunityIcons name="check" size={10} color="white" />
+                                    </View>
+                                </View>
                                 <View style={styles.organizerDetails}>
                                     <Text style={[styles.organizerName, { color: colors.text }]}>{organizer.name}</Text>
-                                    <View style={styles.badgeRow}>
-                                        <View style={[styles.roleBadge, { backgroundColor: colors.primary + '20' }]}>
-                                            <Text style={[styles.roleText, { color: colors.primary }]}>{organizer.role === 'admin' ? 'Event Organizer' : 'Student Pro'}</Text>
-                                        </View>
-                                    </View>
+                                    <Text style={[styles.organizerRole, { color: colors.textSecondary }]}>
+                                        {organizer.role === 'admin' ? 'Elite Organizer' : 'Campus Lead'}
+                                    </Text>
                                 </View>
                             </View>
                             <TouchableOpacity
-                                style={[
-                                    styles.followButton,
-                                    { borderColor: colors.primary },
-                                    isFollowing && { backgroundColor: colors.primary }
-                                ]}
                                 onPress={handleFollow}
                                 disabled={followLoading}
                             >
-                                <Text style={[
-                                    styles.followButtonText,
-                                    { color: isFollowing ? 'white' : colors.primary }
-                                ]}>
-                                    {followLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
-                                </Text>
+                                <ExpoGradient
+                                    colors={isFollowing ? ['#4b5563', '#374151'] : [colors.primary, (colors.iridescent || '#6366f1')]}
+                                    style={styles.premiumFollowBtn}
+                                >
+                                    <Text style={styles.followBtnText}>
+                                        {followLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
+                                    </Text>
+                                </ExpoGradient>
                             </TouchableOpacity>
-                        </View>
+                        </BlurView>
                     )}
 
                     {/* Description */}
-                    <View style={styles.section}>
-                        <Text style={[styles.sectionTitle, { color: colors.text }]}>Explore Event</Text>
-                        <View style={[styles.descriptionCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <Text style={[styles.description, { color: colors.textSecondary }]}>
+                    <View style={styles.sectionArea}>
+                        <Text style={[styles.sectionHeading, { color: colors.text }]}>About the Event</Text>
+                        <BlurView intensity={10} tint={isDarkMode ? 'dark' : 'light'} style={[styles.descriptionPanel, { borderColor: colors.glassBorder }]}>
+                            <Text style={[styles.descriptionText, { color: colors.textSecondary }]}>
                                 {event.description}
                             </Text>
-                        </View>
+                        </BlurView>
                     </View>
+
 
                     {/* Location */}
                     <View style={styles.section}>
@@ -573,7 +587,7 @@ export default function EventDetailsScreen({ route, navigation }) {
                 </View>
             </ScrollView>
 
-            {/* Registration Form Modal */}
+            {/* Premium Registration Modal */}
             <Modal
                 visible={showRegForm}
                 animationType="slide"
@@ -581,26 +595,35 @@ export default function EventDetailsScreen({ route, navigation }) {
                 onRequestClose={() => setShowRegForm(false)}
             >
                 <View style={styles.modalOverlay}>
-                    <BlurView intensity={20} style={StyleSheet.absoluteFill} tint="dark" />
+                    <BlurView intensity={Platform.OS === 'ios' ? 30 : 100} tint="dark" style={StyleSheet.absoluteFill} />
                     <KeyboardAvoidingView
                         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                         style={styles.modalKeyboardAvoid}
                     >
-                        <View style={[styles.modalSheet, { backgroundColor: colors.background, borderColor: colors.border }]}>
+                        <BlurView
+                            intensity={40}
+                            tint={isDarkMode ? 'dark' : 'light'}
+                            style={[styles.modalSheet, { borderColor: colors.glassBorder }]}
+                        >
                             <View style={styles.modalIndicator} />
 
                             <View style={styles.modalHeader}>
-                                <View style={[styles.modalIconWrap, { backgroundColor: colors.primary + '20' }]}>
-                                    <MaterialCommunityIcons name="sparkles" size={24} color={colors.primary} />
-                                </View>
-                                <Text style={[styles.modalTitle, { color: colors.text }]}>Almost there! ✨</Text>
-                                <Text style={[styles.modalSubtitle, { color: colors.textSecondary }]}>Help the host organize better by filling these details.</Text>
+                                <ExpoGradient
+                                    colors={[colors.primary, (colors.iridescent || '#6366f1')]}
+                                    style={styles.modalIconWrap}
+                                >
+                                    <MaterialCommunityIcons name="sparkles" size={28} color="white" />
+                                </ExpoGradient>
+                                <Text style={[styles.modalTitle, { color: colors.text }]}>Confirm Attendance</Text>
+                                <Text style={[styles.modalSubtitle, { color: colors.textSecondary }]}>
+                                    Please verify your details to secure your spot for {event.title}.
+                                </Text>
                             </View>
 
                             <ScrollView style={styles.modalFormScroll} showsVerticalScrollIndicator={false}>
                                 <View style={styles.inputGroup}>
                                     <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Full Name</Text>
-                                    <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                                    <View style={[styles.inputWrapper, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderColor: colors.border }]}>
                                         <MaterialCommunityIcons name="account-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                                         <TextInput
                                             nativeID="reg-name"
@@ -610,71 +633,62 @@ export default function EventDetailsScreen({ route, navigation }) {
                                             placeholderTextColor={colors.textSecondary}
                                             value={regFormData.name}
                                             onChangeText={(val) => setRegFormData(prev => ({ ...prev, name: val }))}
-                                            autoComplete="name"
-                                            textContentType="name"
                                         />
                                     </View>
                                 </View>
 
                                 <View style={styles.inputGroup}>
-                                    <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Email Address</Text>
-                                    <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                                    <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Official Email</Text>
+                                    <View style={[styles.inputWrapper, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderColor: colors.border }]}>
                                         <MaterialCommunityIcons name="email-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                                         <TextInput
                                             nativeID="reg-email"
                                             name="email"
                                             style={[styles.input, { color: colors.text }]}
-                                            placeholder="john@example.com"
+                                            placeholder="john@campus.edu"
                                             placeholderTextColor={colors.textSecondary}
                                             value={regFormData.email}
                                             onChangeText={(val) => setRegFormData(prev => ({ ...prev, email: val }))}
                                             keyboardType="email-address"
-                                            autoCapitalize="none"
-                                            autoComplete="email"
-                                            textContentType="emailAddress"
                                         />
                                     </View>
                                 </View>
 
                                 <View style={styles.inputGroup}>
                                     <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Contact Number</Text>
-                                    <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                                    <View style={[styles.inputWrapper, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderColor: colors.border }]}>
                                         <MaterialCommunityIcons name="phone-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                                         <TextInput
                                             nativeID="reg-contact"
                                             name="contact"
                                             style={[styles.input, { color: colors.text }]}
-                                            placeholder="+91 98765-43210"
+                                            placeholder="+91 12345 67890"
                                             placeholderTextColor={colors.textSecondary}
                                             value={regFormData.contact}
                                             onChangeText={(val) => setRegFormData(prev => ({ ...prev, contact: val }))}
                                             keyboardType="phone-pad"
-                                            autoComplete="tel"
-                                            textContentType="telephoneNumber"
                                         />
                                     </View>
                                 </View>
 
                                 <View style={styles.rowInputs}>
-                                    <View style={[styles.inputGroup, { flex: 1, marginRight: 8 }]}>
-                                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Course</Text>
-                                        <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                                            <MaterialCommunityIcons name="school-outline" size={18} color={colors.primary} style={styles.inputIcon} />
+                                    <View style={[styles.inputGroup, { flex: 1 }]}>
+                                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>University / Course</Text>
+                                        <View style={[styles.inputWrapper, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderColor: colors.border }]}>
                                             <TextInput
                                                 nativeID="reg-course"
                                                 name="course"
                                                 style={[styles.input, { color: colors.text }]}
-                                                placeholder="B.Tech"
+                                                placeholder="B.Tech CS"
                                                 placeholderTextColor={colors.textSecondary}
                                                 value={regFormData.course}
                                                 onChangeText={(val) => setRegFormData(prev => ({ ...prev, course: val }))}
                                             />
                                         </View>
                                     </View>
-                                    <View style={[styles.inputGroup, { flex: 1, marginLeft: 8 }]}>
-                                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Department</Text>
-                                        <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                                            <MaterialCommunityIcons name="office-building" size={18} color={colors.primary} style={styles.inputIcon} />
+                                    <View style={[styles.inputGroup, { flex: 1 }]}>
+                                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Major / Dept</Text>
+                                        <View style={[styles.inputWrapper, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderColor: colors.border }]}>
                                             <TextInput
                                                 nativeID="reg-dept"
                                                 name="department"
@@ -694,24 +708,28 @@ export default function EventDetailsScreen({ route, navigation }) {
                                     style={[styles.modalCancelBtn, { borderColor: colors.border }]}
                                     onPress={() => setShowRegForm(false)}
                                 >
-                                    <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>Cancel</Text>
+                                    <Text style={[styles.modalCancelText, { color: colors.textSecondary }]}>Later</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
-                                    style={[styles.modalSubmitBtn, { backgroundColor: colors.primary }]}
                                     onPress={handleFormSubmit}
                                 >
-                                    <Text style={styles.modalSubmitText}>Register Now</Text>
+                                    <ExpoGradient
+                                        colors={[colors.primary, (colors.iridescent || '#6366f1')]}
+                                        style={styles.modalSubmitBtn}
+                                    >
+                                        <Text style={styles.modalSubmitText}>Complete Registration</Text>
+                                    </ExpoGradient>
                                 </TouchableOpacity>
                             </View>
-                        </View>
+                        </BlurView>
                     </KeyboardAvoidingView>
                 </View>
             </Modal>
 
-            {/* Bottom Register Action */}
-            <View style={[styles.bottomNav, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
+            {/* Premium Floating Footer */}
+            <BlurView intensity={80} tint={isDarkMode ? 'dark' : 'light'} style={[styles.bottomNav, { borderTopColor: colors.glassBorder }]}>
                 <View>
-                    <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>Registration Fee</Text>
+                    <Text style={[styles.priceLabel, { color: colors.textSecondary }]}>ENTRY PASS</Text>
                     <Text style={[styles.finalPrice, { color: event.price > 0 ? colors.text : '#10b981' }]}>
                         {event.price > 0 ? `₹${event.price}` : 'FREE'}
                     </Text>
@@ -719,100 +737,200 @@ export default function EventDetailsScreen({ route, navigation }) {
                 <View style={styles.actionButtons}>
                     {user?.uid === event.createdBy ? (
                         <TouchableOpacity
-                            style={[styles.manageButton, { backgroundColor: colors.primary }]}
                             onPress={() => navigation.navigate('OrganizerDashboard')}
                         >
-                            <MaterialCommunityIcons name="view-dashboard" size={20} color="white" />
-                            <Text style={styles.registerButtonText}>Manage</Text>
+                            <ExpoGradient
+                                colors={[colors.primary, (colors.iridescent || '#6366f1')]}
+                                style={styles.manageButton}
+                            >
+                                <MaterialCommunityIcons name="view-dashboard-outline" size={20} color="white" />
+                                <Text style={styles.registerButtonText}>Manage</Text>
+                            </ExpoGradient>
                         </TouchableOpacity>
                     ) : (
                         <TouchableOpacity
-                            style={[styles.registerButton, { backgroundColor: isRegistered ? '#10b981' : colors.primary }]}
                             onPress={handleRegister}
                             disabled={registering || isRegistered}
                         >
-                            <Text style={styles.registerButtonText}>
-                                {registering ? 'Processing...' : isRegistered ? 'Registered' : 'Register Now'}
-                            </Text>
+                            <ExpoGradient
+                                colors={isRegistered ? ['#10b981', '#059669'] : [colors.primary, (colors.iridescent || '#6366f1')]}
+                                style={[styles.registerButton, registering && { opacity: 0.7 }]}
+                            >
+                                <Text style={styles.registerButtonText}>
+                                    {registering ? 'Securing...' : isRegistered ? 'Got Ticket!' : 'Book My Spot'}
+                                </Text>
+                            </ExpoGradient>
                         </TouchableOpacity>
                     )}
                 </View>
-            </View>
+            </BlurView>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    imageContainer: { width: '100%', height: 440 },
+    bgOrb: {
+        position: 'absolute',
+        width: width * 1.5,
+        height: width * 1.5,
+        borderRadius: width * 0.75,
+        opacity: 0.1,
+    },
+    orb1: { top: 200, right: -width * 0.5 },
+    orb2: { bottom: 0, left: -width * 0.5 },
+    imageContainer: { width: '100%', height: 500, overflow: 'hidden' },
     image: { width: '100%', height: '100%' },
     imageOverlay: { ...StyleSheet.absoluteFillObject },
-    headerOverlay: { position: 'absolute', top: 60, left: 16, right: 16, flexDirection: 'row', justifyContent: 'space-between', zIndex: 100 },
-    roundButton: { width: 44, height: 44, borderRadius: 14, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
+    headerOverlay: { position: 'absolute', top: 60, left: 20, right: 20, flexDirection: 'row', justifyContent: 'space-between', zIndex: 100 },
+    premiumRoundBtn: { width: 48, height: 48, borderRadius: 18, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)' },
     headerActions: { flexDirection: 'row' },
-    quickInfoContainer: { position: 'absolute', bottom: 40, left: 24, right: 24 },
-    heroShadow: { ...StyleSheet.absoluteFillObject, height: 160, bottom: -40, top: 'auto', borderBottomLeftRadius: 36, borderBottomRightRadius: 36 },
-    categoryBadge: { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, marginBottom: 12, borderWidth: 1.5 },
-    categoryText: { fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5 },
-    title: { fontSize: 36, fontWeight: 'bold', letterSpacing: -1, lineHeight: 42 },
-    locationContainer: { flexDirection: 'row', alignItems: 'center', marginTop: 12 },
-    locationText: { color: 'rgba(255,255,255,0.95)', fontSize: 16, marginLeft: 8, fontWeight: '500' },
-    contentContainer: { paddingHorizontal: 24, marginTop: -40, borderTopLeftRadius: 40, borderTopRightRadius: 40, paddingTop: 40 },
-    infoGrid: { flexDirection: 'row', gap: 16, marginBottom: 24 },
-    infoCard: { flex: 1, padding: 18, borderRadius: 24, borderWidth: 1.5, flexDirection: 'row', alignItems: 'center', gap: 14, elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10 },
-    iconBox: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
-    infoLabel: { fontSize: 11, fontWeight: '900', marginBottom: 4, letterSpacing: 0.5, textTransform: 'uppercase', opacity: 0.6 },
-    infoValue: { fontSize: 15, fontWeight: 'bold' },
-    organizerCard: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20, borderRadius: 28, marginBottom: 32, borderWidth: 1.5, elevation: 6, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.1, shadowRadius: 15 },
+    heroTextContent: { position: 'absolute', bottom: 60, left: 24, right: 24, gap: 12 },
+    glassBadge: { alignSelf: 'flex-start', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 12, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.2)' },
+    glassBadgeText: { color: 'white', fontSize: 11, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 2 },
+    titleText: { color: 'white', fontSize: 40, fontWeight: 'bold', letterSpacing: -1, lineHeight: 46 },
+    heroLocationRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+    locationIconGlow: { width: 32, height: 32, borderRadius: 10, backgroundColor: 'rgba(255,255,255,0.15)', alignItems: 'center', justifyContent: 'center' },
+    heroLocationText: { color: 'rgba(255,255,255,0.9)', fontSize: 16, fontWeight: '500' },
+    contentContainer: { marginTop: -40, backgroundColor: 'transparent', borderTopLeftRadius: 40, borderTopRightRadius: 40, paddingHorizontal: 20, paddingTop: 10 },
+    dragIndicator: { width: 40, height: 5, backgroundColor: 'rgba(156, 163, 175, 0.3)', borderRadius: 3, alignSelf: 'center', marginBottom: 30 },
+    infoGrid: { flexDirection: 'row', gap: 15, marginBottom: 15 },
+    premiumInfoCard: { flex: 1, padding: 20, borderRadius: 28, borderWidth: 1, overflow: 'hidden', flexDirection: 'row', alignItems: 'center', gap: 14 },
+    premiumIconBox: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center' },
+    premiumInfoLabel: { fontSize: 10, fontWeight: '900', letterSpacing: 1.5, marginBottom: 4, opacity: 0.8 },
+    premiumInfoValue: { fontSize: 14, fontWeight: 'bold', letterSpacing: -0.2 },
+    organizerPanel: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 20, borderRadius: 32, marginBottom: 32, borderWidth: 1, overflow: 'hidden', marginTop: 15 },
     organizerInfo: { flexDirection: 'row', alignItems: 'center' },
-    organizerAvatar: { width: 54, height: 54, borderRadius: 27 },
-    organizerDetails: { marginLeft: 16 },
+    avatarGlowContainer: { width: 60, height: 60, borderRadius: 30, padding: 3, backgroundColor: 'rgba(99, 102, 241, 0.2)' },
+    premiumAvatar: { width: '100%', height: '100%', borderRadius: 27 },
+    verifiedBadge: { position: 'absolute', bottom: 0, right: 0, width: 18, height: 18, borderRadius: 9, borderWidth: 2, borderColor: 'white', alignItems: 'center', justifyContent: 'center' },
+    organizerDetails: { marginLeft: 15 },
     organizerName: { fontSize: 18, fontWeight: 'bold', letterSpacing: -0.5 },
-    badgeRow: { flexDirection: 'row', alignItems: 'center', marginTop: 6 },
-    roleBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
-    roleText: { fontSize: 11, fontWeight: '900', letterSpacing: 1 },
-    followButton: { paddingHorizontal: 18, paddingVertical: 10, borderRadius: 14, borderWidth: 2 },
-    followButtonText: { fontSize: 14, fontWeight: 'bold' },
-    section: { marginBottom: 32 },
-    sectionTitle: { fontSize: 22, fontWeight: 'bold', marginBottom: 16, letterSpacing: -0.5 },
-    descriptionCard: { padding: 20, borderRadius: 24, borderWidth: 1.5 },
-    description: { fontSize: 16, lineHeight: 26, opacity: 0.8 },
-    mapWrapper: { width: '100%', height: 220, borderRadius: 28, borderWidth: 1.5, overflow: 'hidden', marginTop: 8, elevation: 4 },
-    venueInfoRow: { flexDirection: 'row', alignItems: 'center', marginTop: 16, gap: 10, paddingHorizontal: 4 },
-    venueText: { fontSize: 15, fontWeight: '600', flex: 1 },
-    sponsorScroll: { gap: 16, paddingRight: 24 },
-    sponsorCircle: { width: 72, height: 72, borderRadius: 36, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center', elevation: 2 },
-    bottomNav: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 24, paddingVertical: 20, borderTopWidth: 1.5, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: Platform.OS === 'ios' ? 44 : 24, elevation: 20, shadowColor: '#000', shadowOffset: { width: 0, height: -6 }, shadowOpacity: 0.1, shadowRadius: 12 },
-    priceLabel: { fontSize: 12, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase', opacity: 0.6 },
-    finalPrice: { fontSize: 28, fontWeight: 'bold', letterSpacing: -0.5 },
-    actionButtons: { flexDirection: 'row', gap: 12 },
-    manageButton: { paddingHorizontal: 24, height: 64, borderRadius: 20, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 10, elevation: 8 },
-    registerButton: { paddingHorizontal: 36, height: 64, borderRadius: 20, alignItems: 'center', justifyContent: 'center', elevation: 8, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12 },
+    organizerRole: { fontSize: 13, fontWeight: '500', marginTop: 2 },
+    premiumFollowBtn: {
+        paddingHorizontal: 20,
+        paddingVertical: 10,
+        borderRadius: 16,
+        ...Platform.select({
+            web: { boxShadow: '0 4px 8px rgba(99, 102, 241, 0.2)' },
+            default: {
+                shadowColor: '#6366f1',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 8,
+                elevation: 5
+            }
+        })
+    },
+    followBtnText: { color: 'white', fontSize: 14, fontWeight: 'bold' },
+    sectionArea: { marginBottom: 35 },
+    sectionHeading: { fontSize: 24, fontWeight: 'bold', marginBottom: 18, letterSpacing: -0.5, marginLeft: 4 },
+    descriptionPanel: { padding: 24, borderRadius: 32, borderWidth: 1, overflow: 'hidden' },
+    descriptionText: { fontSize: 16, lineHeight: 28, opacity: 0.9 },
+    mapWrapper: {
+        width: '100%',
+        height: 240,
+        borderRadius: 32,
+        borderWidth: 1,
+        overflow: 'hidden',
+        marginTop: 10,
+        ...Platform.select({
+            web: { boxShadow: '0 10px 20px rgba(0,0,0,0.2)' },
+            default: {
+                elevation: 15,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.2,
+                shadowRadius: 20
+            }
+        })
+    },
+    venueInfoRow: { flexDirection: 'row', alignItems: 'center', marginTop: 20, gap: 12, paddingHorizontal: 8 },
+    venueText: { fontSize: 16, fontWeight: '600', flex: 1, letterSpacing: -0.3 },
+    sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 },
+    sponsorScroll: { gap: 20, paddingRight: 24, paddingVertical: 10 },
+    sponsorItem: { alignItems: 'center', width: 90 },
+    sponsorCircle: {
+        width: 80,
+        height: 80,
+        borderRadius: 40,
+        borderWidth: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        backgroundColor: 'white',
+        ...Platform.select({
+            web: { boxShadow: '0 4px 8px rgba(0,0,0,0.2)' },
+            default: {
+                elevation: 8,
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 8
+            }
+        })
+    },
+    sponsorLogoFull: { width: '80%', height: '80%', resizeMode: 'contain' },
+    sponsorName: { fontSize: 12, marginTop: 10, textAlign: 'center', fontWeight: '700', letterSpacing: -0.2 },
+    sponsorPlaceholder: { width: '100%', height: 120, borderRadius: 32, borderWidth: 2, borderStyle: 'dotted', alignItems: 'center', justifyContent: 'center', gap: 10 },
+    sponsorPlaceholderText: { fontSize: 15, fontWeight: '600', opacity: 0.6 },
+    bottomNav: { position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 24, paddingVertical: 25, borderTopWidth: 1, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingBottom: Platform.OS === 'ios' ? 44 : 25, zIndex: 1000 },
+    priceLabel: { fontSize: 11, fontWeight: '900', letterSpacing: 1.5, textTransform: 'uppercase', opacity: 0.6 },
+    finalPrice: { fontSize: 28, fontWeight: 'bold', letterSpacing: -0.8 },
+    actionButtons: { flexDirection: 'row', gap: 15 },
+    manageButton: { paddingHorizontal: 25, height: 64, borderRadius: 22, alignItems: 'center', justifyContent: 'center', flexDirection: 'row', gap: 10, elevation: 10 },
+    registerButton: {
+        paddingHorizontal: 35,
+        height: 64,
+        borderRadius: 22,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 15,
+        ...Platform.select({
+            web: { boxShadow: '0 8px 16px rgba(0,0,0,0.4)' },
+            default: {
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.4,
+                shadowRadius: 16,
+            }
+        })
+    },
     registerButtonText: { color: 'white', fontSize: 18, fontWeight: 'bold', letterSpacing: 0.2 },
-    sponsorAction: { fontSize: 14, fontWeight: '900', letterSpacing: 1 },
-    sponsorItem: { alignItems: 'center', width: 84, marginRight: 16 },
-    sponsorLogoFull: { width: '100%', height: '100%', borderRadius: 36 },
-    sponsorName: { fontSize: 11, marginTop: 8, textAlign: 'center', fontWeight: 'bold' },
-    sponsorPlaceholder: { width: '100%', height: 110, borderRadius: 28, borderWidth: 2, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', gap: 10 },
-    sponsorPlaceholderText: { fontSize: 14, fontWeight: '600' },
-    modalOverlay: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.7)' },
+    sponsorAction: { fontSize: 14, fontWeight: '900', letterSpacing: 1, textTransform: 'uppercase' },
+    modalOverlay: { flex: 1, justifyContent: 'flex-end' },
     modalKeyboardAvoid: { flex: 1, justifyContent: 'flex-end' },
-    modalSheet: { borderTopLeftRadius: 40, borderTopRightRadius: 40, paddingBottom: Platform.OS === 'ios' ? 44 : 28, paddingHorizontal: 24, borderWidth: 2, borderBottomWidth: 0, maxHeight: '92%' },
-    modalIndicator: { width: 44, height: 5, borderRadius: 3, backgroundColor: 'rgba(255,255,255,0.2)', alignSelf: 'center', marginTop: 14, marginBottom: 24 },
-    modalHeader: { marginBottom: 32, alignItems: 'center' },
-    modalIconWrap: { width: 64, height: 64, borderRadius: 20, alignItems: 'center', justifyContent: 'center', marginBottom: 20, elevation: 4 },
-    modalTitle: { fontSize: 28, fontWeight: 'bold', marginBottom: 8, textAlign: 'center', letterSpacing: -0.5 },
-    modalSubtitle: { fontSize: 15, lineHeight: 22, textAlign: 'center', opacity: 0.7, fontWeight: '500' },
-    modalFormScroll: { maxHeight: 480, paddingBottom: 20 },
-    inputGroup: { marginBottom: 24 },
-    inputLabel: { fontSize: 12, fontWeight: '900', marginBottom: 10, marginLeft: 6, letterSpacing: 1, textTransform: 'uppercase' },
-    inputWrapper: { height: 60, borderRadius: 20, borderWidth: 1.5, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 18 },
-    inputIcon: { marginRight: 14 },
-    input: { flex: 1, fontSize: 16, fontWeight: '600' },
-    rowInputs: { flexDirection: 'row', marginBottom: 6 },
-    modalActions: { flexDirection: 'row', gap: 14, marginTop: 16, paddingBottom: 12 },
-    modalCancelBtn: { flex: 1, height: 64, borderRadius: 20, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
-    modalCancelText: { fontSize: 17, fontWeight: 'bold' },
-    modalSubmitBtn: { flex: 2, height: 64, borderRadius: 20, alignItems: 'center', justifyContent: 'center', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 12, elevation: 8 },
-    modalSubmitText: { color: 'white', fontSize: 17, fontWeight: 'bold', letterSpacing: 0.5 },
+    modalSheet: { borderTopLeftRadius: 40, borderTopRightRadius: 40, paddingBottom: Platform.OS === 'ios' ? 44 : 32, paddingHorizontal: 28, borderWidth: 1, borderBottomWidth: 0, maxHeight: '94%', overflow: 'hidden' },
+    modalIndicator: { width: 44, height: 5, backgroundColor: 'rgba(156, 163, 175, 0.4)', borderRadius: 3, alignSelf: 'center', marginTop: 12, marginBottom: 30 },
+    modalHeader: { alignItems: 'center', marginBottom: 35 },
+    modalIconWrap: { width: 64, height: 64, borderRadius: 24, alignItems: 'center', justifyContent: 'center', marginBottom: 20 },
+    modalTitle: { fontSize: 26, fontWeight: 'bold', letterSpacing: -0.5, marginBottom: 8 },
+    modalSubtitle: { fontSize: 15, textAlign: 'center', opacity: 0.7, lineHeight: 22 },
+    modalFormScroll: { marginBottom: 25 },
+    inputGroup: { marginBottom: 20 },
+    inputLabel: { fontSize: 11, fontWeight: '900', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 10, marginLeft: 4, opacity: 0.7 },
+    inputWrapper: { flexDirection: 'row', alignItems: 'center', borderRadius: 20, borderWidth: 1, paddingHorizontal: 18, height: 60 },
+    inputIcon: { marginRight: 15, opacity: 0.8 },
+    input: { flex: 1, fontSize: 16, fontWeight: '500' },
+    rowInputs: { flexDirection: 'row', gap: 16 },
+    modalActions: { flexDirection: 'row', gap: 14 },
+    modalCancelBtn: { flex: 1, height: 64, borderRadius: 22, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+    modalCancelText: { fontSize: 17, fontWeight: '700' },
+    modalSubmitBtn: {
+        flex: 2,
+        height: 64,
+        borderRadius: 22,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 10,
+        ...Platform.select({
+            web: { boxShadow: '0 8px 12px rgba(99, 102, 241, 0.3)' },
+            default: {
+                shadowColor: '#6366f1',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.3,
+                shadowRadius: 12,
+            }
+        })
+    },
+    modalSubmitText: { color: 'white', fontSize: 17, fontWeight: 'bold' },
 });

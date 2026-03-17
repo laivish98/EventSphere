@@ -403,13 +403,49 @@ const styles = StyleSheet.create({
     iconCircleActive: { backgroundColor: 'rgba(255, 255, 255, 0.2)' },
     categoryChipText: { fontSize: 14, fontWeight: '600', paddingRight: 12 },
     categoryChipTextSelected: { color: 'white', fontWeight: '700' },
-    postButton: { marginTop: 30, height: 56, borderRadius: 14, alignItems: 'center', justifyContent: 'center', elevation: 6, ...(Platform.OS === 'web' ? { boxShadow: '0 4px 10px rgba(0,0,0,0.1)' } : { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 10 }) },
+    postButton: {
+        marginTop: 30,
+        height: 56,
+        borderRadius: 14,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 6,
+        ...Platform.select({
+            web: { boxShadow: '0 4px 10px rgba(0,0,0,0.1)' },
+            default: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 10
+            }
+        })
+    },
     postButtonText: { color: 'white', fontSize: 18, fontWeight: 'bold' },
     thumbnailSection: { marginBottom: 30 },
     thumbnailContainer: { height: 200, borderRadius: 24, overflow: 'hidden', borderWidth: 1, position: 'relative' },
     thumbnailImage: { width: '100%', height: '100%' },
     thumbnailOverlay: { position: 'absolute', bottom: 0, left: 0, right: 0, height: 80 },
-    shuffleButton: { position: 'absolute', bottom: 16, right: 16, paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, flexDirection: 'row', alignItems: 'center', gap: 8, elevation: 4, ...(Platform.OS === 'web' ? { boxShadow: '0 2px 8px rgba(0,0,0,0.2)' } : {}) },
+    shuffleButton: {
+        position: 'absolute',
+        bottom: 16,
+        right: 16,
+        paddingHorizontal: 16,
+        paddingVertical: 10,
+        borderRadius: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        elevation: 4,
+        ...Platform.select({
+            web: { boxShadow: '0 2px 8px rgba(0,0,0,0.2)' },
+            default: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.2,
+                shadowRadius: 4
+            }
+        })
+    },
     shuffleText: { color: 'white', fontWeight: 'bold', fontSize: 13 },
     suggestionSection: { marginTop: 16 },
     suggestionHeader: { flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 10, marginLeft: 4 },

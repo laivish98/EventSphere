@@ -9,7 +9,7 @@ import { db } from '../services/firebase';
 import { collection, query, where, getDocs, onSnapshot } from 'firebase/firestore';
 import { StatusBar } from 'expo-status-bar';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const StatItem = ({ label, value, colors }) => (
     <View style={styles.statItem}>
@@ -121,64 +121,105 @@ export default function ProfileScreen({ navigation }) {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar style={isDarkMode ? "light" : "dark"} />
 
+            {/* Cinematic Background Layering */}
             <ExpoGradient
                 colors={isDarkMode
-                    ? [colors.background, '#1e1b4b', '#0f172a']
+                    ? [colors.background, '#0f172a', '#1e1b4b']
                     : ['#f8fafc', '#f1f5f9', '#e2e8f0']}
                 style={StyleSheet.absoluteFill}
             />
+
+            {/* Ambient Depth Orbs */}
+            <View style={[styles.bgOrb, { top: -width * 0.2, right: -width * 0.2, backgroundColor: colors.primaryGlow, opacity: isDarkMode ? 0.4 : 0.1 }]} />
+            <View style={[styles.bgOrb, { bottom: height * 0.1, left: -width * 0.3, width: 400, height: 400, backgroundColor: isDarkMode ? '#6366f130' : '#6366f110' }]} />
+            <View style={[styles.bgOrb, { top: height * 0.4, right: -width * 0.1, width: 250, height: 250, backgroundColor: isDarkMode ? 'rgba(16, 185, 129, 0.08)' : 'rgba(16, 185, 129, 0.03)' }]} />
 
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Header Profile Section */}
                 <View style={styles.profileHeader}>
                     <ExpoGradient
-                        colors={[colors.primary, colors.primary + '80']}
+                        colors={[colors.primary, '#6366f1', '#a855f7']}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
                         style={styles.headerGradient}
-                    />
+                    >
+                        <View style={styles.mainStatGloss} />
+                    </ExpoGradient>
 
                     {/* Back Button */}
                     <TouchableOpacity
-                        style={[styles.backButton, { backgroundColor: 'rgba(255,255,255,0.15)' }]}
+                        style={[styles.backButton, { backgroundColor: 'rgba(255,255,255,0.2)', borderColor: 'rgba(255,255,255,0.3)', borderWidth: 1 }]}
                         onPress={() => navigation.goBack()}
                     >
                         <MaterialCommunityIcons name="chevron-left" size={28} color="white" />
                     </TouchableOpacity>
 
-                    <View style={styles.profileInfoMain}>
-                        <View style={styles.avatarContainer}>
-                            <View style={[styles.avatarWrapper, { borderColor: 'rgba(255,255,255,0.3)', backgroundColor: 'rgba(255,255,255,0.1)' }]}>
-                                <Image
-                                    source={{
-                                        uri: (userData?.avatarUrl &&
-                                            !userData.avatarUrl.includes('iran.liara.run') &&
-                                            !hasImageError)
-                                            ? userData.avatarUrl
-                                            : getDefaultAvatar(userData?.name || user?.email?.split('@')?.[0] || 'User', userData?.gender)
-                                    }}
-                                    style={styles.avatar}
-                                    onError={() => setHasImageError(true)}
-                                />
-                            </View>
-                        </View>
-
-                        <Text style={[styles.userNameText, { color: colors.text }]}>{userData.name || 'User'}</Text>
-                        <Text style={[styles.userEmailText, { color: colors.textSecondary }]}>{user.email}</Text>
-
+                    <BlurView
+                        intensity={isDarkMode ? 50 : 30}
+                        tint={isDarkMode ? "dark" : "light"}
+                        style={[styles.profileInfoCard, { borderColor: colors.glassBorder }]}
+                    >
                         <ExpoGradient
-                            colors={[colors.primary, colors.primary + 'CC']}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 1 }}
-                            style={styles.roleBadgeContainer}
-                        >
-                            <MaterialCommunityIcons name={userData.role === 'admin' ? "shield-check" : "school"} size={14} color="white" />
-                            <Text style={styles.roleBadgeText}>
-                                {userData.role === 'admin' ? 'Event Organizer' : 'Student Pro'}
-                            </Text>
-                        </ExpoGradient>
-                    </View>
+                            colors={isDarkMode ? ['rgba(255,255,255,0.05)', 'transparent'] : ['rgba(19, 91, 236, 0.05)', 'transparent']}
+                            style={StyleSheet.absoluteFill}
+                        />
+                        <View style={styles.profileInfoMain}>
+                            <View style={[styles.avatarContainer, {
+                                ...Platform.select({
+                                    web: { boxShadow: '0 8px 16px rgba(0,0,0,0.2)' },
+                                    default: {
+                                        shadowColor: '#000',
+                                        shadowOffset: { width: 0, height: 8 },
+                                        shadowOpacity: 0.2,
+                                        shadowRadius: 16,
+                                    }
+                                })
+                            }]}>
+                                <View style={[styles.avatarWrapper, { borderColor: colors.primary, backgroundColor: colors.surface }]}>
+                                    <Image
+                                        source={{
+                                            uri: (userData?.avatarUrl &&
+                                                !userData.avatarUrl.includes('iran.liara.run') &&
+                                                !hasImageError)
+                                                ? userData.avatarUrl
+                                                : getDefaultAvatar(userData?.name || user?.email?.split('@')?.[0] || 'User', userData?.gender)
+                                        }}
+                                        style={styles.avatar}
+                                        onError={() => setHasImageError(true)}
+                                    />
+                                    <BlurView intensity={30} tint="dark" style={styles.editAvatarOverlay}>
+                                        <MaterialCommunityIcons name="camera-outline" size={16} color="white" />
+                                    </BlurView>
+                                </View>
+                            </View>
+
+                            <Text style={[styles.userNameText, { color: colors.text }]}>{userData.name || 'User'}</Text>
+                            <Text style={[styles.userEmailText, { color: colors.textSecondary }]}>{user.email}</Text>
+
+                            <ExpoGradient
+                                colors={[colors.primary, colors.primaryLight]}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 1 }}
+                                style={styles.roleBadgeContainer}
+                            >
+                                <MaterialCommunityIcons name={userData.role === 'admin' ? "shield-check" : "school"} size={14} color="white" />
+                                <Text style={styles.roleBadgeText}>
+                                    {userData.role === 'admin' ? 'Event Organizer' : 'Student PRO'}
+                                </Text>
+                            </ExpoGradient>
+                        </View>
+                    </BlurView>
 
                     {/* Stats Row */}
-                    <BlurView intensity={isDarkMode ? 30 : 50} tint={isDarkMode ? "dark" : "light"} style={[styles.statsRowGlass, { borderColor: colors.border }]}>
+                    <BlurView
+                        intensity={isDarkMode ? 50 : 35}
+                        tint={isDarkMode ? "dark" : "light"}
+                        style={[styles.statsRowGlass, { borderColor: colors.glassBorder }]}
+                    >
+                        <ExpoGradient
+                            colors={isDarkMode ? ['rgba(255,255,255,0.03)', 'transparent'] : ['rgba(19, 91, 236, 0.03)', 'transparent']}
+                            style={StyleSheet.absoluteFill}
+                        />
                         <TouchableOpacity style={styles.statItem} activeOpacity={0.7}>
                             <StatItem label="Tickets" value={regCount} colors={colors} />
                         </TouchableOpacity>
@@ -196,7 +237,7 @@ export default function ProfileScreen({ navigation }) {
                         </TouchableOpacity>
                         <View style={[styles.statDivider, { backgroundColor: colors.border }]} />
                         <TouchableOpacity style={styles.statItem} activeOpacity={0.7}>
-                            <StatItem label="XP Points" value={regCount * 50} colors={colors} />
+                            <StatItem label="XP" value={regCount * 50} colors={colors} />
                         </TouchableOpacity>
                     </BlurView>
                 </View>
@@ -204,7 +245,8 @@ export default function ProfileScreen({ navigation }) {
                 {/* Content Sections */}
                 <View style={styles.contentSections}>
                     <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>ACCOUNT SETTINGS</Text>
-                    <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.menuCardGlass, { borderColor: colors.border }]}>
+                    <BlurView intensity={isDarkMode ? 25 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.menuCardGlass, { borderColor: colors.glassBorder }]}>
+                        <ExpoGradient colors={colors.iridescent} style={StyleSheet.absoluteFill} />
                         <MenuButton
                             icon="account-outline"
                             label="Personal Information"
@@ -232,23 +274,28 @@ export default function ProfileScreen({ navigation }) {
                     </BlurView>
 
                     <Text style={[styles.sectionHeading, { color: colors.textSecondary, marginTop: 24 }]}>PREFERENCES</Text>
-                    <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.menuCardGlass, { borderColor: colors.border }]}>
+                    <BlurView intensity={isDarkMode ? 25 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.menuCardGlass, { borderColor: colors.glassBorder }]}>
+                        <ExpoGradient colors={colors.iridescent} style={StyleSheet.absoluteFill} />
                         <View style={styles.menuButton}>
-                            <View style={[styles.menuIconContainer, { backgroundColor: '#8b5cf615' }]}>
+                            <ExpoGradient
+                                colors={['rgba(139, 92, 246, 0.15)', 'rgba(139, 92, 246, 0.05)']}
+                                style={styles.menuIconContainer}
+                            >
                                 <MaterialCommunityIcons name="theme-light-dark" size={22} color="#8b5cf6" />
-                            </View>
+                            </ExpoGradient>
                             <Text style={[styles.menuLabel, { color: colors.text }]}>Dark Mode</Text>
                             <Switch
                                 value={isDarkMode}
                                 onValueChange={toggleTheme}
-                                trackColor={{ false: '#767577', true: colors.primary }}
+                                trackColor={{ false: '#cbd5e1', true: colors.primary }}
                                 thumbColor={Platform.OS === 'android' ? '#f4f3f4' : ''}
                             />
                         </View>
                     </BlurView>
 
                     <Text style={[styles.sectionHeading, { color: colors.textSecondary, marginTop: 24 }]}>SUPPORT</Text>
-                    <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.menuCardGlass, { borderColor: colors.border }]}>
+                    <BlurView intensity={isDarkMode ? 25 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.menuCardGlass, { borderColor: colors.glassBorder }]}>
+                        <ExpoGradient colors={colors.iridescent} style={StyleSheet.absoluteFill} />
                         <MenuButton
                             icon="help-circle-outline"
                             label="Help Center"
@@ -267,12 +314,12 @@ export default function ProfileScreen({ navigation }) {
                     </BlurView>
 
                     <TouchableOpacity
-                        style={[styles.logoutButton, { backgroundColor: isDarkMode ? '#ef444410' : '#fee2e2' }]}
+                        style={[styles.logoutButton, { backgroundColor: isDarkMode ? 'rgba(239, 68, 68, 0.08)' : '#fee2e2' }]}
                         onPress={handleLogout}
                         activeOpacity={0.8}
                     >
-                        <MaterialCommunityIcons name="logout-variant" size={22} color="#ef4444" />
-                        <Text style={styles.logoutText}>Sign Out</Text>
+                        <MaterialCommunityIcons name="logout-variant" size={20} color="#ef4444" />
+                        <Text style={styles.logoutText}>Sign Out from account</Text>
                     </TouchableOpacity>
 
                     <Text style={[styles.versionText, { color: colors.textSecondary }]}>Version 1.0.0 (Build 124)</Text>
@@ -286,8 +333,8 @@ export default function ProfileScreen({ navigation }) {
 
 const styles = StyleSheet.create({
     container: { flex: 1 },
-    profileHeader: { paddingHorizontal: 24, paddingBottom: 24, position: 'relative', overflow: 'hidden' },
-    headerGradient: { position: 'absolute', top: 0, left: 0, right: 0, height: 280, borderBottomLeftRadius: 40, borderBottomRightRadius: 40 },
+    profileHeader: { paddingHorizontal: 20, paddingBottom: 24, position: 'relative', overflow: 'hidden' },
+    headerGradient: { position: 'absolute', top: 0, left: 0, right: 0, height: 260, borderBottomLeftRadius: 40, borderBottomRightRadius: 40, overflow: 'hidden' },
     backButton: {
         marginTop: Platform.OS === 'ios' ? 60 : 40,
         marginBottom: 20,
@@ -298,44 +345,110 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         zIndex: 10,
     },
-    profileInfoMain: { alignItems: 'center', marginTop: 10 },
+    profileInfoMain: { alignItems: 'center' },
     avatarContainer: { position: 'relative', marginBottom: 16 },
-    avatarWrapper: { padding: 4, borderRadius: 52, borderWidth: 1.5, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.2, shadowRadius: 16 },
-    avatar: { width: 92, height: 92, borderRadius: 46 },
-    userNameText: { fontSize: 28, fontWeight: 'bold', letterSpacing: -1 },
-    userEmailText: { fontSize: 14, marginBottom: 20 },
-    roleBadgeContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, gap: 6 },
-    roleBadgeText: { fontSize: 13, fontWeight: 'bold', color: 'white' },
-    statsRow: { flexDirection: 'row', marginTop: 32, width: '100%', borderRadius: 28, padding: 22, borderWidth: 1.5, justifyContent: 'space-around', alignItems: 'center', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.1, shadowRadius: 20 },
+    avatarWrapper: {
+        padding: 4,
+        borderRadius: 52,
+        borderWidth: 2,
+        ...Platform.select({
+            web: { boxShadow: '0 8px 16px rgba(0,0,0,0.2)' },
+            default: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.2,
+                shadowRadius: 16,
+            }
+        })
+    },
+    avatar: { width: 88, height: 88, borderRadius: 44 },
+    userNameText: { fontSize: 26, fontWeight: '900', letterSpacing: -0.8 },
+    userEmailText: { fontSize: 13, marginBottom: 16, opacity: 0.6 },
+    roleBadgeContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 16, gap: 6 },
+    roleBadgeText: { fontSize: 11, fontWeight: '900', color: 'white', textTransform: 'uppercase', letterSpacing: 0.5 },
     statsRowGlass: {
         flexDirection: 'row',
-        marginTop: 32,
+        marginTop: 24,
         width: '100%',
         borderRadius: 28,
-        padding: 22,
+        padding: 20,
         borderWidth: 1.5,
         justifyContent: 'space-around',
         alignItems: 'center',
         overflow: 'hidden',
     },
-    statItem: { alignItems: 'center' },
-    statValue: { fontSize: 20, fontWeight: 'bold', marginBottom: 2 },
-    statLabel: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, opacity: 0.6 },
-    statDivider: { width: 1.5, height: 36, opacity: 0.3 },
-    contentSections: { paddingHorizontal: 20, marginTop: 40 },
-    sectionHeading: { fontSize: 12, fontWeight: '900', letterSpacing: 1.5, marginLeft: 8, marginBottom: 16 },
-    menuCard: { borderRadius: 32, borderWidth: 1.5, overflow: 'hidden', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 12 },
+    bgOrb: {
+        position: 'absolute',
+        width: 300,
+        height: 300,
+        borderRadius: 150,
+    },
+    mainStatGloss: {
+        position: 'absolute',
+        top: -100,
+        right: -100,
+        width: 250,
+        height: 250,
+        borderRadius: 125,
+        backgroundColor: 'rgba(255,255,255,0.15)',
+    },
+    profileInfoCard: {
+        borderRadius: 36,
+        padding: 24,
+        marginTop: 20,
+        borderWidth: 1.5,
+        overflow: 'hidden',
+        ...Platform.select({
+            web: { boxShadow: '0 20px 40px rgba(0,0,0,0.2)' },
+            default: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 12 },
+                shadowOpacity: 0.15,
+                shadowRadius: 24,
+                elevation: 12,
+            }
+        })
+    },
+    editAvatarOverlay: {
+        position: 'absolute',
+        bottom: 0,
+        right: 0,
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        borderWidth: 2,
+        borderColor: 'white',
+        backgroundColor: '#135bec', // Premium primary color
+        overflow: 'hidden',
+    },
+    statValue: { fontSize: 22, fontWeight: '900', marginBottom: 2 },
+    statLabel: { fontSize: 10, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1, opacity: 0.5 },
+    statDivider: { width: 1.5, height: 32, opacity: 0.1 },
+    contentSections: { paddingHorizontal: 20, marginTop: 32 },
+    sectionHeading: { fontSize: 11, fontWeight: '900', letterSpacing: 2, marginLeft: 8, marginBottom: 16, opacity: 0.5 },
     menuCardGlass: {
-        borderRadius: 32,
+        borderRadius: 28,
         borderWidth: 1.5,
         overflow: 'hidden',
     },
-    menuButton: { flexDirection: 'row', alignItems: 'center', padding: 20 },
-    menuIconContainer: { width: 46, height: 46, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginRight: 18 },
-    menuLabel: { flex: 1, fontSize: 16, fontWeight: '600' },
+    menuButton: { flexDirection: 'row', alignItems: 'center', padding: 18 },
+    menuIconContainer: { width: 42, height: 42, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
+    menuLabel: { flex: 1, fontSize: 15, fontWeight: '700' },
     badgeContainer: { paddingHorizontal: 10, paddingVertical: 3, borderRadius: 12, marginRight: 10 },
     badgeText: { color: 'white', fontSize: 11, fontWeight: '900' },
-    logoutButton: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', marginTop: 32, padding: 22, borderRadius: 32, gap: 12 },
-    logoutText: { color: '#ef4444', fontSize: 16, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1 },
-    versionText: { textAlign: 'center', fontSize: 12, marginVertical: 32, opacity: 0.5, letterSpacing: 1.5 },
+    logoutButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: 32,
+        padding: 18,
+        borderRadius: 28,
+        gap: 10,
+        borderWidth: 1.5,
+        borderColor: 'rgba(239, 68, 68, 0.2)',
+    },
+    logoutText: { color: '#ef4444', fontSize: 13, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5 },
+    versionText: { textAlign: 'center', fontSize: 11, marginVertical: 32, opacity: 0.3, letterSpacing: 2 },
 });

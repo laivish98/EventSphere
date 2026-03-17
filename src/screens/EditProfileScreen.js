@@ -136,12 +136,18 @@ export default function EditProfileScreen({ navigation }) {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar style={isDarkMode ? "light" : "dark"} />
 
+            {/* Cinematic Background Layering */}
             <ExpoGradient
                 colors={isDarkMode
-                    ? [colors.background, '#1e1b4b', '#0f172a']
+                    ? [colors.background, '#0f172a', '#1e1b4b']
                     : ['#f8fafc', '#f1f5f9', '#e2e8f0']}
                 style={StyleSheet.absoluteFill}
             />
+
+            {/* Ambient Depth Orbs */}
+            <View style={[styles.bgOrb, { top: -width * 0.2, right: -width * 0.2, backgroundColor: colors.primaryGlow, opacity: isDarkMode ? 0.4 : 0.1 }]} />
+            <View style={[styles.bgOrb, { bottom: height * 0.1, left: -width * 0.3, width: 400, height: 400, backgroundColor: isDarkMode ? '#6366f130' : '#6366f110' }]} />
+            <View style={[styles.bgOrb, { top: height * 0.4, right: -width * 0.1, width: 250, height: 250, backgroundColor: isDarkMode ? 'rgba(16, 185, 129, 0.08)' : 'rgba(16, 185, 129, 0.03)' }]} />
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 {/* Header */}
@@ -189,53 +195,72 @@ export default function EditProfileScreen({ navigation }) {
                     </View>
                 </View>
 
-                {/* Form Inputs */}
-                <View style={styles.formContainer}>
+                {/* Form Inputs Container */}
+                <BlurView
+                    intensity={isDarkMode ? 35 : 20}
+                    tint={isDarkMode ? "dark" : "light"}
+                    style={[styles.formContainer, { borderColor: colors.glassBorder }]}
+                >
+                    <ExpoGradient
+                        colors={isDarkMode ? ['rgba(255,255,255,0.03)', 'transparent'] : ['rgba(19, 91, 236, 0.03)', 'transparent']}
+                        style={StyleSheet.absoluteFill}
+                    />
+
                     <View style={styles.inputGroup}>
                         <Text style={[styles.inputLabel, { color: colors.primary }]}>FULL NAME</Text>
-                        <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.inputWrapperGlass, { borderColor: colors.border }]}>
+                        <View style={[styles.inputWrapperGlass, { backgroundColor: colors.surface + '40', borderColor: colors.glassBorder }]}>
                             <MaterialCommunityIcons name="account-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                             <TextInput
                                 nativeID="edit-name"
                                 name="name"
                                 style={[styles.input, { color: colors.text }]}
                                 placeholder="Jane Doe"
-                                placeholderTextColor={colors.textSecondary}
+                                placeholderTextColor={colors.textSecondary + '80'}
                                 value={name}
                                 onChangeText={setName}
                                 autoComplete="name"
                                 textContentType="name"
                             />
-                        </BlurView>
+                        </View>
                     </View>
 
                     <View style={styles.inputGroup}>
                         <Text style={[styles.inputLabel, { color: colors.primary }]}>COLLEGE / UNIVERSITY</Text>
                         <TouchableOpacity activeOpacity={0.7} onPress={() => setShowCollegeModal(true)}>
-                            <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.inputWrapperGlass, { borderColor: colors.border }]}>
-                                <View style={[styles.collegeIconBadge, { backgroundColor: colors.primary + '20' }]}>
+                            <View style={[styles.inputWrapperGlass, { backgroundColor: colors.surface + '40', borderColor: colors.glassBorder }]}>
+                                <View style={[styles.collegeIconBadge, { backgroundColor: colors.primary + '15' }]}>
                                     <MaterialCommunityIcons name="bank-outline" size={18} color={colors.primary} />
                                 </View>
-                                <Text style={[styles.input, { textAlignVertical: 'center', paddingTop: Platform.OS === 'android' ? 14 : 0, color: college ? colors.text : colors.textSecondary }]} numberOfLines={1}>
+                                <Text style={[styles.input, { textAlignVertical: 'center', paddingTop: Platform.OS === 'android' ? 14 : 0, color: college ? colors.text : colors.textSecondary + '80' }]} numberOfLines={1}>
                                     {college || "Search for your college..."}
                                 </Text>
                                 <MaterialCommunityIcons name="chevron-down" size={20} color={colors.textSecondary} style={{ marginRight: 15 }} />
-                            </BlurView>
+                            </View>
                         </TouchableOpacity>
                     </View>
-                </View>
+                </BlurView>
 
                 <View style={{ height: 120 }} />
             </ScrollView>
 
-            {/* Bottom Actions */}
-            <View style={[styles.bottomActionContainer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
+            {/* Bottom Sticky Action Bar */}
+            <BlurView intensity={80} tint={isDarkMode ? "dark" : "light"} style={[styles.bottomActionContainer, { borderTopColor: colors.glassBorder }]}>
+                <ExpoGradient
+                    colors={isDarkMode ? ['rgba(15, 23, 42, 0.9)', 'rgba(15, 23, 42, 0.95)'] : ['rgba(255, 255, 255, 0.9)', 'rgba(255, 255, 255, 0.98)']}
+                    style={StyleSheet.absoluteFill}
+                />
                 <TouchableOpacity onPress={handleUpdate} disabled={loading} activeOpacity={0.9}>
-                    <View style={[styles.primaryButton, { backgroundColor: colors.primary }]}>
-                        <Text style={styles.primaryButtonText}>{loading ? 'Saving...' : 'Save Changes'}</Text>
+                    <View style={[styles.primaryButton, Platform.select({ web: { boxShadow: isDarkMode ? 'none' : `0 4px 12px ${colors.primary}60` }, default: { shadowColor: isDarkMode ? 'transparent' : colors.primary } })]}>
+                        <ExpoGradient
+                            colors={[colors.primary, '#6366f1']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 0 }}
+                            style={StyleSheet.absoluteFill}
+                        />
+                        <Text style={styles.primaryButtonText}>{loading ? 'Establishing Sync...' : 'Update Neural Profile'}</Text>
                     </View>
                 </TouchableOpacity>
-            </View>
+            </BlurView>
 
             {/* Modal */}
             <Modal animationType="slide" transparent={true} visible={showCollegeModal}>
@@ -291,8 +316,8 @@ export default function EditProfileScreen({ navigation }) {
                         />
                     </View>
                 </View>
-            </Modal>
-        </View>
+            </Modal >
+        </View >
     );
 }
 
@@ -328,26 +353,46 @@ const styles = StyleSheet.create({
     inputWrapperGlass: {
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 20,
-        height: 60,
+        borderRadius: 24,
+        height: 64,
         borderWidth: 1.5,
         overflow: 'hidden',
     },
-    inputIcon: { marginLeft: 16, marginRight: 12 },
-    input: { flex: 1, height: '100%', fontSize: 15 },
-    collegeIconBadge: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginLeft: 10, marginRight: 10 },
-    bottomActionContainer: { padding: 24, borderTopWidth: 1 },
-    primaryButton: { height: 56, borderRadius: 18, alignItems: 'center', justifyContent: 'center' },
-    primaryButtonText: { color: 'white', fontSize: 16, fontWeight: 'bold' },
-    modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.8)', justifyContent: 'flex-end' },
-    modalContent: { borderTopLeftRadius: 30, borderTopRightRadius: 30, padding: 24, maxHeight: '80%' },
-    modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 },
-    modalTitle: { fontSize: 20, fontWeight: 'bold' },
-    cancelText: { fontWeight: 'bold' },
+    inputIcon: { marginLeft: 18, marginRight: 12 },
+    input: { flex: 1, height: '100%', fontSize: 15, fontWeight: '700' },
+    collegeIconBadge: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginLeft: 12, marginRight: 10 },
+    bottomActionContainer: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20, paddingBottom: 40, borderTopWidth: 1.5, overflow: 'hidden' },
+    primaryButton: {
+        height: 64,
+        borderRadius: 24,
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        ...Platform.select({
+            web: { boxShadow: '0 8px 15px rgba(0,0,0,0.3)' },
+            default: {
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.3,
+                shadowRadius: 15,
+            }
+        })
+    },
+    primaryButtonText: { color: 'white', fontSize: 16, fontWeight: '900', letterSpacing: 0.8, textTransform: 'uppercase' },
+    modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.6)', justifyContent: 'flex-end' },
+    modalContent: { borderTopLeftRadius: 40, borderTopRightRadius: 40, padding: 24, maxHeight: '85%', borderWidth: 1.5, borderBottomWidth: 0, overflow: 'hidden' },
+    modalHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28, paddingHorizontal: 4 },
+    modalTitle: { fontSize: 24, fontWeight: '900', letterSpacing: -0.5 },
+    cancelText: { fontWeight: '800', textTransform: 'uppercase', fontSize: 13, letterSpacing: 1 },
     collegeItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 16, borderBottomWidth: 1 },
-    collegeInitialBadge: { width: 44, height: 44, borderRadius: 22, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
-    collegeInitial: { fontWeight: 'bold', fontSize: 16 },
-    collegeName: { flex: 1, fontSize: 16 },
-    searchWrapper: { flexDirection: 'row', alignItems: 'center', borderRadius: 12, paddingHorizontal: 12, height: 44, borderWidth: 1, marginBottom: 16 },
-    searchInput: { flex: 1, marginLeft: 8, fontSize: 14, height: '100%' },
+    collegeInitialBadge: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginRight: 16 },
+    collegeInitial: { fontWeight: '900', fontSize: 18 },
+    collegeName: { flex: 1, fontSize: 15, fontWeight: '700' },
+    searchWrapper: { flexDirection: 'row', alignItems: 'center', borderRadius: 24, paddingHorizontal: 20, height: 60, borderWidth: 1.5, marginBottom: 20 },
+    searchInput: { flex: 1, marginLeft: 12, fontSize: 16, height: '100%', fontWeight: '600' },
+    bgOrb: {
+        position: 'absolute',
+        width: 300,
+        height: 300,
+        borderRadius: 150,
+    },
 });

@@ -114,7 +114,11 @@ export default function HomeScreen({ navigation }) {
             onPress={() => navigation.navigate('EventDetails', { event: item })}
             style={styles.eventItemWrapper}
         >
-            <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={styles.eventItemGlass}>
+            <BlurView intensity={isDarkMode ? 45 : 30} tint={isDarkMode ? "dark" : "light"} style={[styles.eventItemGlass, { borderColor: colors.glassBorder }]}>
+                <ExpoGradient
+                    colors={colors.iridescent}
+                    style={StyleSheet.absoluteFill}
+                />
                 <View style={styles.imageWrapper}>
                     <Image
                         source={{ uri: item.imageUrl || item.image || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=400&auto=format&fit=crop' }}
@@ -126,8 +130,8 @@ export default function HomeScreen({ navigation }) {
                 </View>
                 <View style={styles.eventInfo}>
                     <View style={styles.eventHeader}>
-                        <Text style={[styles.eventTime, { color: colors.primary, fontWeight: 'bold' }]}>{item.date}</Text>
-                        <MaterialCommunityIcons name="heart-outline" size={18} color={colors.textSecondary} />
+                        <Text style={[styles.eventTime, { color: colors.primary, fontWeight: '900' }]}>{item.date}</Text>
+                        <MaterialCommunityIcons name="heart-outline" size={18} color={isDarkMode ? "rgba(255,255,255,0.4)" : colors.textSecondary} />
                     </View>
                     <Text style={[styles.eventTitle, { color: colors.text }]} numberOfLines={1}>{item.title}</Text>
                     <View style={styles.locationRow}>
@@ -137,7 +141,7 @@ export default function HomeScreen({ navigation }) {
                         </Text>
                     </View>
                     <View style={styles.eventFooter}>
-                        <Text style={[styles.eventPrice, { color: '#10b981', fontWeight: 'bold' }]}>
+                        <Text style={[styles.eventPrice, { color: isDarkMode ? '#10b981' : '#059669', fontWeight: '900' }]}>
                             {item.price > 0 ? `₹${item.price}` : 'FREE'}
                         </Text>
                         <View style={styles.participantSmallRow}>
@@ -201,165 +205,143 @@ export default function HomeScreen({ navigation }) {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <StatusBar style={isDarkMode ? "light" : "dark"} />
+            <StatusBar style={isDarkMode ? 'light' : 'dark'} />
 
-            <ExpoGradient
-                colors={isDarkMode
-                    ? [colors.background, '#1e1b4b', '#0f172a']
-                    : ['#f8fafc', '#f1f5f9', '#e2e8f0']}
-                style={StyleSheet.absoluteFill}
-            />
-
-            {/* Header */}
-            <View style={[styles.header, { backgroundColor: 'transparent', borderBottomColor: colors.border }]}>
-                <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={StyleSheet.absoluteFill} />
-                <TouchableOpacity
-                    style={styles.userInfo}
-                    onPress={() => navigation.navigate('Profile')}
-                >
-                    <Image
-                        source={{
-                            uri: (userData?.avatarUrl &&
-                                !userData.avatarUrl.includes('iran.liara.run') &&
-                                !hasImageError)
-                                ? userData.avatarUrl
-                                : getDefaultAvatar(userData?.name || user?.email?.split('@')?.[0] || 'User', userData?.gender)
-                        }}
-                        style={styles.avatar}
-                        onError={(e) => {
-                            setHasImageError(true);
-                        }}
-                    />
-                    <View>
-                        <Text style={[styles.greeting, { color: colors.textSecondary }]}>Discover Events</Text>
-                        <Text style={[styles.username, { color: colors.text }]}>{userData?.name || user?.email?.split('@')?.[0] || 'User'}</Text>
-                    </View>
-                </TouchableOpacity>
-                <TouchableOpacity style={[styles.iconButton, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('Profile')}>
-                    <MaterialCommunityIcons name="cog-outline" size={24} color={colors.text} />
-                </TouchableOpacity>
+            {/* Cinematic Background Elements */}
+            <View style={StyleSheet.absoluteFill}>
+                <ExpoGradient
+                    colors={isDarkMode ? ['#0f172a', '#1e1b4b', '#000000'] : ['#f8fafc', '#e2e8f0', '#cbd5e1']}
+                    style={StyleSheet.absoluteFill}
+                />
+                <View style={[styles.bgOrb, styles.orb1, { backgroundColor: colors.primaryGlow }]} />
+                <View style={[styles.bgOrb, styles.orb2, { backgroundColor: (colors.secondaryGlow || '#8b5cf630') }]} />
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
-                {/* Search Bar */}
-                <View style={styles.searchSection}>
-                    <BlurView intensity={isDarkMode ? 30 : 60} tint={isDarkMode ? "dark" : "light"} style={[styles.searchBar, { borderColor: colors.border, overflow: 'hidden' }]}>
-                        <MaterialCommunityIcons name="magnify" size={22} color={colors.textSecondary} />
-                        <TextInput
-                            placeholder="Search events, organizers..."
-                            placeholderTextColor={colors.textSecondary}
-                            style={[styles.searchInput, { color: colors.text }]}
-                            value={searchQuery}
-                            onChangeText={setSearchQuery}
+            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+                {/* Premium Header */}
+                <View style={styles.header}>
+                    <View>
+                        <Text style={[styles.welcomeText, { color: colors.textSecondary }]}>Discover</Text>
+                        <Text style={[styles.userName, { color: colors.text }]}>Explore Events</Text>
+                    </View>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('Profile')}
+                        style={styles.avatarWrapper}
+                    >
+                        <BlurView intensity={20} tint={isDarkMode ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
+                        <Image
+                            source={{ uri: (userData?.avatarUrl && !userData.avatarUrl.includes('iran.liara.run') && !hasImageError) ? userData.avatarUrl : getDefaultAvatar(userData?.name || user?.email?.split('@')[0] || 'User', userData?.gender) }}
+                            style={styles.avatar}
+                            onError={() => setHasImageError(true)}
                         />
-                    </BlurView>
+                    </TouchableOpacity>
                 </View>
 
-                {/* Categories */}
+                {/* Glassmorphic Search Bar */}
+                <BlurView intensity={25} tint={isDarkMode ? 'dark' : 'light'} style={[styles.searchContainer, { borderColor: colors.glassBorder }]}>
+                    <MaterialCommunityIcons name="magnify" size={22} color={colors.primary} style={styles.searchIcon} />
+                    <TextInput
+                        placeholder="Search festivals, workshops, etc."
+                        placeholderTextColor={colors.textSecondary + '80'}
+                        style={[styles.searchInput, { color: colors.text }]}
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                    />
+                </BlurView>
+
+                {/* Featured Horizontal Scroller */}
+                {featuredEvents.length > 0 && (
+                    <View style={styles.section}>
+                        <View style={styles.sectionHeader}>
+                            <Text style={[styles.sectionTitle, { color: colors.text }]}>Featured Events</Text>
+                            <TouchableOpacity>
+                                <Text style={[styles.seeAll, { color: colors.primary }]}>View all</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <FlatList
+                            data={featuredEvents}
+                            renderItem={renderFeaturedItem}
+                            keyExtractor={item => item.id}
+                            horizontal
+                            showsHorizontalScrollIndicator={false}
+                            contentContainerStyle={styles.featuredList}
+                            snapToInterval={width * 0.85 + 20}
+                            decelerationRate="fast"
+                        />
+                    </View>
+                )}
+
+                {/* Glassmorphic Category Filter */}
                 <ScrollView
                     horizontal
                     showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={styles.categoriesScroll}
+                    contentContainerStyle={styles.categoryList}
                 >
                     {categories.map((cat) => (
                         <TouchableOpacity
                             key={cat.id}
-                            style={[
-                                styles.categoryChip,
-                                { borderColor: colors.border, overflow: 'hidden' },
-                                activeCategory === cat.id && { borderColor: colors.primary }
-                            ]}
                             onPress={() => setActiveCategory(cat.id)}
                         >
-                            <BlurView intensity={activeCategory === cat.id ? 80 : 30} tint={isDarkMode ? "dark" : "light"} style={StyleSheet.absoluteFill} />
-                            <View style={[
-                                styles.iconCircle,
-                                activeCategory === cat.id && { backgroundColor: 'rgba(255,255,255,0.2)' }
-                            ]}>
+                            <BlurView
+                                intensity={activeCategory === cat.id ? 40 : 15}
+                                tint={isDarkMode ? 'dark' : 'light'}
+                                style={[
+                                    styles.categoryChip,
+                                    {
+                                        borderColor: activeCategory === cat.id ? colors.primary : colors.glassBorder,
+                                        backgroundColor: activeCategory === cat.id ? colors.primary + '15' : 'transparent'
+                                    }
+                                ]}
+                            >
                                 <MaterialCommunityIcons
                                     name={cat.icon}
                                     size={18}
-                                    color={activeCategory === cat.id ? 'white' : colors.textSecondary}
+                                    color={activeCategory === cat.id ? colors.primary : colors.textSecondary}
                                 />
-                            </View>
-                            <Text style={[
-                                styles.categoryLabel,
-                                { color: colors.textSecondary },
-                                activeCategory === cat.id && { color: 'white', fontWeight: 'bold' }
-                            ]}>
-                                {cat.label}
-                            </Text>
+                                <Text style={[
+                                    styles.categoryLabel,
+                                    { color: activeCategory === cat.id ? colors.primary : colors.textSecondary }
+                                ]}>
+                                    {cat.label}
+                                </Text>
+                            </BlurView>
                         </TouchableOpacity>
                     ))}
                 </ScrollView>
 
-                {/* Date Filters */}
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={[styles.categoriesScroll, { marginTop: 12, marginBottom: 8 }]}
-                >
-                    {dateFilters.map((filter) => (
-                        <TouchableOpacity
-                            key={filter}
-                            style={[
-                                styles.dateFilterChip,
-                                { backgroundColor: colors.surfaceLight, borderColor: colors.border },
-                                activeDateFilter === filter && { backgroundColor: colors.primary + '20', borderColor: colors.primary }
-                            ]}
-                            onPress={() => setActiveDateFilter(filter)}
-                        >
-                            <Text style={[
-                                styles.dateFilterLabel,
-                                { color: colors.textSecondary },
-                                activeDateFilter === filter && { color: colors.primary, fontWeight: 'bold' }
-                            ]}>
-                                {filter}
-                            </Text>
-                        </TouchableOpacity>
-                    ))}
-                </ScrollView>
-
-                {/* Featured Section */}
-                {activeCategory === 'all' && (
-                    <View style={styles.section}>
-                        <View style={styles.sectionHeader}>
-                            <Text style={styles.sectionTitle}>Featured Events</Text>
-                            <TouchableOpacity>
-                                <Text style={styles.seeAll}>See All</Text>
-                            </TouchableOpacity>
-                        </View>
-                        <ScrollView
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
-                            contentContainerStyle={styles.featuredScroll}
-                        >
-                            {events.slice(0, 3).map((item) => (
-                                <TouchableOpacity
-                                    key={item.id}
-                                    style={styles.featuredCard}
-                                    onPress={() => navigation.navigate('EventDetails', { event: item })}
+                <View style={styles.filterSection}>
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={styles.dateFilterList}
+                    >
+                        {dateFilters.map((filter) => (
+                            <TouchableOpacity
+                                key={filter}
+                                onPress={() => setActiveDateFilter(filter)}
+                            >
+                                <BlurView
+                                    intensity={activeDateFilter === filter ? 30 : 10}
+                                    tint={isDarkMode ? 'dark' : 'light'}
+                                    style={[
+                                        styles.dateFilterChip,
+                                        {
+                                            borderColor: activeDateFilter === filter ? colors.primary : colors.glassBorder,
+                                            backgroundColor: activeDateFilter === filter ? colors.primary + '10' : 'transparent'
+                                        }
+                                    ]}
                                 >
-                                    <Image
-                                        source={{ uri: item.imageUrl || item.image || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2670&auto=format&fit=crop' }}
-                                        style={styles.featuredImage}
-                                    />
-                                    <ExpoGradient
-                                        colors={['transparent', 'rgba(0,0,0,0.8)']}
-                                        style={styles.featuredGradient}
-                                    />
-                                    <View style={styles.featuredContent}>
-                                        <View style={styles.dateBadge}>
-                                            <Text style={styles.dateDay}>{item.date?.split(' ')[0] || '24'}</Text>
-                                            <Text style={styles.dateMonth}>{item.date?.split(' ')[1] || 'OCT'}</Text>
-                                        </View>
-                                        <Text style={styles.featuredTitle}>{item.title}</Text>
-                                    </View>
-                                </TouchableOpacity>
-                            ))}
-                        </ScrollView>
-                    </View>
-                )}
+                                    <Text style={[
+                                        styles.dateFilterLabel,
+                                        { color: activeDateFilter === filter ? (isDarkMode ? '#fff' : colors.primary) : colors.textSecondary }
+                                    ]}>
+                                        {filter}
+                                    </Text>
+                                </BlurView>
+                            </TouchableOpacity>
+                        ))}
+                    </ScrollView>
+                </View>
 
                 {/* Event List */}
                 <View style={[styles.section, { marginTop: 24 }]}>
@@ -402,7 +384,21 @@ export default function HomeScreen({ navigation }) {
                                 <MaterialCommunityIcons name="view-dashboard" size={24} color="#94a3b8" />
                                 <Text style={styles.navLabel}>Dashboard</Text>
                             </TouchableOpacity>
-                            <TouchableOpacity style={styles.fab} onPress={() => navigation.navigate('CreateEvent')}>
+                            <TouchableOpacity
+                                style={[styles.fab, {
+                                    backgroundColor: colors.primary,
+                                    ...(Platform.OS === 'web'
+                                        ? { boxShadow: `0 4px 10px ${colors.primary}40` }
+                                        : {
+                                            shadowColor: colors.primary,
+                                            shadowOffset: { width: 0, height: 4 },
+                                            shadowOpacity: 0.5,
+                                            shadowRadius: 10,
+                                            elevation: 8,
+                                        })
+                                }]}
+                                onPress={() => navigation.navigate('CreateEvent')}
+                            >
                                 <MaterialCommunityIcons name="plus" size={28} color="white" />
                             </TouchableOpacity>
                             <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('ScanTicket')}>
@@ -429,236 +425,139 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
+    container: { flex: 1 },
+    scrollContent: { paddingBottom: 110 },
+    bgOrb: {
+        position: 'absolute',
+        width: width * 1.5,
+        height: width * 1.5,
+        borderRadius: width * 0.75,
+        opacity: 0.1,
     },
-    header: {
-        paddingTop: 60,
-        paddingHorizontal: 20,
-        paddingBottom: 20,
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        borderBottomWidth: 1,
-    },
-    userInfo: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 12,
-    },
-    avatar: {
-        width: 44,
-        height: 44,
-        borderRadius: 22,
-        borderWidth: 2,
-        borderColor: '#135bec',
-    },
-    greeting: {
-        fontSize: 12,
-        color: '#94a3b8',
-        fontWeight: '500',
-    },
-    username: {
-        fontSize: 16,
-        fontWeight: 'bold',
-    },
-    iconButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    searchSection: {
-        flexDirection: 'row',
-        paddingHorizontal: 20,
-        gap: 12,
-        marginBottom: 24,
-    },
-    searchBar: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 16,
-        paddingVertical: Platform.OS === 'ios' ? 12 : 8,
-        borderRadius: 20,
-        borderWidth: 1,
-    },
-    searchInput: {
-        flex: 1,
-        fontSize: 15,
-        marginLeft: 10,
-    },
-    scrollContent: {
-        paddingTop: 20,
-    },
-    section: {
-        marginBottom: 30,
-    },
-    sectionHeader: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        paddingHorizontal: 20,
-        marginBottom: 16,
-    },
-    sectionTitle: {
-        fontSize: 20,
-        fontWeight: 'bold',
-    },
-    featuredList: {
-        paddingLeft: 20,
-    },
+    orb1: { top: -100, right: -width * 0.5 },
+    orb2: { bottom: 200, left: -width * 0.5 },
+    header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, paddingTop: 60, marginBottom: 30 },
+    welcomeText: { fontSize: 13, fontWeight: '900', letterSpacing: 1.5, textTransform: 'uppercase', marginBottom: 4 },
+    userName: { fontSize: 26, fontWeight: 'bold', letterSpacing: -0.5 },
+    avatarWrapper: { width: 52, height: 52, borderRadius: 20, overflow: 'hidden', borderWidth: 1, borderColor: 'rgba(255,255,255,0.15)', padding: 2 },
+    avatar: { width: '100%', height: '100%', borderRadius: 18 },
+    searchContainer: { flexDirection: 'row', alignItems: 'center', marginHorizontal: 24, paddingHorizontal: 20, height: 60, borderRadius: 24, borderWidth: 1, overflow: 'hidden', marginBottom: 35 },
+    searchIcon: { marginRight: 15 },
+    searchInput: { flex: 1, fontSize: 16, fontWeight: '500' },
+    section: { marginBottom: 35 },
+    sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 24, marginBottom: 20 },
+    sectionTitle: { fontSize: 22, fontWeight: 'bold', letterSpacing: -0.5 },
+    seeAll: { fontSize: 14, fontWeight: 'bold' },
+    featuredList: { paddingLeft: 24, paddingRight: 8 },
     featuredCard: {
-        width: width - 40,
-        height: 220,
-        borderRadius: 24,
+        width: width * 0.85,
+        height: 460,
+        marginRight: 20,
+        borderRadius: 40,
         overflow: 'hidden',
-        marginRight: 16,
+        elevation: 20,
+        ...Platform.select({
+            web: { boxShadow: '0 12px 20px rgba(0,0,0,0.3)' },
+            default: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 12 },
+                shadowOpacity: 0.3,
+                shadowRadius: 20,
+            }
+        })
     },
-    featuredImage: {
-        width: '100%',
-        height: '100%',
-    },
+    featuredImage: { width: '100%', height: '100%' },
     featuredGradient: {
         position: 'absolute',
-        top: 0,
-        left: 0,
-        right: 0,
-        bottom: 0,
-    },
-    featuredContent: {
-        position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
-        padding: 16,
+        height: '70%',
     },
-    featuredBlur: {
-        borderRadius: 20,
+    featuredContent: { position: 'absolute', bottom: 12, left: 12, right: 12, overflow: 'hidden', borderRadius: 32 },
+    featuredGlassInfo: {
+        borderRadius: 24,
         padding: 16,
         overflow: 'hidden',
         borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
+        borderColor: 'rgba(255,255,255,0.15)',
     },
-    featuredTextContainer: {
+    featuredTextContent: {
+        gap: 4,
+    },
+    featuredBlur: { padding: 24, gap: 10 },
+    categoryBadge: { alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 10, borderWidth: 1 },
+    categoryText: { fontSize: 10, fontWeight: '900', textTransform: 'uppercase', letterSpacing: 1.5 },
+    featuredTitle: { fontSize: 28, fontWeight: 'bold', lineHeight: 34, letterSpacing: -0.5 },
+    featuredMeta: { flexDirection: 'row', alignItems: 'center', gap: 8, opacity: 0.8 },
+    featuredMetaRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
         gap: 8,
     },
-    dateBadge: {
-        position: 'absolute',
-        top: 20,
-        left: 20,
-        width: 46,
-        height: 52,
-        backgroundColor: 'rgba(255,255,255,0.9)',
-        borderRadius: 12,
-        alignItems: 'center',
-        justifyContent: 'center',
-        zIndex: 10,
-    },
-    dateDay: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#101622',
-    },
-    dateMonth: {
-        fontSize: 10,
-        fontWeight: 'bold',
-        color: '#135bec',
-        textTransform: 'uppercase',
-    },
-    categoryBadge: {
-        alignSelf: 'flex-start',
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-        borderRadius: 8,
-        borderWidth: 1,
-        marginBottom: 10,
-    },
-    categoryText: {
-        fontSize: 10,
-        fontWeight: 'bold',
-        textTransform: 'uppercase',
-        letterSpacing: 1,
-    },
-    featuredTitle: {
-        fontSize: 22,
-        fontWeight: 'bold',
-        marginBottom: 8,
-    },
-    featuredMeta: {
+    metaItem: {
         flexDirection: 'row',
         alignItems: 'center',
-        gap: 6,
+        gap: 4,
     },
-    featuredSubtitle: {
-        fontSize: 14,
-        color: '#cbd5e1',
-    },
-    categorySection: {
-        marginBottom: 24,
-    },
-    categoriesScroll: {
-        paddingLeft: 20,
-        paddingRight: 20,
-        gap: 12,
-        paddingBottom: 4,
-    },
-    categoryChip: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingHorizontal: 8,
-        paddingVertical: 8,
-        backgroundColor: 'rgba(26, 34, 51, 0.7)',
-        borderRadius: 30,
-        borderWidth: 1,
-        borderColor: 'rgba(35, 47, 72, 0.5)',
-        marginRight: 4,
-    },
-    categoryChipActive: {
-        elevation: 8,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 8,
-    },
-    iconCircle: {
-        width: 32,
-        height: 32,
-        borderRadius: 16,
-        backgroundColor: 'rgba(15, 23, 42, 0.5)',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: 10,
-    },
-    iconCircleActive: {
-        backgroundColor: 'rgba(255, 255, 255, 0.2)',
-    },
-    categoryLabel: {
-        fontSize: 14,
-        color: '#94a3b8',
-        fontWeight: '600',
-        paddingRight: 12,
-    },
-    categoryLabelActive: {
-        color: 'white',
-        fontWeight: '700',
-    },
-    dateFilterChip: {
-        paddingHorizontal: 16,
-        paddingVertical: 6,
-        borderRadius: 20,
-        backgroundColor: 'rgba(26, 34, 51, 0.4)',
-        marginRight: 8,
-        borderWidth: 1,
-        borderColor: 'rgba(35, 47, 72, 0.3)',
-    },
-    dateFilterChipActive: {
-        backgroundColor: 'rgba(59, 130, 246, 0.2)',
-    },
-    dateFilterLabel: {
+    metaText: {
+        color: 'rgba(255,255,255,0.7)',
         fontSize: 12,
-        color: '#64748b',
-        fontWeight: '500',
+        fontWeight: '600',
     },
+    metaDot: {
+        width: 4,
+        height: 4,
+        borderRadius: 2,
+    },
+    featuredDateBadge: {
+        position: 'absolute',
+        top: 16,
+        right: 16,
+        paddingHorizontal: 12,
+        paddingVertical: 8,
+        borderRadius: 16,
+        alignItems: 'center',
+        justifyContent: 'center',
+        elevation: 5,
+    },
+    dateBadgeDay: {
+        color: 'white',
+        fontSize: 18,
+        fontWeight: '900',
+    },
+    dateBadgeMonth: {
+        color: 'rgba(255,255,255,0.8)',
+        fontSize: 10,
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+    },
+    featuredSubtitle: { fontSize: 14, fontWeight: '500' },
+    categoryList: { paddingHorizontal: 24, marginBottom: 35 },
+    categoryChip: {
+        paddingHorizontal: 20,
+        paddingVertical: 12,
+        borderRadius: 20,
+        borderWidth: 1.5,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 10,
+        marginRight: 12,
+        elevation: 6,
+        ...(Platform.OS === 'web'
+            ? { boxShadow: '0 4px 8px rgba(0,0,0,0.1)' }
+            : {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+            })
+    },
+    categoryLabel: { fontSize: 14, fontWeight: 'bold' },
+    filterSection: { paddingHorizontal: 24, marginBottom: 20 },
+    dateFilterList: { paddingBottom: 10 },
+    dateFilterChip: { paddingHorizontal: 18, paddingVertical: 10, borderRadius: 16, marginRight: 10, borderWidth: 1 },
+    dateFilterLabel: { fontSize: 13, fontWeight: 'bold' },
     dateFilterLabelActive: {
         fontWeight: 'bold',
     },
@@ -674,10 +573,14 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         padding: 10,
         elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.05,
-        shadowRadius: 10,
+        ...(Platform.OS === 'web'
+            ? { boxShadow: '0 2px 10px rgba(0,0,0,0.05)' }
+            : {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.05,
+                shadowRadius: 10,
+            })
     },
     eventItemWrapper: {
         marginBottom: 16,
@@ -765,16 +668,20 @@ const styles = StyleSheet.create({
         bottom: 24,
         left: 20,
         right: 20,
-        height: 70,
-        borderRadius: 35,
+        height: 72,
+        borderRadius: 36,
         overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: 'rgba(255,255,255,0.1)',
-        elevation: 10,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 10 },
-        shadowOpacity: 0.3,
-        shadowRadius: 20,
+        borderWidth: 1.5,
+        borderColor: 'rgba(255,255,255,0.15)',
+        elevation: 20,
+        ...(Platform.OS === 'web'
+            ? { boxShadow: '0 12px 24px rgba(0,0,0,0.5)' }
+            : {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 12 },
+                shadowOpacity: 0.5,
+                shadowRadius: 24,
+            })
     },
     bottomNav: {
         flex: 1,
@@ -804,10 +711,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         marginTop: -30,
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.5,
-        shadowRadius: 10,
-        elevation: 8,
     },
     emptyContainer: {
         alignItems: 'center',

@@ -4,7 +4,7 @@ import {
     TextInput, Dimensions, Alert, Platform, Linking
 } from 'react-native';
 import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
-
+import { BlurView } from 'expo-blur';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useAuth } from '../context/AuthContext';
@@ -231,140 +231,136 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
 
     return (
         <View style={[styles.container, { backgroundColor: colors.background }]}>
-            <StatusBar style={isDarkMode ? "light" : "dark"} />
+            <StatusBar style="light" />
 
-            <ExpoGradient
-                colors={isDarkMode ? ['#1e3a8a', '#1e1b4b'] : ['#135bec', '#1e40af']}
-                style={styles.header}
+            {/* Cinematic Background Elements */}
+            <View style={StyleSheet.absoluteFill}>
+                <ExpoGradient
+                    colors={isDarkMode ? ['#0f172a', '#1e1b4b', '#000000'] : ['#f8fafc', '#e2e8f0', '#cbd5e1']}
+                    style={StyleSheet.absoluteFill}
+                />
+                <View style={[styles.bgOrb, styles.orb1, { backgroundColor: colors.primaryGlow }]} />
+                <View style={[styles.bgOrb, styles.orb2, { backgroundColor: (colors.secondaryGlow || '#8b5cf630') }]} />
+            </View>
+
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+                stickyHeaderIndices={[0]}
             >
-                <View style={styles.headerTop}>
-                    <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
-                        <MaterialCommunityIcons name="arrow-left" size={24} color="white" />
-                    </TouchableOpacity>
-                    <TouchableOpacity onPress={handleDebugTrigger} activeOpacity={1}>
-                        <Text style={styles.headerTitle}>Sponsorship Deal</Text>
-                    </TouchableOpacity>
-                    <View style={{ width: 40 }} />
-                </View>
-
-                <View style={styles.eventMiniCard}>
-                    <View style={styles.amountBadge}>
-                        <Text style={styles.amountLabel}>Partner with us for</Text>
-                        <Text style={styles.amountValue}>₹{event.sponsorshipAmount || '0'}</Text>
+                {/* Refined Header */}
+                <BlurView intensity={Platform.OS === 'ios' ? 40 : 100} tint={isDarkMode ? 'dark' : 'light'} style={styles.headerGlass}>
+                    <View style={styles.headerTop}>
+                        <TouchableOpacity style={styles.backButton} onPress={() => navigation.goBack()}>
+                            <View style={[styles.iconCircle, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.05)' }]}>
+                                <MaterialCommunityIcons name="arrow-left" size={24} color={colors.text} />
+                            </View>
+                        </TouchableOpacity>
+                        <Text style={[styles.headerTitle, { color: colors.text }]}>Partner Program</Text>
+                        <View style={{ width: 44 }} />
                     </View>
-                </View>
-            </ExpoGradient>
+                </BlurView>
 
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                {showDiagnostics && (
-                    <View style={[styles.diagnosticCard, { backgroundColor: isDarkMode ? '#1a1a1a' : '#f0f0f0' }]}>
-                        <View style={styles.diagnosticHeader}>
-                            <Text style={[styles.diagnosticTitle, { color: colors.text }]}>System Diagnostics</Text>
-                            <TouchableOpacity onPress={() => setShowDiagnostics(false)}>
-                                <MaterialCommunityIcons name="close" size={20} color={colors.text} />
-                            </TouchableOpacity>
-                        </View>
-                        <Text style={[styles.diagText, { color: colors.text }]}>• Platform: {Platform.OS}</Text>
-                        <Text style={[styles.diagText, { color: colors.text }]}>• Razorpay SDK: {typeof window !== 'undefined' && window.Razorpay ? 'Loaded' : 'Missing'}</Text>
-                        <Text style={[styles.diagText, { color: colors.text }]}>• API Key Prefix: {RazorpayConfig.RAZORPAY_KEY_ID ? RazorpayConfig.RAZORPAY_KEY_ID.substring(0, 8) : 'NONE'}</Text>
-                        <Text style={[styles.diagText, { color: colors.text }]}>• Event ID: {event?.id || 'NULL'}</Text>
-                    </View>
-                )}
-
-                {/* Header */}
-                <View style={styles.headerSection}>
-                    <Text style={[styles.headerTitle, { color: colors.text }]}>Sponsor "{event.title}"</Text>
-                    <Text style={[styles.headerSubtitle, { color: colors.textSecondary }]}>
-                        Directly support this event and get your brand featured in front of the community.
-                    </Text>
-                </View>
-
-                {/* Event Sponsor Info */}
-                <View style={[styles.amountCard, { borderColor: isDarkMode ? 'rgba(19, 91, 236, 0.3)' : colors.border }]}>
+                {/* Event Context Card */}
+                <View style={styles.heroSection}>
                     <ExpoGradient
-                        colors={isDarkMode ? ['rgba(19, 91, 236, 0.15)', 'rgba(25, 33, 51, 0.5)'] : ['rgba(19, 91, 236, 0.05)', colors.surface]}
-                        style={StyleSheet.absoluteFill}
-                    />
-                    <View style={styles.amountRow}>
-                        <View>
-                            <Text style={[styles.amountLabel, { color: colors.textSecondary }]}>SPONSORSHIP AMOUNT</Text>
-                            <Text style={[styles.amountValue, { color: colors.text }]}>₹{(event.sponsorshipAmount || 0).toLocaleString()}</Text>
+                        colors={[colors.primary, (colors.iridescent || '#6366f1')]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 1 }}
+                        style={styles.amountHero}
+                    >
+                        <View style={styles.amountHeroInner}>
+                            <Text style={styles.heroLabel}>Exclusive Sponsorship</Text>
+                            <Text style={styles.heroAmount}>₹{event.sponsorshipAmount || '0'}</Text>
+                            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', backgroundColor: 'rgba(255,255,255,0.15)', padding: '8px 16px', borderRadius: '20px', gap: '8px', border: '1px solid rgba(255,255,255,0.2)' }}>
+                                <MaterialCommunityIcons name="calendar-check" size={14} color="white" />
+                                <Text style={{ color: 'white', fontSize: 14, fontWeight: '600' }}>{event.title}</Text>
+                            </div>
                         </View>
-                        <View style={[styles.eventBadge, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.05)' : colors.surface, borderColor: colors.border }]}>
-                            <MaterialCommunityIcons name="star-outline" size={24} color={colors.primary} />
-                        </View>
-                    </View>
-                    <Text style={[styles.amountHint, { color: colors.textSecondary }]}>One-time sponsorship for the selected event. Get premium visibility.</Text>
+                    </ExpoGradient>
                 </View>
 
-                {/* Registration Form */}
-                <View style={styles.formSection}>
-                    <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Sponsor Details</Text>
+                <View style={styles.formPadding}>
+                    {/* Brand Identity Panel */}
+                    <BlurView intensity={20} tint={isDarkMode ? 'dark' : 'light'} style={[styles.formPanel, { borderColor: colors.glassBorder }]}>
+                        <View style={styles.panelHeader}>
+                            <MaterialCommunityIcons name="briefcase-variant-outline" size={20} color={colors.primary} />
+                            <Text style={[styles.panelTitle, { color: colors.text }]}>Brand Identity</Text>
+                        </View>
 
-                    {/* Company Name */}
-                    <View style={styles.inputGroup}>
-                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>BRAND / COMPANY NAME</Text>
-                        <TextInput
-                            nativeID="company-name"
-                            name="companyName"
-                            style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
-                            placeholder="e.g. Acme Corp"
-                            placeholderTextColor={colors.textSecondary}
-                            value={companyName}
-                            onChangeText={setCompanyName}
-                            selectionColor={colors.primary}
-                            autoComplete="organization"
-                        />
-                    </View>
+                        <View style={styles.inputGroup}>
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>COMPANY LEGAL NAME</Text>
+                            <View style={[styles.inputWrapper, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderColor: colors.border }]}>
+                                <TextInput
+                                    style={[styles.input, { color: colors.text }]}
+                                    placeholder="e.g. Nexus Dynamics"
+                                    placeholderTextColor={colors.textSecondary}
+                                    value={companyName}
+                                    onChangeText={setCompanyName}
+                                    selectionColor={colors.primary}
+                                />
+                            </View>
+                        </View>
 
-                    {/* Logo URL */}
-                    <View style={styles.inputGroup}>
-                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>LOGO IMAGE URL</Text>
-                        <TextInput
-                            nativeID="logo-url"
-                            name="logoUrl"
-                            style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
-                            placeholder="https://example.com/logo.png"
-                            placeholderTextColor={colors.textSecondary}
-                            value={logoUrl}
-                            onChangeText={setLogoUrl}
-                            selectionColor={colors.primary}
-                        />
-                    </View>
+                        <View style={styles.inputGroup}>
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>LOGO ASSET URL (PNG/JPG)</Text>
+                            <View style={[styles.inputWrapper, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderColor: colors.border }]}>
+                                <TextInput
+                                    style={[styles.input, { color: colors.text }]}
+                                    placeholder="https://brand.com/logo.png"
+                                    placeholderTextColor={colors.textSecondary}
+                                    value={logoUrl}
+                                    onChangeText={setLogoUrl}
+                                    selectionColor={colors.primary}
+                                />
+                            </View>
+                        </View>
+                    </BlurView>
 
-                    {/* Details */}
-                    <View style={styles.inputGroup}>
-                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>SPONSORSHIP DETAILS / MESSAGE</Text>
-                        <TextInput
-                            nativeID="sponsor-details"
-                            name="details"
-                            style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text, height: 100, textAlignVertical: 'top' }]}
-                            placeholder="Tell us about your brand and what you'd like to promote..."
-                            placeholderTextColor={colors.textSecondary}
-                            value={details}
-                            onChangeText={setDetails}
-                            multiline
-                            selectionColor={colors.primary}
-                        />
-                    </View>
+                    {/* Partnership Details Panel */}
+                    <BlurView intensity={20} tint={isDarkMode ? 'dark' : 'light'} style={[styles.formPanel, { borderColor: colors.glassBorder }]}>
+                        <View style={styles.panelHeader}>
+                            <MaterialCommunityIcons name="message-text-outline" size={20} color={colors.primary} />
+                            <Text style={[styles.panelTitle, { color: colors.text }]}>Collaboration Note</Text>
+                        </View>
 
-                    {/* Contact Email */}
-                    <View style={styles.inputGroup}>
-                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>CONTACT EMAIL</Text>
-                        <TextInput
-                            nativeID="contact-email"
-                            name="contactEmail"
-                            style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
-                            placeholder="sponsor@company.com"
-                            placeholderTextColor={colors.textSecondary}
-                            value={contactEmail}
-                            onChangeText={setContactEmail}
-                            keyboardType="email-address"
-                            autoCapitalize="none"
-                            selectionColor={colors.primary}
-                            autoComplete="email"
-                            textContentType="emailAddress"
-                        />
+                        <View style={styles.inputGroup}>
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>PROMOTIONAL MESSAGE</Text>
+                            <View style={[styles.inputWrapper, styles.textAreaWrapper, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderColor: colors.border }]}>
+                                <TextInput
+                                    style={[styles.input, styles.textArea, { color: colors.text }]}
+                                    placeholder="Briefly describe your brand goals for this event..."
+                                    placeholderTextColor={colors.textSecondary}
+                                    value={details}
+                                    onChangeText={setDetails}
+                                    multiline
+                                    numberOfLines={4}
+                                    selectionColor={colors.primary}
+                                />
+                            </View>
+                        </View>
+
+                        <View style={styles.inputGroup}>
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>PARTNERSHIP CONTACT EMAIL</Text>
+                            <View style={[styles.inputWrapper, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)', borderColor: colors.border }]}>
+                                <TextInput
+                                    style={[styles.input, { color: colors.text }]}
+                                    placeholder="partners@brand.com"
+                                    placeholderTextColor={colors.textSecondary}
+                                    value={contactEmail}
+                                    onChangeText={setContactEmail}
+                                    keyboardType="email-address"
+                                    autoCapitalize="none"
+                                    selectionColor={colors.primary}
+                                />
+                            </View>
+                        </View>
+                    </BlurView>
+
+                    {/* Quality Assurance */}
+                    <View style={styles.trustFooter}>
+                        <MaterialCommunityIcons name="shield-check-outline" size={16} color={colors.textSecondary} />
+                        <Text style={[styles.trustText, { color: colors.textSecondary }]}>Verified Partnership via EventSphere Secure Gateway</Text>
                     </View>
                 </View>
 
@@ -372,28 +368,41 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                 <View style={{ height: 120 }} />
             </ScrollView>
 
-            {/* Sticky Payment Bar */}
-            <View style={[styles.stickyBar, { backgroundColor: isDarkMode ? 'rgba(16, 22, 34, 0.9)' : 'rgba(255, 255, 255, 0.95)', borderTopColor: colors.border }]}>
+            {/* Premium Sticky Footer */}
+            <BlurView intensity={80} tint={isDarkMode ? 'dark' : 'light'} style={[styles.stickyBar, { borderTopColor: colors.glassBorder }]}>
                 <View style={styles.stickyBarInner}>
                     <View>
-                        <Text style={[styles.totalLabel, { color: colors.textSecondary }]}>TOTAL</Text>
-                        <Text style={[styles.totalValue, { color: colors.text }]}>₹{(event.sponsorshipAmount || 0).toLocaleString()}.00</Text>
+                        <Text style={[styles.totalLabel, { color: colors.textSecondary }]}>COMMITMENT</Text>
+                        <Text style={[styles.totalValue, { color: colors.text }]}>₹{(event.sponsorshipAmount || 0).toLocaleString()}</Text>
                     </View>
-                    <View style={[styles.secureChip, { backgroundColor: isDarkMode ? 'rgba(74, 222, 128, 0.08)' : 'rgba(74, 222, 128, 0.1)', borderColor: 'rgba(74, 222, 128, 0.2)' }]}>
-                        <MaterialCommunityIcons name="lock" size={12} color="#4ade80" />
-                        <Text style={styles.secureText}>SECURE CHECKOUT</Text>
+                    <View style={[styles.secureBadge, { backgroundColor: isDarkMode ? 'rgba(74, 222, 128, 0.1)' : 'rgba(34, 197, 94, 0.1)' }]}>
+                        <MaterialCommunityIcons name="lock-outline" size={14} color="#10b981" />
+                        <Text style={styles.secureBadgeText}>SECURE</Text>
                     </View>
                 </View>
+
                 <TouchableOpacity
-                    style={[styles.payButton, { backgroundColor: colors.primary, shadowColor: colors.primary }]}
                     onPress={handlePay}
                     disabled={loading}
-                    activeOpacity={0.85}
+                    activeOpacity={0.9}
                 >
-                    <Text style={styles.payButtonText}>{loading ? 'Processing...' : 'Pay & Register'}</Text>
-                    <MaterialCommunityIcons name="arrow-right" size={20} color="white" />
+                    <ExpoGradient
+                        colors={[colors.primary, (colors.iridescent || '#6366f1')]}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
+                        style={[styles.premiumPayBtn, loading && { opacity: 0.7 }]}
+                    >
+                        {loading ? (
+                            <Text style={styles.payButtonText}>Securing Assets...</Text>
+                        ) : (
+                            <>
+                                <Text style={styles.payButtonText}>Finalize Partnership</Text>
+                                <MaterialCommunityIcons name="arrow-right" size={20} color="white" />
+                            </>
+                        )}
+                    </ExpoGradient>
                 </TouchableOpacity>
-            </View>
+            </BlurView>
         </View>
     );
 }
@@ -402,169 +411,179 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
     },
-    header: {
-        paddingTop: 55,
-        paddingHorizontal: 16,
-        paddingBottom: 20,
-        borderBottomLeftRadius: 20,
-        borderBottomRightRadius: 20,
-        overflow: 'hidden',
+    bgOrb: {
+        position: 'absolute',
+        width: width * 1.2,
+        height: width * 1.2,
+        borderRadius: width * 0.6,
+        opacity: 0.15,
+    },
+    orb1: {
+        top: -width * 0.4,
+        right: -width * 0.4,
+    },
+    orb2: {
+        bottom: -width * 0.4,
+        left: -width * 0.2,
+    },
+    scrollContent: {
+        paddingBottom: 150,
+    },
+    headerGlass: {
+        paddingTop: Platform.OS === 'ios' ? 60 : 40,
+        paddingBottom: 15,
+        paddingHorizontal: 20,
+        borderBottomWidth: 1,
+        borderBottomColor: 'rgba(255,255,255,0.05)',
+        zIndex: 100,
     },
     headerTop: {
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        marginBottom: 20,
     },
     backButton: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
-        alignItems: 'center',
-        justifyContent: 'center',
+        zIndex: 10,
     },
-    headerTitle: {
-        fontSize: 17,
-        fontWeight: '600',
-        color: 'white',
-        textAlign: 'center',
-    },
-    eventMiniCard: {
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        borderRadius: 12,
-        padding: 16,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-    },
-    amountBadge: {
-        flexDirection: 'row',
-        alignItems: 'baseline',
-        gap: 8,
-    },
-    scrollContent: {
-        paddingBottom: 40,
-    },
-    headerSection: {
-        paddingHorizontal: 20,
-        paddingTop: 24,
-        paddingBottom: 8,
-    },
-    headerSubtitle: {
-        fontSize: 15,
-        color: '#9ca3af',
-        lineHeight: 22,
-    },
-    amountCard: {
-        marginHorizontal: 20,
-        borderRadius: 20,
-        padding: 24,
-        overflow: 'hidden',
-        borderWidth: 1,
-        borderColor: 'rgba(19, 91, 236, 0.3)',
-        marginBottom: 24,
-    },
-    amountRow: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: 12,
-    },
-    amountLabel: {
-        fontSize: 12,
-        fontWeight: '700',
-        color: '#9ca3af',
-        letterSpacing: 1,
-        marginBottom: 4,
-    },
-    amountValue: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        color: 'white',
-    },
-    eventBadge: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: 'rgba(255,255,255,0.05)',
+    iconCircle: {
+        width: 44,
+        height: 44,
+        borderRadius: 22,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 1,
         borderColor: 'rgba(255,255,255,0.1)',
     },
-    amountHint: {
+    headerTitle: {
+        fontSize: 18,
+        fontWeight: '700',
+        letterSpacing: -0.5,
+    },
+    heroSection: {
+        padding: 20,
+        paddingTop: 30,
+    },
+    amountHero: {
+        borderRadius: 32,
+        padding: 30,
+        overflow: 'hidden',
+        elevation: 10,
+        ...Platform.select({
+            web: { boxShadow: '0 10px 20px rgba(0,0,0,0.3)' },
+            default: {
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 10 },
+                shadowOpacity: 0.3,
+                shadowRadius: 20,
+            }
+        })
+    },
+    amountHeroInner: {
+        alignItems: 'center',
+    },
+    heroLabel: {
+        color: 'rgba(255,255,255,0.8)',
         fontSize: 13,
-        color: '#64748b',
-        lineHeight: 18,
+        fontWeight: '600',
+        letterSpacing: 2,
+        textTransform: 'uppercase',
+        marginBottom: 10,
     },
-    inputHint: {
-        fontSize: 12,
-        color: '#64748b',
-        marginTop: 4,
-        marginLeft: 4,
+    heroAmount: {
+        color: 'white',
+        fontSize: 48,
+        fontWeight: 'bold',
+        letterSpacing: -1,
+        marginBottom: 20,
     },
-    formSection: {
-        paddingHorizontal: 20,
-        paddingTop: 24,
-        gap: 16,
-    },
-    uploadBox: {
-        borderWidth: 2,
-        borderStyle: 'dashed',
-        borderColor: 'rgba(75, 85, 99, 0.6)',
-        borderRadius: 16,
-        padding: 24,
+    eventPill: {
+        flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#1c2333',
+        backgroundColor: 'rgba(255,255,255,0.15)',
+        paddingHorizontal: 16,
+        paddingVertical: 8,
+        borderRadius: 20,
         gap: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.2)',
     },
-    uploadIconBg: {
-        width: 48,
-        height: 48,
-        borderRadius: 24,
-        backgroundColor: 'rgba(19, 91, 236, 0.1)',
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginBottom: 4,
-    },
-    uploadTitle: {
+    eventPillText: {
+        color: 'white',
         fontSize: 14,
         fontWeight: '600',
-        color: 'white',
     },
-    uploadHint: {
-        fontSize: 12,
-        color: '#6b7280',
+    formPadding: {
+        paddingHorizontal: 20,
+        gap: 20,
+    },
+    formPanel: {
+        borderRadius: 24,
+        padding: 24,
+        borderWidth: 1,
+        overflow: 'hidden',
+    },
+    panelHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+        marginBottom: 24,
+    },
+    panelTitle: {
+        fontSize: 17,
+        fontWeight: '700',
+        letterSpacing: -0.3,
     },
     inputGroup: {
-        gap: 6,
+        marginBottom: 20,
     },
     inputLabel: {
         fontSize: 11,
-        fontWeight: '700',
-        color: '#6b7280',
-        letterSpacing: 0.8,
+        fontWeight: '800',
+        letterSpacing: 1,
+        marginBottom: 10,
         marginLeft: 4,
+        opacity: 0.8,
+    },
+    inputWrapper: {
+        borderRadius: 18,
+        borderWidth: 1,
+        overflow: 'hidden',
     },
     input: {
-        borderWidth: 1,
-        borderRadius: 14,
-        paddingHorizontal: 16,
-        paddingVertical: 14,
+        paddingHorizontal: 18,
+        paddingVertical: 16,
         fontSize: 16,
+        fontWeight: '500',
+    },
+    textAreaWrapper: {
+        minHeight: 120,
+    },
+    textArea: {
+        textAlignVertical: 'top',
+        paddingTop: 16,
+    },
+    trustFooter: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 8,
+        marginTop: 10,
+        opacity: 0.6,
+    },
+    trustText: {
+        fontSize: 12,
+        fontWeight: '600',
     },
     stickyBar: {
         position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
-        padding: 20,
-        paddingBottom: 36,
+        paddingBottom: Platform.OS === 'ios' ? 44 : 24,
+        paddingTop: 20,
+        paddingHorizontal: 24,
         borderTopWidth: 1,
-        borderTopLeftRadius: 20,
-        borderTopRightRadius: 20,
-        gap: 14,
-        overflow: 'hidden',
+        gap: 20,
     },
     stickyBarInner: {
         flexDirection: 'row',
@@ -573,49 +592,51 @@ const styles = StyleSheet.create({
     },
     totalLabel: {
         fontSize: 11,
-        fontWeight: '700',
-        color: '#6b7280',
-        letterSpacing: 0.8,
+        fontWeight: '800',
+        letterSpacing: 1.5,
+        marginBottom: 4,
     },
     totalValue: {
-        fontSize: 22,
+        fontSize: 26,
         fontWeight: 'bold',
-        color: 'white',
+        letterSpacing: -0.5,
     },
-    secureChip: {
+    secureBadge: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 6,
-        backgroundColor: 'rgba(74, 222, 128, 0.08)',
-        paddingHorizontal: 10,
-        paddingVertical: 5,
-        borderRadius: 6,
-        borderWidth: 1,
-        borderColor: 'rgba(74, 222, 128, 0.2)',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 10,
     },
-    secureText: {
-        fontSize: 10,
-        fontWeight: 'bold',
-        color: '#4ade80',
+    secureBadgeText: {
+        fontSize: 11,
+        fontWeight: '900',
+        color: '#10b981',
         letterSpacing: 0.5,
     },
-    payButton: {
-        height: 56,
-        backgroundColor: '#135bec',
-        borderRadius: 14,
+    premiumPayBtn: {
+        height: 64,
+        borderRadius: 22,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        gap: 10,
-        shadowColor: '#135bec',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.4,
-        shadowRadius: 10,
-        elevation: 8,
+        gap: 12,
+        elevation: 10,
+        ...Platform.select({
+            web: { boxShadow: '0 8px 16px rgba(99, 102, 241, 0.4)' },
+            default: {
+                shadowColor: '#6366f1',
+                shadowOffset: { width: 0, height: 8 },
+                shadowOpacity: 0.4,
+                shadowRadius: 16,
+            }
+        })
     },
     payButtonText: {
         color: 'white',
-        fontSize: 17,
+        fontSize: 18,
         fontWeight: 'bold',
+        letterSpacing: 0.2,
     },
 });
