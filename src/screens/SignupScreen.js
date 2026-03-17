@@ -7,7 +7,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const RoleCard = ({ role, icon, label, selected, onSelect, colors, isDarkMode }) => (
     <TouchableOpacity
