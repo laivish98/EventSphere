@@ -8,6 +8,7 @@ import { useTheme } from '../context/ThemeContext';
 import { db } from '../services/firebase';
 import { collection, query, where, getDocs, doc, getDoc } from 'firebase/firestore';
 import { StatusBar } from 'expo-status-bar';
+import { getDefaultAvatar } from '../context/AuthContext';
 
 export default function FollowListScreen({ route, navigation }) {
     const { colors, isDarkMode } = useTheme();
@@ -71,7 +72,11 @@ export default function FollowListScreen({ route, navigation }) {
             }}
         >
             <Image
-                source={{ uri: item.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(item.name || 'User')}&background=random&color=fff` }}
+                source={{
+                    uri: (item.avatarUrl && !item.avatarUrl.includes('iran.liara.run'))
+                        ? item.avatarUrl
+                        : getDefaultAvatar(item.name || 'User', item.gender)
+                }}
                 style={styles.avatar}
             />
             <View style={styles.userInfo}>

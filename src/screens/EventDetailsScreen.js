@@ -15,7 +15,7 @@ const { width } = Dimensions.get('window');
 export default function EventDetailsScreen({ route, navigation }) {
     const { event } = route.params;
     const { colors, isDarkMode } = useTheme();
-    const { user, userData } = useAuth();
+    const { user, userData, getDefaultAvatar } = useAuth();
     const [isRegistered, setIsRegistered] = useState(false);
     const [registering, setRegistering] = useState(false);
     const [organizer, setOrganizer] = useState(null);
@@ -470,7 +470,7 @@ export default function EventDetailsScreen({ route, navigation }) {
                                     source={{
                                         uri: (organizer.avatarUrl && !organizer.avatarUrl.includes('iran.liara.run'))
                                             ? organizer.avatarUrl
-                                            : `https://ui-avatars.com/api/?name=${encodeURIComponent(organizer.name || 'Organizer')}&background=random&color=fff`
+                                            : getDefaultAvatar(organizer.name || 'Organizer', organizer.gender)
                                     }}
                                     style={styles.organizerAvatar}
                                 />

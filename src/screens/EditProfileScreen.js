@@ -99,10 +99,27 @@ export default function EditProfileScreen({ navigation }) {
         setLoading(true);
         try {
             const userDocRef = doc(db, 'users', user.uid);
+
+            // Auto-update avatar if it matches the default pattern for the old gender
+            let newAvatarUrl = userData?.avatarUrl;
+            const isDefaultAvatar = !userData?.avatarUrl || userData.avatarUrl.includes('dicebear.com') || userData.avatarUrl.includes('ui-avatars.com');
+
+            if (isDefaultAvatar) {
+                const seed = encodeURIComponent(name.trim() || 'User');
+                if (gender === 'Male') {
+                    newAvatarUrl = `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&hair=short&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+                } else if (gender === 'Female') {
+                    newAvatarUrl = `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&hair=long&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+                } else {
+                    newAvatarUrl = `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+                }
+            }
+
             await updateDoc(userDocRef, {
                 name: name.trim(),
                 college: college,
                 gender: gender,
+                avatarUrl: newAvatarUrl,
                 updatedAt: new Date(),
             });
             Alert.alert('Success ✨', 'Your profile has been updated!');

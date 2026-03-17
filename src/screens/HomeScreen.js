@@ -47,7 +47,7 @@ const categories = [
 ];
 
 export default function HomeScreen({ navigation }) {
-    const { user, userData, logout } = useAuth();
+    const { user, userData, logout, getDefaultAvatar } = useAuth();
     const { isDarkMode, colors } = useTheme();
     const [events, setEvents] = useState([]);
     const [activeCategory, setActiveCategory] = useState('all');
@@ -211,7 +211,7 @@ export default function HomeScreen({ navigation }) {
                         source={{
                             uri: (userData?.avatarUrl && !userData.avatarUrl.includes('iran.liara.run'))
                                 ? userData.avatarUrl
-                                : `https://ui-avatars.com/api/?name=${encodeURIComponent(userData?.name || user?.email?.split('@')[0] || 'User')}&background=random&color=fff`
+                                : getDefaultAvatar(userData?.name || user?.email?.split('@')[0], userData?.gender)
                         }}
                         style={styles.avatar}
                         onError={(e) => {

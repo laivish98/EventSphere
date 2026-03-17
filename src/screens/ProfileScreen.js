@@ -147,9 +147,6 @@ export default function ProfileScreen({ navigation }) {
                                     style={styles.avatar}
                                 />
                             </View>
-                            <TouchableOpacity style={[styles.editAvatarButton, { backgroundColor: colors.primary }]}>
-                                <MaterialCommunityIcons name="camera" size={16} color="white" />
-                            </TouchableOpacity>
                         </View>
 
                         <Text style={styles.userNameText}>{userData.name || 'User'}</Text>
@@ -288,7 +285,6 @@ const styles = StyleSheet.create({
     avatarContainer: { position: 'relative', marginBottom: 16 },
     avatarWrapper: { padding: 4, borderRadius: 52, borderWidth: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.2, shadowRadius: 16 },
     avatar: { width: 92, height: 92, borderRadius: 46 },
-    editAvatarButton: { position: 'absolute', bottom: 0, right: 0, width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', borderWidth: 2, borderColor: 'white', elevation: 4 },
     userNameText: { fontSize: 28, fontWeight: 'bold', color: 'white', letterSpacing: -1 },
     userEmailText: { fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 20 },
     roleBadgeContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, gap: 6, backgroundColor: 'rgba(255,255,255,0.15)' },

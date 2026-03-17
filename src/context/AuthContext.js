@@ -7,6 +7,18 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
+// Helper to get animated avatar from Dicebear
+export const getDefaultAvatar = (name, gender) => {
+    const seed = encodeURIComponent(name || 'User');
+    // Male (short hair), Female (long hair), Other (default)
+    if (gender === 'Male') {
+        return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&hair=short&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+    } else if (gender === 'Female') {
+        return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&hair=long&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+    }
+    return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+};
+
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null); // Firebase User object
     const [userData, setUserData] = useState(null); // Firestore User Data (role, etc.)
@@ -51,21 +63,6 @@ export const AuthProvider = ({ children }) => {
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         const user = userCredential.user;
 
-        // Assign default avatar based on gender/name
-        const nameForAvatar = metadata.name || email.split('@')[0];
-        const uiAvatarBase = `https://ui-avatars.com/api/?name=${encodeURIComponent(nameForAvatar)}&background=random&color=fff`;
-
-        // Use ui-avatars as the primary reliable provider
-        let defaultAvatar = uiAvatarBase;
-
-        // Add gender-specific flavors if desired, but stick to ui-avatars for reliability
-        if (metadata.gender === 'Male') {
-            defaultAvatar = `${uiAvatarBase}&rounded=true&bold=true`;
-        } else if (metadata.gender === 'Female') {
-            defaultAvatar = `${uiAvatarBase}&rounded=true&italic=true`;
-        }
-
-        // Final sanity check: if iran.liara.run is flaky, ui-avatars will be used in components
 
         const userDataToSave = {
             email: user.email,
@@ -73,7 +70,7 @@ export const AuthProvider = ({ children }) => {
             name: metadata.name || '',
             college: metadata.college || '',
             gender: metadata.gender || 'Not Specified',
-            avatarUrl: defaultAvatar,
+            avatarUrl: getDefaultAvatar(metadata.name || email.split('@')[0], metadata.gender),
             createdAt: new Date(),
         };
 
@@ -107,7 +104,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, userData, loading, login, signup, logout, updateUserPassword, deleteUserAccount }}>
+        <AuthContext.Provider value={{ user, userData, loading, login, signup, logout, updateUserPassword, deleteUserAccount, getDefaultAvatar }}>
             {!loading && children}
         </AuthContext.Provider>
     );

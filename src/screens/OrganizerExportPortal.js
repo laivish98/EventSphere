@@ -88,7 +88,7 @@ const StatCard = ({ def, count, selected, onToggle, index, colors, isDarkMode })
 
 // ─── Main Component ─────────────────────────────
 export default function OrganizerExportPortal({ navigation }) {
-    const { user, userData } = useAuth();
+    const { user, userData, getDefaultAvatar } = useAuth();
     const { colors, isDarkMode } = useTheme();
 
     // State
@@ -562,15 +562,14 @@ export default function OrganizerExportPortal({ navigation }) {
                             <MaterialCommunityIcons name="arrow-left" size={22} color={colors.text} />
                         </TouchableOpacity>
                         <View style={styles.headerUserInfo}>
-                            {userData?.avatarUrl ? (
-                                <Image source={{ uri: userData.avatarUrl }} style={[styles.headerAvatar, { borderColor: colors.primary }]} />
-                            ) : (
-                                <View style={[styles.headerAvatar, styles.headerAvatarPlaceholder, { backgroundColor: colors.surface, borderColor: colors.primary }]}>
-                                    <Text style={[styles.headerAvatarText, { color: colors.primary }]}>
-                                        {(userData?.name || 'O')[0].toUpperCase()}
-                                    </Text>
-                                </View>
-                            )}
+                            <Image
+                                source={{
+                                    uri: (userData?.avatarUrl && !userData.avatarUrl.includes('iran.liara.run'))
+                                        ? userData.avatarUrl
+                                        : getDefaultAvatar(userData?.name || user?.email?.split('@')[0], userData?.gender)
+                                }}
+                                style={[styles.headerAvatar, { borderColor: colors.primary }]}
+                            />
                         </View>
                     </View>
                     <Text style={[styles.headerTitle, { color: colors.primary }]}>ORGANIZER EXPORT PORTAL</Text>
