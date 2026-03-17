@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 
 const ThemeContext = createContext();
 
@@ -9,6 +10,16 @@ export const ThemeProvider = ({ children }) => {
     useEffect(() => {
         loadTheme();
     }, []);
+
+    useEffect(() => {
+        if (Platform.OS === 'web') {
+            const currentColors = isDarkMode ? darkColors : lightColors;
+            document.body.style.backgroundColor = currentColors.background;
+            document.documentElement.style.backgroundColor = currentColors.background;
+            // Prevent scroll chaining and ensure smooth overscroll color
+            document.body.style.overscrollBehavior = 'none';
+        }
+    }, [isDarkMode]);
 
     const loadTheme = async () => {
         try {

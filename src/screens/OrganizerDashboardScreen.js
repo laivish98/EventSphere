@@ -308,7 +308,11 @@ export default function OrganizerDashboardScreen({ navigation }) {
                 </View>
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+            <ScrollView
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+                bounces={Platform.OS !== 'web'}
+            >
                 {/* Stats Summary Area */}
                 <View style={styles.statsOverview}>
                     <View style={styles.gridStats}>

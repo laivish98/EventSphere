@@ -134,7 +134,7 @@ export default function ProfileScreen({ navigation }) {
             <View style={[styles.bgOrb, { bottom: height * 0.1, left: -width * 0.3, width: 400, height: 400, backgroundColor: isDarkMode ? '#6366f130' : '#6366f110' }]} />
             <View style={[styles.bgOrb, { top: height * 0.4, right: -width * 0.1, width: 250, height: 250, backgroundColor: isDarkMode ? 'rgba(16, 185, 129, 0.08)' : 'rgba(16, 185, 129, 0.03)' }]} />
 
-            <ScrollView showsVerticalScrollIndicator={false}>
+            <ScrollView showsVerticalScrollIndicator={false} bounces={Platform.OS !== 'web'}>
                 {/* Header Profile Section */}
                 <View style={styles.profileHeader}>
                     <ExpoGradient

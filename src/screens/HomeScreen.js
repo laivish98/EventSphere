@@ -217,7 +217,11 @@ export default function HomeScreen({ navigation }) {
                 <View style={[styles.bgOrb, styles.orb2, { backgroundColor: (colors.secondaryGlow || '#8b5cf630') }]} />
             </View>
 
-            <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
+            <ScrollView
+                showsVerticalScrollIndicator={false}
+                contentContainerStyle={styles.scrollContent}
+                bounces={Platform.OS !== 'web'}
+            >
                 {/* Premium Header */}
                 <View style={styles.header}>
                     <View>
