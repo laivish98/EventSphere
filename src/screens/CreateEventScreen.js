@@ -165,8 +165,13 @@ export default function CreateEventScreen({ navigation }) {
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}
+                enabled={Platform.OS !== 'web'}
             >
-                <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                <ScrollView
+                    contentContainerStyle={[styles.scrollContent, { flexGrow: 1 }]}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                >
                     <TextInput
                         nativeID="event-title"
                         name="title"
@@ -399,6 +404,7 @@ export default function CreateEventScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
+    container: { flex: 1 },
     header: {
         flexDirection: 'row',
         alignItems: 'center',
@@ -421,7 +427,10 @@ const styles = StyleSheet.create({
     },
     scrollContent: {
         paddingHorizontal: 20,
-        paddingBottom: 120,
+        paddingBottom: 60,
+    },
+    inputGroup: {
+        marginVertical: 12,
     },
     input: {
         marginBottom: 16,

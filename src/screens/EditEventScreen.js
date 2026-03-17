@@ -164,8 +164,13 @@ export default function EditEventScreen({ route, navigation }) {
             <KeyboardAvoidingView
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
                 style={{ flex: 1 }}
+                enabled={Platform.OS !== 'web'}
             >
-                <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+                <ScrollView
+                    contentContainerStyle={[styles.scrollContent, { flexGrow: 1 }]}
+                    showsVerticalScrollIndicator={false}
+                    keyboardShouldPersistTaps="handled"
+                >
                     <TextInput
                         nativeID="edit-event-title"
                         name="title"
@@ -387,8 +392,9 @@ const styles = StyleSheet.create({
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 16, paddingBottom: 20 },
     backButton: { width: 40, height: 40, borderRadius: 20, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
     headerTitle: { fontSize: 18, fontWeight: 'bold' },
-    scrollContent: { paddingHorizontal: 20, paddingBottom: 40 },
+    scrollContent: { paddingHorizontal: 20, paddingBottom: 60 },
     input: { marginBottom: 16 },
+    inputGroup: { marginVertical: 12 },
     categorySection: { marginBottom: 20, marginTop: 4 },
     sectionLabel: { fontSize: 14, fontWeight: '600', marginBottom: 12, marginLeft: 4 },
     categoryScroll: { paddingRight: 20, gap: 10 },
