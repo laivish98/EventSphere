@@ -187,7 +187,7 @@ export default function CreateEventScreen({ navigation }) {
                 </TouchableOpacity>
                 <Text style={[styles.headerTitle, { color: colors.text }]}>Publish Event</Text>
                 <TouchableOpacity style={[styles.backButton, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'white', borderColor: colors.glassBorder }]} onPress={() => Alert.alert('Help Center', 'Our AI assists you in making your event stand out. Fill in the details below.')}>
-                    <MaterialCommunityIcons name="sparkles" size={20} color={colors.primary} />
+                    <MaterialCommunityIcons name="star-four-points" size={20} color={colors.primary} />
                 </TouchableOpacity>
             </View>
 
@@ -361,7 +361,7 @@ export default function CreateEventScreen({ navigation }) {
                             {suggestedImages.length > 0 && (
                                 <View style={styles.suggestionSection}>
                                     <View style={styles.suggestionHeader}>
-                                        <MaterialCommunityIcons name="sparkles" size={16} color="#fbbf24" />
+                                        <MaterialCommunityIcons name="star-four-points" size={16} color="#fbbf24" />
                                         <Text style={[styles.suggestionLabel, { color: colors.textSecondary }]}>
                                             {imageSearchQuery ? 'SEARCH RESULTS' : 'AI SUGGESTIONS'}
                                         </Text>
