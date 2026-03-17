@@ -11,13 +11,14 @@ import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { db } from '../services/firebase';
 import { useTheme } from '../context/ThemeContext';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
 const { width } = Dimensions.get('window');
 const SCAN_WINDOW = 260;
 
 // Scan result state type: null | 'success' | 'error' | 'used'
-export default function ScanTicketScreen({ navigation }) {
+export default function ScanTicketScreen({ navigation, route }) {
+    const eventId = route.params?.eventId;
     const { colors, isDarkMode } = useTheme();
     const [permission, requestPermission] = useCameraPermissions();
     const [scanned, setScanned] = useState(false);
@@ -98,6 +99,42 @@ export default function ScanTicketScreen({ navigation }) {
                     });
                 }
             } else {
+                // If direct doc fetch fails, try to resolve as a short ID if we have an eventId context
+                if (registrationId.length <= 8 && eventId) {
+                    const q = query(collection(db, 'registrations'), where('eventId', '==', eventId));
+                    const querySnapshot = await getDocs(q);
+
+                    let matchedDoc = null;
+                    querySnapshot.forEach((d) => {
+                        if (d.id.toUpperCase().startsWith(registrationId.toUpperCase())) {
+                            matchedDoc = d;
+                        }
+                    });
+
+                    if (matchedDoc) {
+                        const regData = matchedDoc.data();
+                        if (regData.utilized) {
+                            setScanResult({
+                                type: 'used',
+                                name: regData.userName || 'Unknown',
+                                passType: 'General Admission',
+                                message: 'Ticket Already Used',
+                                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                            });
+                        } else {
+                            await updateDoc(doc(db, 'registrations', matchedDoc.id), { utilized: true });
+                            setScanResult({
+                                type: 'success',
+                                name: regData.userName || 'Attendee',
+                                passType: 'General Admission',
+                                message: 'Ticket Valid',
+                                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+                            });
+                        }
+                        return;
+                    }
+                }
+
                 setScanResult({ type: 'error', message: 'Ticket not found in database' });
             }
         } catch (e) {
