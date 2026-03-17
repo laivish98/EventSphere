@@ -45,44 +45,45 @@ export default function SecurityScreen({ navigation }) {
         }
     };
 
+    const executeDelete = async () => {
+        setDeleting(true);
+        try {
+            await deleteUserAccount();
+            navigation.replace('Welcome');
+        } catch (error) {
+            console.error("Error deleting account:", error);
+            if (error.code === 'auth/requires-recent-login') {
+                if (Platform.OS === 'web') {
+                    window.alert("Verification Needed: This action requires recent authentication. Please log out and log back in to delete your account.");
+                } else {
+                    Alert.alert("Verification Needed", "This action requires recent authentication. Please log out and log back in to delete your account.");
+                }
+            } else {
+                if (Platform.OS === 'web') {
+                    window.alert(`Error: ${error.message}`);
+                } else {
+                    Alert.alert("Error", error.message);
+                }
+            }
+        } finally {
+            setDeleting(false);
+        }
+    };
+
     const handleDeleteAccount = () => {
-        const confirmDelete = () => {
+        if (Platform.OS === 'web') {
+            if (window.confirm("Are you absolutely sure? This action is permanent and will delete all your data including tickets and profile information.")) {
+                executeDelete();
+            }
+        } else {
             Alert.alert(
                 "Delete Account",
                 "Are you absolutely sure? This action is permanent and will delete all your data including tickets and profile information.",
                 [
                     { text: "Cancel", style: "cancel" },
-                    {
-                        text: "Delete My Account",
-                        style: "destructive",
-                        onPress: async () => {
-                            setDeleting(true);
-                            try {
-                                await deleteUserAccount();
-                                navigation.replace('Welcome');
-                            } catch (error) {
-                                console.error("Error deleting account:", error);
-                                if (error.code === 'auth/requires-recent-login') {
-                                    Alert.alert("Verification Needed", "This action requires recent authentication. Please log out and log back in to delete your account.");
-                                } else {
-                                    Alert.alert("Error", error.message);
-                                }
-                            } finally {
-                                setDeleting(false);
-                            }
-                        }
-                    }
+                    { text: "Delete My Account", style: "destructive", onPress: executeDelete }
                 ]
             );
-        };
-
-        // Web fallback for Alert confirmation
-        if (Platform.OS === 'web') {
-            if (window.confirm("Are you absolutely sure? This action is permanent and will delete all your data including tickets and profile information.")) {
-                confirmDelete();
-            }
-        } else {
-            confirmDelete();
         }
     };
 

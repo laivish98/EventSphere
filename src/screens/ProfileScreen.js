@@ -81,15 +81,31 @@ export default function ProfileScreen({ navigation }) {
     }, [user, userData]);
 
     const handleLogout = async () => {
+        const performLogout = async () => {
+            try {
+                // Reset the navigation stack to Login before logging out 
+                // to prevent ProfileScreen from returning `null` while still mounted.
+                navigation.reset({
+                    index: 0,
+                    routes: [{ name: 'Login' }],
+                });
+                // Small deliberate delay to allow navigation animation/stack flush
+                setTimeout(async () => {
+                    await logout();
+                }, 100);
+            } catch (error) {
+                if (Platform.OS === 'web') {
+                    window.alert("Error: " + error.message);
+                } else {
+                    Alert.alert("Error", error.message);
+                }
+            }
+        };
+
         if (Platform.OS === 'web') {
             const confirmed = window.confirm("Are you sure you want to logout?");
             if (confirmed) {
-                try {
-                    await logout();
-                    navigation.replace('Login');
-                } catch (error) {
-                    alert("Error: " + error.message);
-                }
+                performLogout();
             }
             return;
         }
@@ -102,14 +118,7 @@ export default function ProfileScreen({ navigation }) {
                 {
                     text: "Logout",
                     style: "destructive",
-                    onPress: async () => {
-                        try {
-                            await logout();
-                            navigation.replace('Login');
-                        } catch (error) {
-                            Alert.alert("Error", error.message);
-                        }
-                    }
+                    onPress: performLogout
                 }
             ]
         );
