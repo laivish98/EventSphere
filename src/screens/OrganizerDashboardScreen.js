@@ -15,33 +15,51 @@ import { isEventPast } from '../utils/dateUtils';
 const { width } = Dimensions.get('window');
 
 // Mini Revenue Chart using SVG
-// Enhanced Revenue Chart Component
+// Enhanced Revenue Chart Component with smooth Bezier curves and area fill
 const RevenueChart = ({ data = [40, 70, 45, 90, 65, 80, 50], colors }) => {
-    const chartHeight = 120;
+    const chartHeight = 140;
     const chartWidth = 400;
     const maxVal = Math.max(...data, 100);
 
-    // Generate SVG path dynamically
-    const points = data.map((val, i) => {
-        const x = (i / (data.length - 1)) * chartWidth;
-        const y = chartHeight - (val / maxVal) * chartHeight;
-        return `${x},${y}`;
-    }).join(' ');
+    // Create a smooth Bezier path
+    const getBezierPath = (data) => {
+        if (!data || data.length < 2) return '';
+        const points = data.map((val, i) => ({
+            x: (i / (data.length - 1)) * chartWidth,
+            y: chartHeight - (val / maxVal) * chartHeight
+        }));
 
-    const fillPath = `M0,${chartHeight} ${points} V${chartHeight} H0 Z`;
-    const strokePath = `M${points}`;
+        let path = `M ${points[0].x},${points[0].y}`;
+        for (let i = 0; i < points.length - 1; i++) {
+            const curr = points[i];
+            const next = points[i + 1];
+            const cp1x = curr.x + (next.x - curr.x) / 2;
+            const cp1y = curr.y;
+            const cp2x = curr.x + (next.x - curr.x) / 2;
+            const cp2y = next.y;
+            path += ` C ${cp1x},${cp1y} ${cp2x},${cp2y} ${next.x},${next.y}`;
+        }
+        return path;
+    };
+
+    const strokePath = getBezierPath(data);
+    const fillPath = `${strokePath} V ${chartHeight} H 0 Z`;
 
     return (
         <View style={chartStyles.container}>
             <Svg width="100%" height={chartHeight} viewBox={`0 0 ${chartWidth} ${chartHeight}`} preserveAspectRatio="none">
                 <Defs>
-                    <LinearGradient id="chartGradient" x1="0" y1="0" x2="0" y2="1">
-                        <Stop offset="0%" stopColor={colors.primary} stopOpacity="0.4" />
+                    <LinearGradient id="chartFillGradient" x1="0" y1="0" x2="0" y2="1">
+                        <Stop offset="0%" stopColor={colors.primary} stopOpacity="0.3" />
                         <Stop offset="100%" stopColor={colors.primary} stopOpacity="0" />
                     </LinearGradient>
+                    <LinearGradient id="lineGradient" x1="0" y1="0" x2="1" y2="0">
+                        <Stop offset="0%" stopColor={colors.primary} />
+                        <Stop offset="100%" stopColor={colors.primaryLight || colors.primary} />
+                    </LinearGradient>
                 </Defs>
-                <Path d={fillPath} fill="url(#chartGradient)" />
-                <Path d={strokePath} fill="none" stroke={colors.primary} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" />
+                <Path d={fillPath} fill="url(#chartFillGradient)" />
+                <Path d={strokePath} fill="none" stroke="url(#lineGradient)" strokeWidth="4" strokeLinecap="round" />
             </Svg>
             <View style={chartStyles.labels}>
                 {['WK 1', 'WK 2', 'WK 3', 'WK 4'].map(l => (
@@ -52,15 +70,20 @@ const RevenueChart = ({ data = [40, 70, 45, 90, 65, 80, 50], colors }) => {
     );
 };
 const chartStyles = StyleSheet.create({
-    container: { width: '100%' },
-    labels: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 8, marginTop: 8 },
-    label: { fontSize: 10, color: '#92a4c9', fontWeight: '500' },
+    container: { width: '100%', marginTop: 10 },
+    labels: { flexDirection: 'row', justifyContent: 'space-between', paddingHorizontal: 12, marginTop: 12 },
+    label: { fontSize: 11, fontWeight: '600', opacity: 0.6 },
 });
 
 // Progress Bar
 const ProgressBar = ({ percent, colors }) => (
-    <View style={{ height: 4, backgroundColor: colors.surface, borderRadius: 2, marginTop: 8, overflow: 'hidden' }}>
-        <View style={{ height: '100%', width: `${percent}%`, backgroundColor: colors.primary, borderRadius: 2 }} />
+    <View style={{ height: 6, backgroundColor: colors.surface, borderRadius: 3, marginTop: 12, overflow: 'hidden' }}>
+        <LinearGradient
+            colors={[colors.primary, colors.primaryLight || colors.primary]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            style={{ height: '100%', width: `${percent}%`, borderRadius: 3 }}
+        />
     </View>
 );
 
@@ -145,55 +168,72 @@ export default function OrganizerDashboardScreen({ navigation }) {
 
     const renderEventCard = (event) => {
         const eventRegs = registrations.filter(r => r.eventId === event.id).length;
-        const capacity = 100; // Default capacity for percentage
+        const capacity = event.capacity || 100;
         const percent = Math.min(Math.round((eventRegs / capacity) * 100), 100);
         const isPast = isEventPast(event.date);
 
         return (
             <TouchableOpacity
                 key={event.id}
-                style={styles.eventCard}
+                style={[styles.glassCard, styles.eventCard, { borderColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' }]}
                 onPress={() => navigation.navigate('EventDetails', { event })}
-                activeOpacity={0.75}
+                activeOpacity={0.8}
             >
-                <Image
-                    source={{ uri: event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=400&auto=format&fit=crop' }}
-                    style={styles.eventThumb}
-                />
+                <View style={styles.eventImageContainer}>
+                    <Image
+                        source={{ uri: event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=400&auto=format&fit=crop' }}
+                        style={styles.eventThumb}
+                    />
+                    {!isPast && (
+                        <View style={styles.livePulseContainer}>
+                            <View style={[styles.livePulse, { backgroundColor: colors.success }]} />
+                        </View>
+                    )}
+                </View>
                 <View style={styles.eventInfo}>
                     <View style={styles.eventInfoTop}>
-                        <Text style={styles.eventName} numberOfLines={1}>{event.title}</Text>
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('EditEvent', { event })}
-                            style={[styles.chatIconBtn, { backgroundColor: colors.surface, borderColor: colors.border, borderWidth: 1 }]}
-                        >
-                            <MaterialCommunityIcons name="pencil-outline" size={20} color={colors.primary} />
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('EventChat', { eventId: event.id, eventTitle: event.title })}
-                            style={[styles.chatIconBtn, { backgroundColor: isDarkMode ? 'rgba(19, 91, 236, 0.1)' : 'rgba(19, 91, 236, 0.05)' }]}
-                        >
-                            <MaterialCommunityIcons name="chat-processing-outline" size={20} color={colors.primary} />
-                        </TouchableOpacity>
+                        <Text style={[styles.eventName, { color: colors.text }]} numberOfLines={1}>{event.title}</Text>
                         <View style={[
-                            styles.statusBadge,
-                            { backgroundColor: !isPast ? 'rgba(11, 218, 94, 0.1)' : 'rgba(239, 68, 68, 0.1)' }
+                            styles.premiumStatusBadge,
+                            { backgroundColor: !isPast ? colors.success + '15' : colors.error + '15' }
                         ]}>
                             <Text style={[
-                                styles.statusText,
-                                { color: !isPast ? '#0bda5e' : '#ef4444' }
+                                styles.premiumStatusText,
+                                { color: !isPast ? colors.success : colors.error }
                             ]}>
-                                {!isPast ? 'ACTIVE' : 'PAST'}
+                                {!isPast ? 'LIVE' : 'FINISHED'}
                             </Text>
                         </View>
                     </View>
-                    <Text style={[styles.eventMeta, { color: colors.textSecondary }]}>{event.department || 'General'} • {event.date} • {event.venue}</Text>
-                    <ProgressBar percent={percent} colors={colors} />
+                    <Text style={[styles.eventMeta, { color: colors.textSecondary }]}>{event.venue} • {event.date}</Text>
+
                     <View style={styles.eventStatsRow}>
-                        <Text style={[styles.soldText, { color: colors.textSecondary }]}>{eventRegs} Registered</Text>
-                        <Text style={[styles.checkInText, { color: colors.success }]}>{registrations.filter(r => r.eventId === event.id && r.utilized).length} Checked In</Text>
-                        <Text style={[styles.percentText, { color: colors.success }]}>{percent}%</Text>
+                        <View style={styles.miniStatItem}>
+                            <Text style={[styles.miniStatValue, { color: colors.text }]}>{eventRegs}</Text>
+                            <Text style={[styles.miniStatLabel, { color: colors.textSecondary }]}>Sales</Text>
+                        </View>
+                        <View style={styles.miniStatDivider} />
+                        <View style={styles.miniStatItem}>
+                            <Text style={[styles.miniStatValue, { color: colors.text }]}>{percent}%</Text>
+                            <Text style={[styles.miniStatLabel, { color: colors.textSecondary }]}>Capacity</Text>
+                        </View>
+                        <View style={{ flex: 1 }} />
+                        <View style={styles.actionRow}>
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('EditEvent', { event })}
+                                style={[styles.iconButtonSmall, { backgroundColor: colors.surface }]}
+                            >
+                                <MaterialCommunityIcons name="pencil" size={16} color={colors.primary} />
+                            </TouchableOpacity>
+                            <TouchableOpacity
+                                onPress={() => navigation.navigate('EventChat', { eventId: event.id, eventTitle: event.title })}
+                                style={[styles.iconButtonSmall, { backgroundColor: colors.primary + '15' }]}
+                            >
+                                <MaterialCommunityIcons name="chat-processing" size={16} color={colors.primary} />
+                            </TouchableOpacity>
+                        </View>
                     </View>
+                    <ProgressBar percent={percent} colors={colors} />
                 </View>
             </TouchableOpacity>
         );
@@ -217,22 +257,25 @@ export default function OrganizerDashboardScreen({ navigation }) {
 
             {/* Header */}
             <View style={[styles.header, { backgroundColor: colors.background }]}>
-                <TouchableOpacity
-                    style={styles.headerLeft}
-                    onPress={() => navigation.navigate('Profile')}
-                >
+                <View style={styles.headerLeft}>
                     <Text style={[styles.greeting, { color: colors.textSecondary }]}>{getGreeting()}</Text>
-                    <Text style={[styles.collegeName, { color: colors.text }]}>{userData?.name || "Admin Panel"}</Text>
-                </TouchableOpacity>
+                    <Text style={[styles.collegeName, { color: colors.text }]}>{userData?.name || "Organizer"}</Text>
+                </View>
                 <View style={styles.headerRight}>
-                    <TouchableOpacity style={[styles.profileBtn, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => navigation.navigate('Ticket')}>
-                        <MaterialCommunityIcons name="ticket-outline" size={24} color={colors.primary} />
+                    <TouchableOpacity style={[styles.premiumIconBtn, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('Ticket')}>
+                        <MaterialCommunityIcons name="ticket-confirmation-outline" size={22} color={colors.primary} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.profileBtn, { backgroundColor: colors.primary + '10', borderColor: colors.primary + '20' }]} onPress={() => navigation.navigate('OrganizerExportPortal')}>
-                        <MaterialCommunityIcons name="file-download-outline" size={24} color={colors.primary} />
+                    <TouchableOpacity style={[styles.premiumIconBtn, { backgroundColor: colors.primary + '15' }]} onPress={() => navigation.navigate('OrganizerExportPortal')}>
+                        <MaterialCommunityIcons name="export-variant" size={22} color={colors.primary} />
                     </TouchableOpacity>
-                    <TouchableOpacity style={[styles.profileBtn, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => navigation.navigate('Profile')}>
-                        <MaterialCommunityIcons name="account-circle-outline" size={24} color={colors.primary} />
+                    <TouchableOpacity
+                        style={[styles.profileCircle, { borderColor: colors.primary + '30' }]}
+                        onPress={() => navigation.navigate('Profile')}
+                    >
+                        <Image
+                            source={{ uri: userData?.avatarUrl || 'https://ui-avatars.com/api/?name=' + (userData?.name || 'A') }}
+                            style={styles.avatarMini}
+                        />
                     </TouchableOpacity>
                 </View>
             </View>
@@ -240,45 +283,67 @@ export default function OrganizerDashboardScreen({ navigation }) {
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 {/* Stats Summary Area */}
                 <View style={styles.statsOverview}>
-                    <LinearGradient
-                        colors={[colors.primary, colors.primaryLight]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 0 }}
-                        style={styles.mainStat}
-                    >
-                        <Text style={styles.mainStatLabel}>Total Revenue</Text>
-                        <Text style={styles.mainStatValue}>₹{totalRevenue.toLocaleString()}</Text>
-                        <View style={styles.trendContainer}>
-                            <MaterialCommunityIcons name="trending-up" size={16} color="white" />
-                            <Text style={styles.trendText}>+12.5% this month</Text>
-                        </View>
-                    </LinearGradient>
+                    <TouchableOpacity activeOpacity={0.9}>
+                        <LinearGradient
+                            colors={[colors.primary, colors.primaryLight || '#8b5cf6', '#a855f7']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.mainStatCard}
+                        >
+                            <View style={styles.mainStatGloss} />
+                            <View style={styles.mainStatContent}>
+                                <View style={styles.mainStatLabelRow}>
+                                    <Text style={styles.mainStatLabel}>Gross Revenue</Text>
+                                    <View style={styles.premiumBadge}>
+                                        <MaterialCommunityIcons name="crown" size={12} color="#FFD700" />
+                                        <Text style={styles.premiumBadgeText}>PRO</Text>
+                                    </View>
+                                </View>
+                                <Text style={styles.mainStatValue}>₹{totalRevenue.toLocaleString()}</Text>
+                                <View style={styles.trendContainer}>
+                                    <MaterialCommunityIcons name="trending-up" size={14} color="white" />
+                                    <Text style={styles.trendText}>+12.5% vs last month</Text>
+                                </View>
+                            </View>
+                        </LinearGradient>
+                    </TouchableOpacity>
 
                     <View style={styles.gridStats}>
-                        <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Ticket Sales</Text>
+                        <View style={[styles.glassCard, styles.statCard, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }]}>
+                            <View style={[styles.statIconBox, { backgroundColor: colors.primary + '15' }]}>
+                                <MaterialCommunityIcons name="ticket" size={20} color={colors.primary} />
+                            </View>
+                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Sales</Text>
                             <Text style={[styles.statValue, { color: colors.text }]}>₹{ticketRevenue.toLocaleString()}</Text>
                         </View>
-                        <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Sponsorships</Text>
+                        <View style={[styles.glassCard, styles.statCard, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }]}>
+                            <View style={[styles.statIconBox, { backgroundColor: colors.success + '15' }]}>
+                                <MaterialCommunityIcons name="handshake" size={20} color={colors.success} />
+                            </View>
+                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Sponsors</Text>
                             <Text style={[styles.statValue, { color: colors.text }]}>₹{sponsorshipRevenue.toLocaleString()}</Text>
                         </View>
                     </View>
 
                     <View style={styles.gridStats}>
-                        <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Registrations</Text>
-                            <Text style={[styles.statValue, { color: colors.text }]}>{totalRegistrations.toLocaleString()}</Text>
+                        <View style={[styles.glassCard, styles.statCard, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }]}>
+                            <View style={[styles.statIconBox, { backgroundColor: colors.accent + '15' }]}>
+                                <MaterialCommunityIcons name="account-group" size={20} color={colors.accent || colors.primary} />
+                            </View>
+                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Users</Text>
+                            <Text style={[styles.statValue, { color: colors.text }]}>{totalRegistrations}</Text>
                         </View>
-                        <View style={[styles.statCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
-                                <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Live Check-ins</Text>
-                                <View style={[styles.liveIndicatorContainer, { backgroundColor: isDarkMode ? 'rgba(11, 218, 94, 0.2)' : 'rgba(11, 218, 94, 0.1)' }]}>
+                        <View style={[styles.glassCard, styles.statCard, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }]}>
+                            <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
+                                <View style={[styles.statIconBox, { backgroundColor: colors.success + '15' }]}>
+                                    <MaterialCommunityIcons name="check-decagram" size={20} color={colors.success} />
+                                </View>
+                                <View style={styles.liveIndicatorContainer}>
                                     <View style={[styles.liveIndicator, { backgroundColor: colors.success }]} />
                                 </View>
                             </View>
-                            <Text style={[styles.statValue, { color: colors.text }]}>{liveCheckIns.toLocaleString()}</Text>
-                            <Text style={[styles.statSubValue, { color: colors.textSecondary }]}>Real-time updates</Text>
+                            <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Check-ins</Text>
+                            <Text style={[styles.statValue, { color: colors.text }]}>{liveCheckIns}</Text>
                         </View>
                     </View>
                 </View>
@@ -389,17 +454,20 @@ export default function OrganizerDashboardScreen({ navigation }) {
             </ScrollView>
 
             {/* Bottom Navigation */}
-            <View style={[styles.bottomNav, { backgroundColor: isDarkMode ? 'rgba(25, 34, 51, 0.92)' : 'rgba(255, 255, 255, 0.95)', borderTopColor: colors.border }]}>
+            <View style={[styles.floatingBottomNav, { backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.9)' : 'rgba(255, 255, 255, 0.9)' }]}>
                 <TouchableOpacity style={styles.navItem}>
-                    <MaterialCommunityIcons name="view-dashboard" size={24} color={colors.primary} />
-                    <Text style={[styles.navLabelActive, { color: colors.primary }]}>Dashboard</Text>
+                    <MaterialCommunityIcons name="view-dashboard" size={26} color={colors.primary} />
+                    <Text style={[styles.navLabel, { color: colors.primary, fontWeight: '700' }]}>Dash</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Home')}>
-                    <MaterialCommunityIcons name="calendar-search" size={24} color={colors.textSecondary} />
+                    <MaterialCommunityIcons name="compass-outline" size={26} color={colors.textSecondary} />
                     <Text style={[styles.navLabel, { color: colors.textSecondary }]}>Discover</Text>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={[styles.fab, { backgroundColor: colors.primary, shadowColor: colors.primary }]} onPress={() => navigation.navigate('CreateEvent')}>
+                <TouchableOpacity
+                    style={[styles.floatingFab, { backgroundColor: colors.primary, shadowColor: colors.primary }]}
+                    onPress={() => navigation.navigate('CreateEvent')}
+                >
                     <MaterialCommunityIcons name="plus" size={32} color="white" />
                 </TouchableOpacity>
 
@@ -408,7 +476,7 @@ export default function OrganizerDashboardScreen({ navigation }) {
                     <Text style={[styles.navLabel, { color: colors.textSecondary }]}>Scan</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.navItem} onPress={() => navigation.navigate('Profile')}>
-                    <MaterialCommunityIcons name="account" size={24} color={colors.textSecondary} />
+                    <MaterialCommunityIcons name="account-outline" size={26} color={colors.textSecondary} />
                     <Text style={[styles.navLabel, { color: colors.textSecondary }]}>Profile</Text>
                 </TouchableOpacity>
             </View>
@@ -417,83 +485,146 @@ export default function OrganizerDashboardScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-    },
+    container: { flex: 1 },
     header: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 24,
         paddingTop: 60,
-        paddingBottom: 24,
-    },
-    headerRight: { flexDirection: 'row', gap: 10 },
-    greeting: { fontSize: 13, fontWeight: '600', opacity: 0.7 },
-    collegeName: { fontSize: 22, fontWeight: 'bold', marginTop: 2, letterSpacing: -0.5 },
-    profileBtn: {
-        width: 42,
-        height: 42,
-        borderRadius: 14,
-        alignItems: 'center',
-        justifyContent: 'center',
-        borderWidth: 1,
+        paddingBottom: 20,
     },
     headerLeft: { flex: 1 },
-    scrollContent: { paddingHorizontal: 20, paddingBottom: 120 },
-    mainStat: {
-        padding: 24,
+    headerRight: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+    greeting: { fontSize: 13, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1, opacity: 0.6 },
+    collegeName: { fontSize: 24, fontWeight: '900', marginTop: 2, letterSpacing: -0.8 },
+    premiumIconBtn: { width: 44, height: 44, borderRadius: 15, alignItems: 'center', justifyContent: 'center' },
+    profileCircle: { width: 44, height: 44, borderRadius: 22, borderWidth: 2, overflow: 'hidden' },
+    avatarMini: { width: '100%', height: '100%' },
+    scrollContent: { paddingHorizontal: 20, paddingBottom: 140 },
+
+    // Stats
+    statsOverview: { marginBottom: 24, gap: 16 },
+    mainStatCard: {
+        padding: 28,
+        borderRadius: 32,
+        overflow: 'hidden',
+        position: 'relative',
+        elevation: 12,
+        shadowColor: '#6366f1',
+        shadowOffset: { width: 0, height: 8 },
+        shadowOpacity: 0.4,
+        shadowRadius: 16,
+    },
+    mainStatGloss: {
+        position: 'absolute',
+        top: -100,
+        right: -100,
+        width: 250,
+        height: 250,
+        borderRadius: 125,
+        backgroundColor: 'rgba(255,255,255,0.15)',
+    },
+    mainStatLabelRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginBottom: 8 },
+    mainStatLabel: { color: 'rgba(255,255,255,0.9)', fontSize: 13, fontWeight: '800', textTransform: 'uppercase', letterSpacing: 1.2 },
+    premiumBadge: { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(0,0,0,0.2)', paddingHorizontal: 8, paddingVertical: 2, borderRadius: 6 },
+    premiumBadgeText: { color: '#FFD700', fontSize: 10, fontWeight: '900' },
+    mainStatValue: { color: 'white', fontSize: 44, fontWeight: '900', letterSpacing: -1.5, marginBottom: 12 },
+    trendContainer: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,0.2)', alignSelf: 'flex-start', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 100 },
+    trendText: { color: 'white', fontSize: 12, fontWeight: '700' },
+
+    gridStats: { flexDirection: 'row', gap: 16 },
+    statCard: { flex: 1, padding: 20, borderRadius: 28, borderWidth: 1, gap: 4 },
+    statIconBox: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+    statLabel: { fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8 },
+    statValue: { fontSize: 20, fontWeight: '900', letterSpacing: -0.5 },
+    liveIndicatorContainer: { width: 16, height: 16, borderRadius: 8, backgroundColor: 'rgba(11, 218, 94, 0.1)', alignItems: 'center', justifyContent: 'center' },
+    liveIndicator: { width: 6, height: 6, borderRadius: 3 },
+
+    // Sections
+    section: { marginBottom: 32 },
+    sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, paddingHorizontal: 4 },
+    sectionTitle: { fontSize: 20, fontWeight: '900', letterSpacing: -0.5 },
+    sectionSubtitle: { fontSize: 12, marginTop: 2, opacity: 0.6 },
+    badgeTextCount: { fontSize: 14, fontWeight: '800', opacity: 0.5 },
+
+    // Glass & Content
+    glassCard: {
+        borderWidth: 1,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.05,
+        shadowRadius: 12,
+        elevation: 2,
+    },
+    eventCard: { flexDirection: 'row', padding: 14, borderRadius: 28, marginBottom: 16, alignItems: 'center' },
+    eventImageContainer: { position: 'relative' },
+    eventThumb: { width: 80, height: 80, borderRadius: 20, marginRight: 16 },
+    livePulseContainer: { position: 'absolute', top: -4, right: 12, width: 12, height: 12, borderRadius: 6, backgroundColor: 'white', alignItems: 'center', justifyContent: 'center', elevation: 2 },
+    livePulse: { width: 8, height: 8, borderRadius: 4 },
+    eventInfo: { flex: 1 },
+    eventInfoTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
+    eventName: { fontSize: 17, fontWeight: '800', flex: 1, letterSpacing: -0.3 },
+    premiumStatusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 8 },
+    premiumStatusText: { fontSize: 9, fontWeight: '900', letterSpacing: 0.8 },
+    eventMeta: { fontSize: 12, marginBottom: 12, opacity: 0.6, fontWeight: '600' },
+    eventStatsRow: { flexDirection: 'row', alignItems: 'center', gap: 12, marginBottom: 2 },
+    miniStatItem: { alignItems: 'flex-start' },
+    miniStatValue: { fontSize: 14, fontWeight: '900' },
+    miniStatLabel: { fontSize: 9, fontWeight: '700', textTransform: 'uppercase', opacity: 0.5 },
+    miniStatDivider: { width: 1, height: 20, backgroundColor: 'rgba(0,0,0,0.1)' },
+    actionRow: { flexDirection: 'row', gap: 8 },
+    iconButtonSmall: { width: 32, height: 32, borderRadius: 10, alignItems: 'center', justifyContent: 'center' },
+
+    // Others
+    categoryStatsRow: { flexDirection: 'row', justifyContent: 'space-around', padding: 24, borderRadius: 32, marginTop: 12, borderWidth: 1, height: 180, alignItems: 'flex-end' },
+    categoryStatItem: { alignItems: 'center', flex: 1 },
+    categoryStatBarContainer: { height: 100, width: 16, borderRadius: 8, justifyContent: 'flex-end', overflow: 'hidden', marginBottom: 12 },
+    categoryStatBar: { width: '100%', borderRadius: 8 },
+    categoryStatLabel: { fontSize: 10, fontWeight: '800', textTransform: 'uppercase', opacity: 0.6 },
+    categoryStatCount: { fontSize: 13, fontWeight: '900' },
+
+    sponsorItem: { borderRadius: 26, padding: 18, flexDirection: 'row', alignItems: 'center', borderWidth: 1, minWidth: 200, marginRight: 16 },
+    sponsorLogo: { width: 48, height: 48, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginRight: 14 },
+    sponsorName: { fontSize: 15, fontWeight: '800' },
+    sponsorTier: { fontSize: 13, opacity: 0.6, fontWeight: '700', marginTop: 2 },
+
+    filterChip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 14, gap: 6 },
+    filterChipText: { fontSize: 13, fontWeight: '800' },
+
+    floatingBottomNav: {
+        position: 'absolute',
+        bottom: 30,
+        left: 24,
+        right: 24,
+        height: 76,
         borderRadius: 28,
-        elevation: 8,
+        flexDirection: 'row',
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        paddingHorizontal: 12,
+        elevation: 15,
         shadowColor: '#000',
         shadowOffset: { width: 0, height: 10 },
         shadowOpacity: 0.2,
         shadowRadius: 20,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
     },
-    mainStatLabel: { color: 'rgba(255, 255, 255, 0.8)', fontSize: 13, fontWeight: '600', textTransform: 'uppercase', letterSpacing: 0.5 },
-    mainStatValue: { color: 'white', fontSize: 36, fontWeight: 'bold', marginVertical: 6, letterSpacing: -1 },
-    trendContainer: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: 'rgba(255,255,255,0.2)', alignSelf: 'flex-start', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 100 },
-    trendText: { color: 'white', fontSize: 11, fontWeight: 'bold' },
-    gridStats: { flexDirection: 'row', gap: 16 },
-    statCard: { flex: 1, padding: 18, borderRadius: 24, borderWidth: 1, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8 },
-    statLabel: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 },
-    statValue: { fontSize: 22, fontWeight: 'bold', letterSpacing: -0.5 },
-    statSubValue: { fontSize: 10, marginTop: 4, opacity: 0.6 },
-    liveIndicatorContainer: { width: 14, height: 14, borderRadius: 7, alignItems: 'center', justifyContent: 'center' },
-    liveIndicator: { width: 6, height: 6, borderRadius: 3 },
-    categoryStatsRow: { flexDirection: 'row', justifyContent: 'space-around', padding: 24, borderRadius: 28, marginTop: 12, borderWidth: 1, height: 160, alignItems: 'flex-end', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 10 },
-    categoryStatItem: { alignItems: 'center', flex: 1 },
-    categoryStatBarContainer: { height: 80, width: 14, borderRadius: 7, justifyContent: 'flex-end', overflow: 'hidden', marginBottom: 10 },
-    categoryStatBar: { width: '100%', borderRadius: 7 },
-    categoryStatLabel: { fontSize: 9, fontWeight: 'bold', marginTop: 4, textTransform: 'uppercase' },
-    categoryStatCount: { fontSize: 12, fontWeight: 'bold' },
-    section: { marginBottom: 32 },
-    sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-    sectionTitle: { fontSize: 18, fontWeight: 'bold', letterSpacing: -0.2 },
-    sectionSubtitle: { fontSize: 12, marginTop: 2, opacity: 0.6 },
-    filterChip: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 12, paddingVertical: 6, borderRadius: 12, gap: 4 },
-    filterChipText: { fontSize: 12, fontWeight: 'bold' },
-    eventCard: { flexDirection: 'row', borderRadius: 24, padding: 12, marginBottom: 16, borderWidth: 1, alignItems: 'center', elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8 },
-    eventThumb: { width: 64, height: 64, borderRadius: 16, marginRight: 16 },
-    eventInfo: { flex: 1 },
-    eventInfoTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 },
-    eventName: { fontSize: 16, fontWeight: 'bold', flex: 1, marginRight: 8, letterSpacing: -0.2 },
-    chatIconBtn: { width: 34, height: 34, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginLeft: 8 },
-    eventMeta: { fontSize: 12, marginBottom: 8, opacity: 0.7 },
-    statusBadge: { paddingHorizontal: 10, paddingVertical: 4, borderRadius: 100 },
-    statusText: { fontSize: 9, fontWeight: '900', letterSpacing: 0.5 },
-    eventStatsRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 10, alignItems: 'center' },
-    checkInText: { fontSize: 11, fontWeight: 'bold' },
-    percentText: { fontSize: 11, fontWeight: '800' },
-    sponsorItem: { borderRadius: 24, padding: 16, flexDirection: 'row', alignItems: 'center', borderWidth: 1, minWidth: 180, elevation: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.05, shadowRadius: 8 },
-    sponsorLogo: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginRight: 12 },
-    sponsorName: { fontSize: 14, fontWeight: 'bold' },
-    sponsorTier: { fontSize: 12, opacity: 0.7 },
-    bottomNav: { position: 'absolute', bottom: 0, left: 0, right: 0, flexDirection: 'row', justifyContent: 'space-around', alignItems: 'flex-end', paddingBottom: 32, paddingTop: 12, paddingHorizontal: 16, borderTopWidth: 1, elevation: 20 },
-    navItem: { flex: 1, alignItems: 'center', gap: 4 },
-    navLabel: { fontSize: 10, fontWeight: '600' },
-    navLabelActive: { fontSize: 10, fontWeight: 'bold' },
-    fab: { width: 56, height: 56, borderRadius: 20, alignItems: 'center', justifyContent: 'center', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 6 }, shadowOpacity: 0.3, shadowRadius: 10, marginBottom: 12 },
-    badgeTextCount: { fontSize: 14, fontWeight: 'bold', marginLeft: 8 },
-    emptyCard: { padding: 32, borderRadius: 24, borderWidth: 1, borderStyle: 'dashed', alignItems: 'center', opacity: 0.6 }
+    navItem: { alignItems: 'center', gap: 2 },
+    navLabel: { fontSize: 11, fontWeight: '600' },
+    floatingFab: {
+        width: 60,
+        height: 60,
+        borderRadius: 22,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginTop: -40,
+        elevation: 10,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.3,
+        shadowRadius: 12,
+    },
+    emptyCard: { padding: 40, borderRadius: 32, borderWidth: 2, borderStyle: 'dashed', alignItems: 'center', opacity: 0.4 },
+    emptyText: { fontWeight: '700', letterSpacing: 0.5 }
 });
