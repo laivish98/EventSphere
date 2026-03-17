@@ -47,13 +47,13 @@ const categories = [
 ];
 
 export default function HomeScreen({ navigation }) {
-    const { user, userData, logout, getDefaultAvatar } = useAuth();
+    const { user, userData, logout, getDefaultAvatar, getBackupAvatar } = useAuth();
     const { isDarkMode, colors } = useTheme();
     const [events, setEvents] = useState([]);
     const [activeCategory, setActiveCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
     const [activeDateFilter, setActiveDateFilter] = useState('All');
-    const [hasImageError, setHasImageError] = useState(false);
+    const [fallbackLevel, setFallbackLevel] = useState(0); // 0: primary, 1: dicebear, 2: backup
 
     const dateFilters = ['All', 'Today', 'This Week', 'Upcoming'];
 
@@ -234,9 +234,20 @@ export default function HomeScreen({ navigation }) {
                     >
                         <BlurView intensity={20} tint={isDarkMode ? 'dark' : 'light'} style={StyleSheet.absoluteFill} />
                         <Image
-                            source={{ uri: (userData?.avatarUrl && !userData.avatarUrl.includes('iran.liara.run') && !hasImageError) ? userData.avatarUrl : getDefaultAvatar(userData?.name || user?.email?.split('@')[0] || 'User', userData?.gender) }}
+                            source={{
+                                uri: (() => {
+                                    const name = userData?.name || user?.email?.split('@')[0] || 'User';
+                                    if (fallbackLevel === 0 && userData?.avatarUrl && !userData.avatarUrl.includes('iran.liara.run')) {
+                                        return userData.avatarUrl;
+                                    }
+                                    if (fallbackLevel <= 1) {
+                                        return getDefaultAvatar(name, userData?.gender);
+                                    }
+                                    return getBackupAvatar(name);
+                                })()
+                            }}
                             style={styles.avatar}
-                            onError={() => setHasImageError(true)}
+                            onError={() => setFallbackLevel(prev => Math.min(prev + 1, 2))}
                         />
                     </TouchableOpacity>
                 </View>

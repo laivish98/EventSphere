@@ -80,7 +80,7 @@ const GenderCard = ({ value, icon, selected, onSelect, colors, isDarkMode }) => 
 
 export default function EditProfileScreen({ navigation }) {
     const { colors, isDarkMode } = useTheme();
-    const { user, userData, getDefaultAvatar } = useAuth();
+    const { user, userData, getDefaultAvatar, getBackupAvatar } = useAuth();
     const [name, setName] = useState(userData?.name || '');
     const [gender, setGender] = useState(userData?.gender || 'Male');
     const [college, setCollege] = useState(userData?.college || '');
@@ -103,16 +103,16 @@ export default function EditProfileScreen({ navigation }) {
 
             let newAvatarUrl = userData?.avatarUrl;
 
-            // Detection: Has dicebear or ui-avatars, OR has the old legacy patterns
-            const isDefaultAvatar = !userData?.avatarUrl ||
-                userData.avatarUrl.includes('dicebear.com') ||
-                userData.avatarUrl.includes('ui-avatars.com') ||
+            // Detection: Has older dicebear, broken iran.liara.run, or missing avatar
+            const isBrokenOrDefault = !userData?.avatarUrl ||
+                userData.avatarUrl.includes('dicebear.com/7.x') ||
+                userData.avatarUrl.includes('dicebear.com/avataaars') ||
                 userData.avatarUrl.includes('iran.liara.run') ||
-                userData.avatarUrl.includes('hair=short') ||
-                userData.avatarUrl.includes('hair=long');
+                userData.avatarUrl.includes('ui-avatars.com/api/?name=') || // Re-sync ui-avatars too
+                !userData.avatarUrl.startsWith('http');
 
-            if (isDefaultAvatar) {
-                // If it's a default avatar, we sync it with the NEW parameters
+            if (isBrokenOrDefault) {
+                // Auto-repair to Dicebear v9
                 newAvatarUrl = getDefaultAvatar(name.trim() || 'User', gender);
             }
 

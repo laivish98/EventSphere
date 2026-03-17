@@ -9,17 +9,22 @@ export const useAuth = () => useContext(AuthContext);
 
 export const getDefaultAvatar = (name, gender) => {
     const seed = encodeURIComponent(name || 'User');
-    const backgrounds = 'b6e3f4,c0aede,d1d4f9';
+    const backgrounds = 'b6e3f4,c0aede,d1d4f9,ffd5dc,ffdfbf';
 
-    // Dicebear Adventurer v7 parameters
-    if (gender === 'Male') {
-        const maleHair = 'short01,short02,short03,short04,short05,shaved01,shaved02,mowhawk';
-        return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&hair=${maleHair}&backgroundColor=${backgrounds}`;
-    } else if (gender === 'Female') {
-        const femaleHair = 'long01,long02,long03,long04,long05,bob01,bob02,curly';
-        return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&hair=${femaleHair}&backgroundColor=${backgrounds}`;
+    // Dicebear Adventurer v9 parameters (more stable)
+    let hair = 'short01,short02,short03,short04,short05';
+    if (gender === 'Female') {
+        hair = 'long01,long02,long03,long04,long05,bob01';
+    } else if (gender === 'Other') {
+        hair = 'short01,long01,curly,bob01';
     }
-    return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&backgroundColor=${backgrounds}`;
+
+    return `https://api.dicebear.com/9.x/adventurer/png?seed=${seed}&hair=${hair}&backgroundColor=${backgrounds}`;
+};
+
+export const getBackupAvatar = (name) => {
+    const initials = encodeURIComponent(name || 'U');
+    return `https://ui-avatars.com/api/?name=${initials}&background=random&color=fff&size=512`;
 };
 
 export const AuthProvider = ({ children }) => {
@@ -107,7 +112,7 @@ export const AuthProvider = ({ children }) => {
     };
 
     return (
-        <AuthContext.Provider value={{ user, userData, loading, login, signup, logout, updateUserPassword, deleteUserAccount, getDefaultAvatar }}>
+        <AuthContext.Provider value={{ user, userData, loading, login, signup, logout, updateUserPassword, deleteUserAccount, getDefaultAvatar, getBackupAvatar }}>
             {!loading && children}
         </AuthContext.Provider>
     );

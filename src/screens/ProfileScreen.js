@@ -42,13 +42,13 @@ const MenuButton = ({ icon, label, onPress, colors, showBadge, badgeCount, color
 
 export default function ProfileScreen({ navigation }) {
     const { colors, isDarkMode, toggleTheme } = useTheme();
-    const { user, userData, logout, getDefaultAvatar } = useAuth();
+    const { user, userData, logout, getDefaultAvatar, getBackupAvatar } = useAuth();
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
     const [regCount, setRegCount] = useState(0);
     const [createdCount, setCreatedCount] = useState(0);
     const [followersCount, setFollowersCount] = useState(0);
     const [followingCount, setFollowingCount] = useState(0);
-    const [hasImageError, setHasImageError] = useState(false);
+    const [fallbackLevel, setFallbackLevel] = useState(0); // 0: primary, 1: dicebear, 2: backup
 
     useEffect(() => {
         if (!user) return;
@@ -178,14 +178,20 @@ export default function ProfileScreen({ navigation }) {
                                 <View style={[styles.avatarWrapper, { borderColor: colors.primary, backgroundColor: colors.surface }]}>
                                     <Image
                                         source={{
-                                            uri: (userData?.avatarUrl &&
-                                                !userData.avatarUrl.includes('iran.liara.run') &&
-                                                !hasImageError)
-                                                ? userData.avatarUrl
-                                                : getDefaultAvatar(userData?.name || user?.email?.split('@')?.[0] || 'User', userData?.gender)
+                                            uri: (() => {
+                                                const name = userData?.name || user?.email?.split('@')?.[0] || 'User';
+
+                                                if (fallbackLevel === 0 && userData?.avatarUrl && !userData.avatarUrl.includes('iran.liara.run')) {
+                                                    return userData.avatarUrl;
+                                                }
+                                                if (fallbackLevel <= 1) {
+                                                    return getDefaultAvatar(name, userData?.gender);
+                                                }
+                                                return getBackupAvatar(name);
+                                            })()
                                         }}
                                         style={styles.avatar}
-                                        onError={() => setHasImageError(true)}
+                                        onError={() => setFallbackLevel(prev => Math.min(prev + 1, 2))}
                                     />
                                     <BlurView intensity={30} tint="dark" style={styles.editAvatarOverlay}>
                                         <MaterialCommunityIcons name="camera-outline" size={16} color="white" />
