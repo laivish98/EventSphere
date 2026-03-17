@@ -140,9 +140,12 @@ export default function ProfileScreen({ navigation }) {
                             <View style={[styles.avatarWrapper, { borderColor: 'rgba(255,255,255,0.3)', backgroundColor: 'rgba(255,255,255,0.1)' }]}>
                                 <Image
                                     source={{
-                                        uri: (userData?.avatarUrl && !userData.avatarUrl.includes('iran.liara.run'))
+                                        uri: (userData?.avatarUrl &&
+                                            !userData.avatarUrl.includes('iran.liara.run') &&
+                                            !userData.avatarUrl.includes('hair=short') &&
+                                            !userData.avatarUrl.includes('hair=long'))
                                             ? userData.avatarUrl
-                                            : `https://ui-avatars.com/api/?name=${encodeURIComponent(userData.name || 'User')}&background=random&color=fff`
+                                            : getDefaultAvatar(userData?.name || user?.email?.split('@')[0], userData?.gender)
                                     }}
                                     style={styles.avatar}
                                 />

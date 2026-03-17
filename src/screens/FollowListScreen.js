@@ -73,7 +73,10 @@ export default function FollowListScreen({ route, navigation }) {
         >
             <Image
                 source={{
-                    uri: (item.avatarUrl && !item.avatarUrl.includes('iran.liara.run'))
+                    uri: (item.avatarUrl &&
+                        !item.avatarUrl.includes('iran.liara.run') &&
+                        !item.avatarUrl.includes('hair=short') &&
+                        !item.avatarUrl.includes('hair=long'))
                         ? item.avatarUrl
                         : getDefaultAvatar(item.name || 'User', item.gender)
                 }}

@@ -209,7 +209,10 @@ export default function HomeScreen({ navigation }) {
                 >
                     <Image
                         source={{
-                            uri: (userData?.avatarUrl && !userData.avatarUrl.includes('iran.liara.run'))
+                            uri: (userData?.avatarUrl &&
+                                !userData.avatarUrl.includes('iran.liara.run') &&
+                                !userData.avatarUrl.includes('hair=short') &&
+                                !userData.avatarUrl.includes('hair=long'))
                                 ? userData.avatarUrl
                                 : getDefaultAvatar(userData?.name || user?.email?.split('@')[0], userData?.gender)
                         }}

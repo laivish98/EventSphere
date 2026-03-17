@@ -79,7 +79,7 @@ const GenderCard = ({ value, icon, selected, onSelect, colors, isDarkMode }) => 
 
 export default function EditProfileScreen({ navigation }) {
     const { colors, isDarkMode } = useTheme();
-    const { user, userData } = useAuth();
+    const { user, userData, getDefaultAvatar } = useAuth();
     const [name, setName] = useState(userData?.name || '');
     const [gender, setGender] = useState(userData?.gender || 'Male');
     const [college, setCollege] = useState(userData?.college || '');
@@ -100,19 +100,18 @@ export default function EditProfileScreen({ navigation }) {
         try {
             const userDocRef = doc(db, 'users', user.uid);
 
-            // Auto-update avatar if it matches the default pattern for the old gender
+            // Auto-update avatar if it matches the default pattern or is missing
             let newAvatarUrl = userData?.avatarUrl;
-            const isDefaultAvatar = !userData?.avatarUrl || userData.avatarUrl.includes('dicebear.com') || userData.avatarUrl.includes('ui-avatars.com');
+
+            // Detection: Has dicebear or ui-avatars, OR has the old "hair=short/long" bug
+            const isDefaultAvatar = !userData?.avatarUrl ||
+                userData.avatarUrl.includes('dicebear.com') ||
+                userData.avatarUrl.includes('ui-avatars.com') ||
+                userData.avatarUrl.includes('hair=short') ||
+                userData.avatarUrl.includes('hair=long');
 
             if (isDefaultAvatar) {
-                const seed = encodeURIComponent(name.trim() || 'User');
-                if (gender === 'Male') {
-                    newAvatarUrl = `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&hair=short&backgroundColor=b6e3f4,c0aede,d1d4f9`;
-                } else if (gender === 'Female') {
-                    newAvatarUrl = `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&hair=long&backgroundColor=b6e3f4,c0aede,d1d4f9`;
-                } else {
-                    newAvatarUrl = `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
-                }
+                newAvatarUrl = getDefaultAvatar(name.trim() || 'User', gender);
             }
 
             await updateDoc(userDocRef, {

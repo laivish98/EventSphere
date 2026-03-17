@@ -468,7 +468,10 @@ export default function EventDetailsScreen({ route, navigation }) {
                             <View style={styles.organizerInfo}>
                                 <Image
                                     source={{
-                                        uri: (organizer.avatarUrl && !organizer.avatarUrl.includes('iran.liara.run'))
+                                        uri: (organizer.avatarUrl &&
+                                            !organizer.avatarUrl.includes('iran.liara.run') &&
+                                            !organizer.avatarUrl.includes('hair=short') &&
+                                            !organizer.avatarUrl.includes('hair=long'))
                                             ? organizer.avatarUrl
                                             : getDefaultAvatar(organizer.name || 'Organizer', organizer.gender)
                                     }}

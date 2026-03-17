@@ -10,13 +10,22 @@ export const useAuth = () => useContext(AuthContext);
 // Helper to get animated avatar from Dicebear
 export const getDefaultAvatar = (name, gender) => {
     const seed = encodeURIComponent(name || 'User');
-    // Male (short hair), Female (long hair), Other (default)
+    // Using Adventurer style with specific hair groups for gender-leaning looks
+    // Male: short hair types
+    const maleHair = 'short01,short02,short03,short04,short05,shaved01,shaved02';
+    // Female: long hair types
+    const femaleHair = 'long01,long02,long03,long04,long05,bob01,bob02,curly';
+
+    let hairParam = '';
     if (gender === 'Male') {
-        return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&hair=short&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+        hairParam = `&hair=${maleHair}`;
     } else if (gender === 'Female') {
-        return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&hair=long&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+        hairParam = `&hair=${femaleHair}`;
     }
-    return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+
+    // Using SVG for better reliability on web/native + better scale
+    // Background colors: light blue, purple, soft indigo
+    return `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}${hairParam}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
 };
 
 export const AuthProvider = ({ children }) => {
