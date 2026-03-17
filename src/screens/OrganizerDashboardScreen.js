@@ -542,7 +542,10 @@ export default function OrganizerDashboardScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: {
+        flex: 1,
+        ...(Platform.OS === 'web' ? { overflow: 'hidden', height: '100vh' } : {})
+    },
     header: {
         paddingTop: Platform.OS === 'ios' ? 60 : 40,
         paddingHorizontal: 24,
@@ -659,7 +662,6 @@ const styles = StyleSheet.create({
     filterChipText: { fontSize: 13, fontWeight: '800' },
 
     bottomNavContainer: {
-        position: 'absolute',
         bottom: 24,
         left: 20,
         right: 20,
@@ -670,8 +672,13 @@ const styles = StyleSheet.create({
         borderColor: 'rgba(255,255,255,0.15)',
         elevation: 20,
         ...Platform.select({
-            web: { boxShadow: '0 12px 24px rgba(0,0,0,0.5)' },
+            web: {
+                position: 'fixed',
+                boxShadow: '0 12px 24px rgba(0,0,0,0.5)',
+                zIndex: 1000,
+            },
             default: {
+                position: 'absolute',
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 12 },
                 shadowOpacity: 0.5,

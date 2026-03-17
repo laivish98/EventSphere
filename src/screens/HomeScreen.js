@@ -429,7 +429,10 @@ export default function HomeScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: {
+        flex: 1,
+        ...(Platform.OS === 'web' ? { overflow: 'hidden', height: '100vh' } : {})
+    },
     scrollContent: { paddingBottom: 110 },
     bgOrb: {
         position: 'absolute',
@@ -668,7 +671,6 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     bottomNavContainer: {
-        position: 'absolute',
         bottom: 24,
         left: 20,
         right: 20,
@@ -678,14 +680,20 @@ const styles = StyleSheet.create({
         borderWidth: 1.5,
         borderColor: 'rgba(255,255,255,0.15)',
         elevation: 20,
-        ...(Platform.OS === 'web'
-            ? { boxShadow: '0 12px 24px rgba(0,0,0,0.5)' }
-            : {
+        ...Platform.select({
+            web: {
+                position: 'fixed',
+                boxShadow: '0 12px 24px rgba(0,0,0,0.5)',
+                zIndex: 1000,
+            },
+            default: {
+                position: 'absolute',
                 shadowColor: '#000',
                 shadowOffset: { width: 0, height: 12 },
                 shadowOpacity: 0.5,
                 shadowRadius: 24,
-            })
+            }
+        })
     },
     bottomNav: {
         flex: 1,
