@@ -9,7 +9,7 @@ import { useAuth } from '../context/AuthContext';
 import { db } from '../services/firebase';
 import { doc, updateDoc } from 'firebase/firestore';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const colleges = [
     'University of Delhi (DU) - Main Campus',
@@ -322,7 +322,10 @@ export default function EditProfileScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: {
+        flex: 1,
+        ...(Platform.OS === 'web' ? { overflow: 'hidden', height: '100vh' } : {})
+    },
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 50, paddingHorizontal: 16, paddingBottom: 16 },
     headerGlass: {
         flexDirection: 'row',
@@ -361,7 +364,19 @@ const styles = StyleSheet.create({
     inputIcon: { marginLeft: 18, marginRight: 12 },
     input: { flex: 1, height: '100%', fontSize: 15, fontWeight: '700' },
     collegeIconBadge: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginLeft: 12, marginRight: 10 },
-    bottomActionContainer: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20, paddingBottom: 40, borderTopWidth: 1.5, overflow: 'hidden' },
+    bottomActionContainer: {
+        bottom: 0,
+        left: 0,
+        right: 0,
+        padding: 20,
+        paddingBottom: 40,
+        borderTopWidth: 1.5,
+        overflow: 'hidden',
+        ...Platform.select({
+            web: { position: 'fixed', zIndex: 1000 },
+            default: { position: 'absolute' }
+        })
+    },
     primaryButton: {
         height: 64,
         borderRadius: 24,

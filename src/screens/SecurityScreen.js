@@ -174,7 +174,10 @@ export default function SecurityScreen({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-    container: { flex: 1 },
+    container: {
+        flex: 1,
+        ...(Platform.OS === 'web' ? { overflow: 'hidden', height: '100vh' } : {})
+    },
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 15 },
     headerTitle: { fontSize: 20, fontWeight: 'bold' },
     backBtn: { padding: 4 },
