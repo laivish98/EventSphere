@@ -9,6 +9,7 @@ import { db } from '../services/firebase';
 import { collection, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { StatusBar } from 'expo-status-bar';
 import { isEventPast } from '../utils/dateUtils';
+import PromotionalBanner from '../components/PromotionalBanner';
 
 const { width } = Dimensions.get('window');
 
@@ -56,6 +57,23 @@ export default function HomeScreen({ navigation }) {
     const [fallbackLevel, setFallbackLevel] = useState(0); // 0: primary, 1: dicebear, 2: backup
 
     const dateFilters = ['All', 'Today', 'This Week', 'Upcoming'];
+
+    // Define the dynamic content for the promotional banner based on user role
+    const bannerContent = userData?.role === 'admin'
+        ? {
+            title: "Host Your Next Big Event!",
+            description: "Manage and create engaging events for your audience seamlessly.",
+            icon: "creation",
+            buttonText: "Create Event",
+            onPress: () => navigation.navigate('CreateEvent')
+        }
+        : {
+            title: "Don't Miss Out!",
+            description: "Find and secure spots for your favorite events before they run out.",
+            icon: "ticket-percent-outline",
+            buttonText: "Tickets",
+            onPress: () => navigation.navigate('Ticket')
+        };
 
     useEffect(() => {
         const q = query(collection(db, 'events'), orderBy('createdAt', 'desc'));
@@ -263,6 +281,15 @@ export default function HomeScreen({ navigation }) {
                         onChangeText={setSearchQuery}
                     />
                 </BlurView>
+
+                {/* Promotional Banner Section */}
+                <PromotionalBanner
+                    title={bannerContent.title}
+                    description={bannerContent.description}
+                    icon={bannerContent.icon}
+                    buttonText={bannerContent.buttonText}
+                    onPress={bannerContent.onPress}
+                />
 
                 {/* Featured Horizontal Scroller */}
                 {featuredEvents.length > 0 && (
