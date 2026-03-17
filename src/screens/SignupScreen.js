@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, ScrollView, TextInput, Dimensions, KeyboardAvoidingView, Platform, Modal, Alert, FlatList } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '../context/ThemeContext';
@@ -15,7 +15,7 @@ const RoleCard = ({ role, icon, label, selected, onSelect, colors, isDarkMode })
         activeOpacity={0.7}
     >
         {selected && (
-            <LinearGradient
+            <ExpoGradient
                 colors={[colors.primary + '15', colors.primary + '05']}
                 style={StyleSheet.absoluteFill}
             />
@@ -136,7 +136,7 @@ export default function SignupScreen({ navigation }) {
             activeOpacity={0.7}
         >
             {selected && (
-                <LinearGradient
+                <ExpoGradient
                     colors={[colors.primary + '10', 'transparent']}
                     style={StyleSheet.absoluteFill}
                 />
@@ -312,7 +312,7 @@ export default function SignupScreen({ navigation }) {
             <View style={[styles.bottomActionContainer, { backgroundColor: colors.background, borderTopColor: colors.border }]}>
                 <TouchableOpacity onPress={handleSignup} disabled={loading} activeOpacity={0.9}>
                     <View style={[styles.primaryButton, { shadowColor: colors.primary, elevation: 8 }]}>
-                        <LinearGradient
+                        <ExpoGradient
                             colors={[colors.primary, colors.primaryLight]}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}

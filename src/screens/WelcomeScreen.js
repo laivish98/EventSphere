@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, Dimensions } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
@@ -16,8 +16,8 @@ export default function WelcomeScreen({ navigation }) {
             <StatusBar style={isDarkMode ? "light" : "dark"} />
 
             {/* Background Gradient */}
-            <LinearGradient
-                colors={isDarkMode ? [colors.background, '#0d121c'] : [colors.background, '#f1f5f9']}
+            <ExpoGradient
+                colors={[colors.primary + '15', colors.primary + '05']}
                 style={StyleSheet.absoluteFill}
             />
 
@@ -31,7 +31,7 @@ export default function WelcomeScreen({ navigation }) {
                 {/* Logo Section */}
                 <View style={styles.logoContainer}>
                     <BlurView intensity={20} tint={isDarkMode ? "dark" : "light"} style={[styles.glassPanel, { backgroundColor: isDarkMode ? 'rgba(255, 255, 255, 0.03)' : 'rgba(19, 91, 236, 0.05)', borderColor: colors.glassBorder }]}>
-                        <LinearGradient
+                        <ExpoGradient
                             colors={isDarkMode ? ['rgba(255,255,255,0.1)', 'transparent'] : ['rgba(19, 91, 236, 0.1)', 'transparent']}
                             style={styles.innerGlow}
                         />
@@ -57,7 +57,7 @@ export default function WelcomeScreen({ navigation }) {
                         activeOpacity={0.8}
                         onPress={() => navigation.navigate('Signup')}
                     >
-                        <LinearGradient
+                        <ExpoGradient
                             colors={[colors.primary, colors.primaryLight]}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}

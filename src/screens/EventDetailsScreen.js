@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, ScrollView, TouchableOpacity, Text, Image, Dimensions, Share, Platform, Alert, Modal, TextInput, Linking, KeyboardAvoidingView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { StatusBar } from 'expo-status-bar';
@@ -64,7 +64,7 @@ export default function EventDetailsScreen({ route, navigation }) {
             setOrganizer({
                 name: 'EventSphere Team',
                 role: 'admin',
-                avatarUrl: 'https://ui-avatars.com/api/?name=EventSphere&background=135bec&color=fff'
+                avatarUrl: getDefaultAvatar('EventSphere', 'Male')
             });
             return;
         }
@@ -74,7 +74,7 @@ export default function EventDetailsScreen({ route, navigation }) {
             setOrganizer({
                 name: 'Official Partner',
                 role: 'admin',
-                avatarUrl: `https://ui-avatars.com/api/?name=${encodeURIComponent(event.category || 'Event')}&background=random&color=fff`
+                avatarUrl: getDefaultAvatar(event.category || 'Event', 'Male')
             });
             return;
         }
@@ -87,17 +87,16 @@ export default function EventDetailsScreen({ route, navigation }) {
                 setOrganizer({
                     name: 'Campus Organizer',
                     role: 'organizer',
-                    avatarUrl: 'https://ui-avatars.com/api/?name=Campus+Organizer&background=random&color=fff'
+                    avatarUrl: getDefaultAvatar('Campus Organizer', 'Male')
                 });
             }
         } catch (error) {
-            console.error('Error fetching organizer:', error);
+            // Silently handle or fallback
         }
     };
 
     const checkFollowStatus = async () => {
         if (!user || !event.createdBy || typeof event.createdBy !== 'string' || event.createdBy.trim() === '') {
-            console.log('Skipping follow check: invalid user or event.createdBy');
             return;
         }
         try {
@@ -372,7 +371,7 @@ export default function EventDetailsScreen({ route, navigation }) {
                 {/* Hero Image */}
                 <View style={styles.imageContainer}>
                     <Image source={{ uri: event.imageUrl || event.image }} style={styles.image} />
-                    <LinearGradient
+                    <ExpoGradient
                         colors={['transparent', 'rgba(0,0,0,0.8)']}
                         style={styles.imageOverlay}
                     />
@@ -401,7 +400,7 @@ export default function EventDetailsScreen({ route, navigation }) {
 
                     {/* Quick Info */}
                     <View style={styles.quickInfoContainer}>
-                        <LinearGradient
+                        <ExpoGradient
                             colors={['transparent', 'rgba(0,0,0,0.6)']}
                             style={styles.heroShadow}
                         />

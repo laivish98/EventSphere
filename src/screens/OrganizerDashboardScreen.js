@@ -80,7 +80,7 @@ const chartStyles = StyleSheet.create({
 // Progress Bar
 const ProgressBar = ({ percent, colors }) => (
     <View style={{ height: 6, backgroundColor: colors.surface, borderRadius: 3, marginTop: 12, overflow: 'hidden' }}>
-        <LinearGradient
+        <ExpoGradient
             colors={[colors.primary, colors.primaryLight || colors.primary]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
@@ -303,7 +303,7 @@ export default function OrganizerDashboardScreen({ navigation }) {
                 {/* Stats Summary Area */}
                 <View style={styles.statsOverview}>
                     <TouchableOpacity activeOpacity={0.9}>
-                        <LinearGradient
+                        <ExpoGradient
                             colors={[colors.primary, colors.primaryLight || '#8b5cf6', '#a855f7']}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 1 }}
@@ -324,7 +324,7 @@ export default function OrganizerDashboardScreen({ navigation }) {
                                     <Text style={styles.trendText}>+12.5% vs last month</Text>
                                 </View>
                             </View>
-                        </LinearGradient>
+                        </ExpoGradient>
                     </TouchableOpacity>
 
                     <View style={styles.gridStats}>

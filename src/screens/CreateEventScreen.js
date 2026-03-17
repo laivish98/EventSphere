@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, TouchableOpacity, Image } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, TouchableOpacity, Image, KeyboardAvoidingView, Platform } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Button, Text, TextInput, HelperText, Switch } from 'react-native-paper';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { db } from '../services/firebase';
 import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 import { useAuth } from '../context/AuthContext';
@@ -115,7 +115,6 @@ export default function CreateEventScreen({ navigation }) {
 
         setLoading(true);
         try {
-            console.log("Attempting to post event for user:", user.uid);
             await addDoc(collection(db, 'events'), {
                 title: trimmedTitle,
                 description: trimmedDescription,
@@ -134,12 +133,6 @@ export default function CreateEventScreen({ navigation }) {
             Alert.alert('Success ✨', 'Your event has been published to the community!');
             navigation.goBack();
         } catch (error) {
-            console.error("Firestore post error details:", {
-                code: error.code,
-                message: error.message,
-                user: user.uid,
-                data: { title: trimmedTitle, category }
-            });
 
             let errorMessage = 'Failed to connect to database. Please check your network.';
             if (error.code === 'permission-denied') {
@@ -159,7 +152,7 @@ export default function CreateEventScreen({ navigation }) {
             <StatusBar style={isDarkMode ? "light" : "dark"} />
 
             {/* Premium Header */}
-            <View style={[styles.header, { backgroundColor: colors.background }]}>
+            <View style={[styles.header, { backgroundColor: colors.background, paddingTop: Platform.OS === 'ios' ? 60 : 40 }]}>
                 <TouchableOpacity style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => navigation.goBack()}>
                     <MaterialCommunityIcons name="chevron-left" size={28} color={isDarkMode ? "white" : colors.text} />
                 </TouchableOpacity>
@@ -169,233 +162,238 @@ export default function CreateEventScreen({ navigation }) {
                 </TouchableOpacity>
             </View>
 
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                <TextInput
-                    nativeID="event-title"
-                    name="title"
-                    label="Event Title"
-                    value={title}
-                    onChangeText={setTitle}
-                    style={[styles.input, { backgroundColor: colors.surface }]}
-                    mode="outlined"
-                    outlineColor={colors.border}
-                    activeOutlineColor={colors.primary}
-                    textColor={colors.text}
-                    placeholder="Enter a catchy title"
-                    theme={{ colors: { primary: colors.primary, outline: colors.border } }}
-                />
-                <TextInput
-                    nativeID="event-desc"
-                    name="description"
-                    label="Description"
-                    value={description}
-                    onChangeText={setDescription}
-                    style={[styles.input, { backgroundColor: colors.surface }]}
-                    mode="outlined"
-                    multiline
-                    numberOfLines={4}
-                    outlineColor={colors.border}
-                    activeOutlineColor={colors.primary}
-                    textColor={colors.text}
-                    placeholder="What's happening?"
-                    theme={{ colors: { primary: colors.primary, outline: colors.border } }}
-                />
-                <View style={styles.gridRow}>
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={{ flex: 1 }}
+            >
+                <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                     <TextInput
-                        nativeID="event-date"
-                        name="date"
-                        label="Date"
-                        value={date}
-                        onChangeText={setDate}
-                        style={[styles.input, styles.flexInput, { backgroundColor: colors.surface }]}
+                        nativeID="event-title"
+                        name="title"
+                        label="Event Title"
+                        value={title}
+                        onChangeText={setTitle}
+                        style={[styles.input, { backgroundColor: colors.surface }]}
                         mode="outlined"
-                        placeholder="25 OCT"
+                        outlineColor={colors.border}
+                        activeOutlineColor={colors.primary}
+                        textColor={colors.text}
+                        placeholder="Enter a catchy title"
+                        theme={{ colors: { primary: colors.primary, outline: colors.border } }}
+                    />
+                    <TextInput
+                        nativeID="event-desc"
+                        name="description"
+                        label="Description"
+                        value={description}
+                        onChangeText={setDescription}
+                        style={[styles.input, { backgroundColor: colors.surface }]}
+                        mode="outlined"
+                        multiline
+                        numberOfLines={4}
+                        outlineColor={colors.border}
+                        activeOutlineColor={colors.primary}
+                        textColor={colors.text}
+                        placeholder="What's happening?"
+                        theme={{ colors: { primary: colors.primary, outline: colors.border } }}
+                    />
+                    <View style={styles.gridRow}>
+                        <TextInput
+                            nativeID="event-date"
+                            name="date"
+                            label="Date"
+                            value={date}
+                            onChangeText={setDate}
+                            style={[styles.input, styles.flexInput, { backgroundColor: colors.surface }]}
+                            mode="outlined"
+                            placeholder="25 OCT"
+                            theme={{ roundness: 16, colors: { primary: colors.primary } }}
+                        />
+                        <View style={{ width: 12 }} />
+                        <TextInput
+                            nativeID="event-venue"
+                            name="venue"
+                            label="Venue"
+                            value={venue}
+                            onChangeText={setVenue}
+                            style={[styles.input, styles.flexInput, { backgroundColor: colors.surface }]}
+                            mode="outlined"
+                            placeholder="Main Hall"
+                            theme={{ roundness: 16, colors: { primary: colors.primary } }}
+                        />
+                    </View>
+
+                    <TextInput
+                        nativeID="event-dept"
+                        name="department"
+                        label="Department"
+                        placeholder="e.g. Computer Science"
+                        value={department}
+                        onChangeText={setDepartment}
+                        style={[styles.input, { backgroundColor: colors.surface }]}
+                        mode="outlined"
+                        outlineColor={colors.border}
+                        activeOutlineColor={colors.primary}
+                        textColor={colors.text}
                         theme={{ roundness: 16, colors: { primary: colors.primary } }}
                     />
-                    <View style={{ width: 12 }} />
-                    <TextInput
-                        nativeID="event-venue"
-                        name="venue"
-                        label="Venue"
-                        value={venue}
-                        onChangeText={setVenue}
-                        style={[styles.input, styles.flexInput, { backgroundColor: colors.surface }]}
-                        mode="outlined"
-                        placeholder="Main Hall"
-                        theme={{ roundness: 16, colors: { primary: colors.primary } }}
-                    />
-                </View>
 
-                <TextInput
-                    nativeID="event-dept"
-                    name="department"
-                    label="Department"
-                    placeholder="e.g. Computer Science"
-                    value={department}
-                    onChangeText={setDepartment}
-                    style={[styles.input, { backgroundColor: colors.surface }]}
-                    mode="outlined"
-                    outlineColor={colors.border}
-                    activeOutlineColor={colors.primary}
-                    textColor={colors.text}
-                    theme={{ roundness: 16, colors: { primary: colors.primary } }}
-                />
+                    <View style={styles.categorySection}>
+                        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>Event Category</Text>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryScroll}>
+                            {CATEGORIES.map((cat) => (
+                                <TouchableOpacity
+                                    key={cat.id}
+                                    style={[
+                                        styles.categoryChip,
+                                        { backgroundColor: colors.surface, borderColor: colors.border },
+                                        category === cat.id && { backgroundColor: colors.primary, borderColor: colors.primary }
+                                    ]}
+                                    onPress={() => setCategory(cat.id)}
+                                >
+                                    <View style={[
+                                        styles.iconCircle,
+                                        { backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.5)' : 'rgba(255, 255, 255, 0.5)' },
+                                        category === cat.id && styles.iconCircleActive
+                                    ]}>
+                                        <MaterialCommunityIcons
+                                            name={cat.icon}
+                                            size={18}
+                                            color={category === cat.id ? 'white' : colors.textSecondary}
+                                        />
+                                    </View>
+                                    <Text style={[
+                                        styles.categoryChipText,
+                                        { color: colors.textSecondary },
+                                        category === cat.id && styles.categoryChipTextSelected
+                                    ]}>
+                                        {cat.label}
+                                    </Text>
+                                </TouchableOpacity>
+                            ))}
+                        </ScrollView>
+                    </View>
 
-                <View style={styles.categorySection}>
-                    <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>Event Category</Text>
-                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.categoryScroll}>
-                        {CATEGORIES.map((cat) => (
-                            <TouchableOpacity
-                                key={cat.id}
-                                style={[
-                                    styles.categoryChip,
-                                    { backgroundColor: colors.surface, borderColor: colors.border },
-                                    category === cat.id && { backgroundColor: colors.primary, borderColor: colors.primary }
-                                ]}
-                                onPress={() => setCategory(cat.id)}
-                            >
-                                <View style={[
-                                    styles.iconCircle,
-                                    { backgroundColor: isDarkMode ? 'rgba(15, 23, 42, 0.5)' : 'rgba(255, 255, 255, 0.5)' },
-                                    category === cat.id && styles.iconCircleActive
-                                ]}>
-                                    <MaterialCommunityIcons
-                                        name={cat.icon}
-                                        size={18}
-                                        color={category === cat.id ? 'white' : colors.textSecondary}
-                                    />
+                    {/* Thumbnail Preview */}
+                    <View style={styles.thumbnailSection}>
+                        <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>Event Poster</Text>
+                        <View style={[styles.thumbnailContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                            {selectedImage ? (
+                                <Image source={{ uri: selectedImage }} style={styles.thumbnailImage} />
+                            ) : (
+                                <View style={styles.imagePlaceholder}>
+                                    <MaterialCommunityIcons name="image-off" size={40} color={colors.border} />
                                 </View>
-                                <Text style={[
-                                    styles.categoryChipText,
-                                    { color: colors.textSecondary },
-                                    category === cat.id && styles.categoryChipTextSelected
-                                ]}>
-                                    {cat.label}
-                                </Text>
+                            )}
+                            <ExpoGradient
+                                colors={['transparent', 'rgba(0,0,0,0.6)']}
+                                style={styles.thumbnailOverlay}
+                            />
+                            <TouchableOpacity
+                                style={[styles.shuffleButton, { backgroundColor: colors.primary }]}
+                                onPress={handleShuffle}
+                                activeOpacity={0.8}
+                            >
+                                <MaterialCommunityIcons name="cached" size={20} color="white" />
+                                <Text style={styles.shuffleText}>Shuffle Designs</Text>
                             </TouchableOpacity>
-                        ))}
-                    </ScrollView>
-                </View>
+                        </View>
 
-                {/* Thumbnail Preview */}
-                <View style={styles.thumbnailSection}>
-                    <Text style={[styles.sectionLabel, { color: colors.textSecondary }]}>Event Poster</Text>
-                    <View style={[styles.thumbnailContainer, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                        {selectedImage ? (
-                            <Image source={{ uri: selectedImage }} style={styles.thumbnailImage} />
-                        ) : (
-                            <View style={styles.imagePlaceholder}>
-                                <MaterialCommunityIcons name="image-off" size={40} color={colors.border} />
+                        {/* AI Magic Suggestions */}
+                        {suggestedImages.length > 0 && (
+                            <View style={styles.suggestionSection}>
+                                <View style={styles.suggestionHeader}>
+                                    <MaterialCommunityIcons name="sparkles" size={16} color="#fbbf24" />
+                                    <Text style={[styles.suggestionLabel, { color: colors.textSecondary }]}>MAGIC SUGGESTIONS</Text>
+                                </View>
+                                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionScroll}>
+                                    {suggestedImages.map((img, index) => (
+                                        <TouchableOpacity
+                                            key={index}
+                                            onPress={() => setSelectedImage(img)}
+                                            style={[
+                                                styles.suggestionItem,
+                                                selectedImage === img && { borderColor: colors.primary, borderWidth: 2 }
+                                            ]}
+                                        >
+                                            <Image source={{ uri: img }} style={styles.suggestionImage} />
+                                            {selectedImage === img && (
+                                                <View style={[styles.checkBadge, { backgroundColor: colors.primary }]}>
+                                                    <MaterialCommunityIcons name="check" size={12} color="white" />
+                                                </View>
+                                            )}
+                                        </TouchableOpacity>
+                                    ))}
+                                </ScrollView>
                             </View>
                         )}
-                        <LinearGradient
-                            colors={['transparent', 'rgba(0,0,0,0.6)']}
-                            style={styles.thumbnailOverlay}
-                        />
-                        <TouchableOpacity
-                            style={[styles.shuffleButton, { backgroundColor: colors.primary }]}
-                            onPress={handleShuffle}
-                            activeOpacity={0.8}
-                        >
-                            <MaterialCommunityIcons name="cached" size={20} color="white" />
-                            <Text style={styles.shuffleText}>Shuffle Designs</Text>
-                        </TouchableOpacity>
-                    </View>
 
-                    {/* AI Magic Suggestions */}
-                    {suggestedImages.length > 0 && (
-                        <View style={styles.suggestionSection}>
-                            <View style={styles.suggestionHeader}>
-                                <MaterialCommunityIcons name="sparkles" size={16} color="#fbbf24" />
-                                <Text style={[styles.suggestionLabel, { color: colors.textSecondary }]}>MAGIC SUGGESTIONS</Text>
-                            </View>
-                            <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.suggestionScroll}>
-                                {suggestedImages.map((img, index) => (
-                                    <TouchableOpacity
-                                        key={index}
-                                        onPress={() => setSelectedImage(img)}
-                                        style={[
-                                            styles.suggestionItem,
-                                            selectedImage === img && { borderColor: colors.primary, borderWidth: 2 }
-                                        ]}
-                                    >
-                                        <Image source={{ uri: img }} style={styles.suggestionImage} />
-                                        {selectedImage === img && (
-                                            <View style={[styles.checkBadge, { backgroundColor: colors.primary }]}>
-                                                <MaterialCommunityIcons name="check" size={12} color="white" />
-                                            </View>
-                                        )}
-                                    </TouchableOpacity>
-                                ))}
-                            </ScrollView>
+                        <View style={styles.hintContainer}>
+                            <MaterialCommunityIcons name="information-outline" size={14} color={colors.primary} />
+                            <Text style={[styles.thumbnailHint, { color: colors.textSecondary }]}>
+                                Smart AI picking! Tap shuffle or select from magic suggestions above.
+                            </Text>
                         </View>
-                    )}
-
-                    <View style={styles.hintContainer}>
-                        <MaterialCommunityIcons name="information-outline" size={14} color={colors.primary} />
-                        <Text style={[styles.thumbnailHint, { color: colors.textSecondary }]}>
-                            Smart AI picking! Tap shuffle or select from magic suggestions above.
-                        </Text>
                     </View>
-                </View>
 
-                <TextInput
-                    label="Ticket Price (₹)"
-                    value={price}
-                    onChangeText={setPrice}
-                    keyboardType="numeric"
-                    style={[styles.input, { backgroundColor: colors.surface }]}
-                    mode="outlined"
-                    outlineColor={colors.border}
-                    activeOutlineColor={colors.primary}
-                    textColor={colors.text}
-                    placeholderTextColor={colors.textSecondary}
-                    theme={{ colors: { text: colors.text, placeholder: colors.textSecondary, primary: colors.primary, outline: colors.border } }}
-                />
-
-                <View style={[styles.inputGroup, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, paddingHorizontal: 4 }]}>
-                    <View>
-                        <Text style={{ color: colors.text, fontSize: 16, fontWeight: '600' }}>Accept Sponsorship</Text>
-                        <Text style={{ color: colors.textSecondary, fontSize: 12 }}>Allow brands to sponsor this show</Text>
-                    </View>
-                    <Switch
-                        value={acceptsSponsorship}
-                        onValueChange={setAcceptsSponsorship}
-                        color={colors.primary}
+                    <TextInput
+                        label="Ticket Price (₹)"
+                        value={price}
+                        onChangeText={setPrice}
+                        keyboardType="numeric"
+                        style={[styles.input, { backgroundColor: colors.surface }]}
+                        mode="outlined"
+                        outlineColor={colors.border}
+                        activeOutlineColor={colors.primary}
+                        textColor={colors.text}
+                        placeholderTextColor={colors.textSecondary}
+                        theme={{ colors: { text: colors.text, placeholder: colors.textSecondary, primary: colors.primary, outline: colors.border } }}
                     />
-                </View>
 
-                {
-                    acceptsSponsorship && (
-                        <>
-                            <TextInput
-                                label="Sponsorship Amount (₹)"
-                                value={sponsorshipAmount}
-                                onChangeText={setSponsorshipAmount}
-                                keyboardType="numeric"
-                                style={[styles.input, { backgroundColor: colors.surface }]}
-                                mode="outlined"
-                                outlineColor={colors.border}
-                                activeOutlineColor={colors.primary}
-                                textColor={colors.text}
-                                placeholderTextColor={colors.textSecondary}
-                                theme={{ colors: { text: colors.text, placeholder: colors.textSecondary, primary: colors.primary, outline: colors.border } }}
-                            />
-                            <HelperText type="info" style={{ color: colors.textSecondary, marginBottom: 10 }}>
-                                Minimum amount for sponsors to advertise at this event.
-                            </HelperText>
-                        </>
-                    )
-                }
+                    <View style={[styles.inputGroup, { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20, paddingHorizontal: 4 }]}>
+                        <View>
+                            <Text style={{ color: colors.text, fontSize: 16, fontWeight: '600' }}>Accept Sponsorship</Text>
+                            <Text style={{ color: colors.textSecondary, fontSize: 12 }}>Allow brands to sponsor this show</Text>
+                        </View>
+                        <Switch
+                            value={acceptsSponsorship}
+                            onValueChange={setAcceptsSponsorship}
+                            color={colors.primary}
+                        />
+                    </View>
 
-                <TouchableOpacity
-                    style={[styles.postButton, { backgroundColor: colors.primary }, loading && { opacity: 0.7 }]}
-                    onPress={handleCreateEvent}
-                    disabled={loading}
-                >
-                    <Text style={styles.postButtonText}>{loading ? 'Posting...' : 'Post Event'}</Text>
-                </TouchableOpacity>
-            </ScrollView >
+                    {
+                        acceptsSponsorship && (
+                            <>
+                                <TextInput
+                                    label="Sponsorship Amount (₹)"
+                                    value={sponsorshipAmount}
+                                    onChangeText={setSponsorshipAmount}
+                                    keyboardType="numeric"
+                                    style={[styles.input, { backgroundColor: colors.surface }]}
+                                    mode="outlined"
+                                    outlineColor={colors.border}
+                                    activeOutlineColor={colors.primary}
+                                    textColor={colors.text}
+                                    placeholderTextColor={colors.textSecondary}
+                                    theme={{ colors: { text: colors.text, placeholder: colors.textSecondary, primary: colors.primary, outline: colors.border } }}
+                                />
+                                <HelperText type="info" style={{ color: colors.textSecondary, marginBottom: 10 }}>
+                                    Minimum amount for sponsors to advertise at this event.
+                                </HelperText>
+                            </>
+                        )
+                    }
+
+                    <TouchableOpacity
+                        style={[styles.postButton, { backgroundColor: colors.primary }, loading && { opacity: 0.7 }]}
+                        onPress={handleCreateEvent}
+                        disabled={loading}
+                    >
+                        <Text style={styles.postButtonText}>{loading ? 'Posting...' : 'Post Event'}</Text>
+                    </TouchableOpacity>
+                </ScrollView >
+            </KeyboardAvoidingView>
         </View >
     );
 }
@@ -405,7 +403,6 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        paddingTop: 60,
         paddingHorizontal: 16,
         paddingBottom: 24,
     },
@@ -488,10 +485,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
         elevation: 8,
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 10,
+        ...(Platform.OS === 'web' ? { boxShadow: '0 4px 10px rgba(0,0,0,0.3)' } : { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 10 }),
     },
     postButtonText: {
         color: 'white',

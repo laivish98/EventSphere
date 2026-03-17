@@ -3,19 +3,19 @@ import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Platform }
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { useTheme } from '../context/ThemeContext';
 import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 
 export default function AboutScreen({ navigation }) {
     const { colors, isDarkMode } = useTheme();
 
     const FeatureItem = ({ icon, title, description }) => (
         <View style={styles.featureItem}>
-            <LinearGradient
+            <ExpoGradient
                 colors={[colors.primary + '15', colors.primary + '05']}
                 style={styles.iconContainer}
             >
                 <MaterialCommunityIcons name={icon} size={24} color={colors.primary} />
-            </LinearGradient>
+            </ExpoGradient>
             <View style={styles.featureText}>
                 <Text style={[styles.featureTitle, { color: colors.text }]}>{title}</Text>
                 <Text style={[styles.featureDesc, { color: colors.textSecondary }]}>{description}</Text>
@@ -38,12 +38,12 @@ export default function AboutScreen({ navigation }) {
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <View style={styles.heroSection}>
                     <View style={[styles.logoOuter, { borderColor: colors.primary + '20' }]}>
-                        <LinearGradient
+                        <ExpoGradient
                             colors={[colors.primary, colors.primary + '80']}
                             style={styles.logoGradient}
                         >
                             <MaterialCommunityIcons name="ticket-confirmation" size={50} color="white" />
-                        </LinearGradient>
+                        </ExpoGradient>
                     </View>
                     <Text style={[styles.appName, { color: colors.text }]}>EventSphere</Text>
                     <View style={[styles.versionBadge, { backgroundColor: colors.primary + '10' }]}>

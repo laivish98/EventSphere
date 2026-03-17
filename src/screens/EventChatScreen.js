@@ -55,7 +55,6 @@ export default function EventChatScreen({ route, navigation }) {
                     navigation.goBack();
                 }
             } catch (error) {
-                console.error('Error checking access:', error);
                 setVerifying(false);
                 setLoading(false);
                 Alert.alert('Error', 'Wait, we couldn\'t verify your access. Please check your connection and try again.');
@@ -84,8 +83,6 @@ export default function EventChatScreen({ route, navigation }) {
                 setMessages(msgs);
                 setLoading(false);
             }, (error) => {
-                console.error('Chat Listener Error:', error);
-                // If it's a missing index error, the message will contain a link
                 Alert.alert('Chat Error', 'Could not load messages. This might be due to a missing index or permissions. ' + error.message);
                 setLoading(false);
             });

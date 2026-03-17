@@ -131,7 +131,7 @@ export default function ProfileScreen({ navigation }) {
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Header Profile Section */}
                 <View style={styles.profileHeader}>
-                    <LinearGradient
+                    <ExpoGradient
                         colors={[colors.primary, colors.primary + '80']}
                         style={styles.headerGradient}
                     />
@@ -164,12 +164,17 @@ export default function ProfileScreen({ navigation }) {
                         <Text style={[styles.userNameText, { color: colors.text }]}>{userData.name || 'User'}</Text>
                         <Text style={[styles.userEmailText, { color: colors.textSecondary }]}>{user.email}</Text>
 
-                        <View style={[styles.roleBadgeContainer, { backgroundColor: colors.primary }]}>
+                        <ExpoGradient
+                            colors={[colors.primary, colors.primary + 'CC']}
+                            start={{ x: 0, y: 0 }}
+                            end={{ x: 1, y: 1 }}
+                            style={styles.roleBadgeContainer}
+                        >
                             <MaterialCommunityIcons name={userData.role === 'admin' ? "shield-check" : "school"} size={14} color="white" />
                             <Text style={styles.roleBadgeText}>
                                 {userData.role === 'admin' ? 'Event Organizer' : 'Student Pro'}
                             </Text>
-                        </View>
+                        </ExpoGradient>
                     </View>
 
                     {/* Stats Row */}
@@ -295,11 +300,11 @@ const styles = StyleSheet.create({
     },
     profileInfoMain: { alignItems: 'center', marginTop: 10 },
     avatarContainer: { position: 'relative', marginBottom: 16 },
-    avatarWrapper: { padding: 4, borderRadius: 52, borderWidth: 2, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.2, shadowRadius: 16 },
+    avatarWrapper: { padding: 4, borderRadius: 52, borderWidth: 1.5, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.2, shadowRadius: 16 },
     avatar: { width: 92, height: 92, borderRadius: 46 },
-    userNameText: { fontSize: 28, fontWeight: 'bold', color: 'white', letterSpacing: -1 },
-    userEmailText: { fontSize: 14, color: 'rgba(255,255,255,0.7)', marginBottom: 20 },
-    roleBadgeContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, gap: 6, backgroundColor: 'rgba(255,255,255,0.15)' },
+    userNameText: { fontSize: 28, fontWeight: 'bold', letterSpacing: -1 },
+    userEmailText: { fontSize: 14, marginBottom: 20 },
+    roleBadgeContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, gap: 6 },
     roleBadgeText: { fontSize: 13, fontWeight: 'bold', color: 'white' },
     statsRow: { flexDirection: 'row', marginTop: 32, width: '100%', borderRadius: 28, padding: 22, borderWidth: 1.5, justifyContent: 'space-around', alignItems: 'center', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.1, shadowRadius: 20 },
     statsRowGlass: {

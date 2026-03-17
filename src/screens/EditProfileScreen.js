@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, ScrollView, TextInput, Dimensions, KeyboardAvoidingView, Platform, Modal, Alert, FlatList } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
@@ -135,15 +136,22 @@ export default function EditProfileScreen({ navigation }) {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar style={isDarkMode ? "light" : "dark"} />
 
+            <ExpoGradient
+                colors={isDarkMode
+                    ? [colors.background, '#1e1b4b', '#0f172a']
+                    : ['#f8fafc', '#f1f5f9', '#e2e8f0']}
+                style={StyleSheet.absoluteFill}
+            />
+
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 {/* Header */}
-                <View style={styles.header}>
-                    <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backButton, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                        <MaterialCommunityIcons name="chevron-left" size={28} color={isDarkMode ? "white" : colors.text} />
+                <BlurView intensity={isDarkMode ? 30 : 50} tint={isDarkMode ? "dark" : "light"} style={styles.headerGlass}>
+                    <TouchableOpacity onPress={() => navigation.goBack()} style={[styles.backButton, { backgroundColor: 'rgba(255,255,255,0.15)' }]}>
+                        <MaterialCommunityIcons name="chevron-left" size={28} color="white" />
                     </TouchableOpacity>
-                    <Text style={[styles.headerTitle, { color: colors.textSecondary }]}>EDIT PROFILE</Text>
+                    <Text style={[styles.headerTitle, { color: 'white' }]}>EDIT PROFILE</Text>
                     <View style={{ width: 44 }} />
-                </View>
+                </BlurView>
 
                 <View style={styles.titleContainer}>
                     <Text style={[styles.screenTitle, { color: colors.text }]}>Personal Info</Text>
@@ -184,9 +192,9 @@ export default function EditProfileScreen({ navigation }) {
                 {/* Form Inputs */}
                 <View style={styles.formContainer}>
                     <View style={styles.inputGroup}>
-                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>Full Name</Text>
-                        <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
-                            <MaterialCommunityIcons name="account-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
+                        <Text style={[styles.inputLabel, { color: colors.primary }]}>FULL NAME</Text>
+                        <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.inputWrapperGlass, { borderColor: colors.border }]}>
+                            <MaterialCommunityIcons name="account-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                             <TextInput
                                 nativeID="edit-name"
                                 name="name"
@@ -198,19 +206,21 @@ export default function EditProfileScreen({ navigation }) {
                                 autoComplete="name"
                                 textContentType="name"
                             />
-                        </View>
+                        </BlurView>
                     </View>
 
                     <View style={styles.inputGroup}>
-                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>College / University</Text>
-                        <TouchableOpacity style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]} onPress={() => setShowCollegeModal(true)}>
-                            <View style={[styles.collegeIconBadge, { backgroundColor: isDarkMode ? 'rgba(19, 91, 236, 0.1)' : 'rgba(19, 91, 236, 0.05)' }]}>
-                                <MaterialCommunityIcons name="bank-outline" size={18} color={colors.primary} />
-                            </View>
-                            <Text style={[styles.input, { textAlignVertical: 'center', paddingTop: Platform.OS === 'android' ? 14 : 0, color: college ? colors.text : colors.textSecondary }]} numberOfLines={1}>
-                                {college || "Search for your college..."}
-                            </Text>
-                            <MaterialCommunityIcons name="chevron-down" size={20} color={colors.textSecondary} style={{ marginRight: 15 }} />
+                        <Text style={[styles.inputLabel, { color: colors.primary }]}>COLLEGE / UNIVERSITY</Text>
+                        <TouchableOpacity activeOpacity={0.7} onPress={() => setShowCollegeModal(true)}>
+                            <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.inputWrapperGlass, { borderColor: colors.border }]}>
+                                <View style={[styles.collegeIconBadge, { backgroundColor: colors.primary + '20' }]}>
+                                    <MaterialCommunityIcons name="bank-outline" size={18} color={colors.primary} />
+                                </View>
+                                <Text style={[styles.input, { textAlignVertical: 'center', paddingTop: Platform.OS === 'android' ? 14 : 0, color: college ? colors.text : colors.textSecondary }]} numberOfLines={1}>
+                                    {college || "Search for your college..."}
+                                </Text>
+                                <MaterialCommunityIcons name="chevron-down" size={20} color={colors.textSecondary} style={{ marginRight: 15 }} />
+                            </BlurView>
                         </TouchableOpacity>
                     </View>
                 </View>
@@ -289,8 +299,19 @@ export default function EditProfileScreen({ navigation }) {
 const styles = StyleSheet.create({
     container: { flex: 1 },
     header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', paddingTop: 50, paddingHorizontal: 16, paddingBottom: 16 },
-    backButton: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center', borderWidth: 1 },
-    headerTitle: { fontSize: 13, fontWeight: 'bold', letterSpacing: 2 },
+    headerGlass: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        paddingTop: Platform.OS === 'ios' ? 60 : 40,
+        paddingHorizontal: 16,
+        paddingBottom: 20,
+        borderBottomLeftRadius: 32,
+        borderBottomRightRadius: 32,
+        overflow: 'hidden',
+    },
+    backButton: { width: 44, height: 44, borderRadius: 12, alignItems: 'center', justifyContent: 'center' },
+    headerTitle: { fontSize: 13, fontWeight: '900', letterSpacing: 2 },
     scrollContent: { paddingHorizontal: 24, paddingBottom: 40 },
     titleContainer: { marginBottom: 32, marginTop: 10 },
     screenTitle: { fontSize: 32, fontWeight: 'bold', letterSpacing: -0.5 },
@@ -302,8 +323,16 @@ const styles = StyleSheet.create({
     genderLabel: { fontSize: 13, fontWeight: '600' },
     formContainer: { gap: 20 },
     inputGroup: { gap: 8 },
-    inputLabel: { fontSize: 14, fontWeight: '600', marginLeft: 4 },
+    inputLabel: { fontSize: 12, fontWeight: '900', marginLeft: 8, letterSpacing: 1 },
     inputWrapper: { flexDirection: 'row', alignItems: 'center', borderRadius: 16, height: 56, borderWidth: 1 },
+    inputWrapperGlass: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderRadius: 20,
+        height: 60,
+        borderWidth: 1.5,
+        overflow: 'hidden',
+    },
     inputIcon: { marginLeft: 16, marginRight: 12 },
     input: { flex: 1, height: '100%', fontSize: 15 },
     collegeIconBadge: { width: 36, height: 36, borderRadius: 10, alignItems: 'center', justifyContent: 'center', marginLeft: 10, marginRight: 10 },

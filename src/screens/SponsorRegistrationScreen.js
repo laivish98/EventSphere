@@ -3,7 +3,7 @@ import {
     View, Text, StyleSheet, ScrollView, TouchableOpacity,
     TextInput, Dimensions, Alert, Platform, Linking
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
@@ -29,13 +29,7 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
     const [showDiagnostics, setShowDiagnostics] = useState(false);
 
     const handleDebugTrigger = () => {
-        setDebugCount(prev => {
-            if (prev + 1 >= 5) {
-                setShowDiagnostics(true);
-                return 0;
-            }
-            return prev + 1;
-        });
+        // Debug trigger removed for production
     };
 
     useEffect(() => {
@@ -65,14 +59,12 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
         }
 
         if (!event?.id) {
-            console.error("Missing event ID in navigation params");
             Alert.alert('Error', 'Invalid event data. Please go back and try again.');
             return;
         }
 
         // Refined check for event.createdBy
         if (!event.createdBy || typeof event.createdBy !== 'string' || event.createdBy.trim() === '') {
-            console.error('Invalid event.createdBy: Cannot process sponsorship without event organizer info.');
             Alert.alert('Error', 'Event organizer information is missing or invalid. Please contact support.');
             return;
         }
@@ -81,23 +73,13 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
         const rawAmount = String(event.sponsorshipAmount || '0').replace(/[^0-9.]/g, '');
         const amount = parseFloat(rawAmount) || 0;
 
-        console.log("Sponsorship Debug:", {
-            amount,
-            rawAmount,
-            eventId: event.id,
-            razorpayKeyPrefix: RazorpayConfig.RAZORPAY_KEY_ID ? RazorpayConfig.RAZORPAY_KEY_ID.substring(0, 8) + '...' : 'MISSING',
-            platform: Platform.OS
-        });
-
         if (amount <= 0) {
-            console.log("Processing free sponsorship...");
             await finalizeRegistration('FREE');
             return;
         }
 
         if (!RazorpayConfig.RAZORPAY_KEY_ID) {
-            console.error("CRITICAL: Razorpay API Key is missing from config!");
-            Alert.alert('Gateway Error', 'The payment gateway is not configured properly. (Key Missing)');
+            Alert.alert('Gateway Error', 'The payment gateway is not configured properly.');
             return;
         }
 
@@ -251,7 +233,7 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar style={isDarkMode ? "light" : "dark"} />
 
-            <LinearGradient
+            <ExpoGradient
                 colors={isDarkMode ? ['#1e3a8a', '#1e1b4b'] : ['#135bec', '#1e40af']}
                 style={styles.header}
             >
@@ -271,7 +253,7 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                         <Text style={styles.amountValue}>₹{event.sponsorshipAmount || '0'}</Text>
                     </View>
                 </View>
-            </LinearGradient>
+            </ExpoGradient>
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 {showDiagnostics && (
@@ -299,7 +281,7 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
 
                 {/* Event Sponsor Info */}
                 <View style={[styles.amountCard, { borderColor: isDarkMode ? 'rgba(19, 91, 236, 0.3)' : colors.border }]}>
-                    <LinearGradient
+                    <ExpoGradient
                         colors={isDarkMode ? ['rgba(19, 91, 236, 0.15)', 'rgba(25, 33, 51, 0.5)'] : ['rgba(19, 91, 236, 0.05)', colors.surface]}
                         style={StyleSheet.absoluteFill}
                     />

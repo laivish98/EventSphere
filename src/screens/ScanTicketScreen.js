@@ -6,7 +6,7 @@ import {
 } from 'react-native';
 import { CameraView, useCameraPermissions } from 'expo-camera';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { db } from '../services/firebase';
 import { useTheme } from '../context/ThemeContext';
@@ -191,7 +191,7 @@ export default function ScanTicketScreen({ navigation }) {
             </View>
 
             {/* Top header */}
-            <LinearGradient
+            <ExpoGradient
                 colors={['rgba(0,0,0,0.75)', 'transparent']}
                 style={styles.topBar}
             >
@@ -245,7 +245,7 @@ export default function ScanTicketScreen({ navigation }) {
                 >
                     <MaterialCommunityIcons name={torchOn ? 'flash' : 'flash-outline'} size={24} color="white" />
                 </Pressable>
-            </LinearGradient>
+            </ExpoGradient>
 
             {/* Bottom Result Sheet */}
             {scanResult && (
@@ -255,14 +255,13 @@ export default function ScanTicketScreen({ navigation }) {
                     transform: [{ translateY: cardSlide }]
                 }]}>
                     {/* Top color bar */}
-                    <LinearGradient
+                    <ExpoGradient
                         colors={scanResult.type === 'success'
                             ? ['#4ade80', '#059669']
-                            : scanResult.type === 'used'
-                                ? ['#f59e0b', '#d97706']
-                                : ['#ef4444', '#dc2626']}
-                        start={{ x: 0, y: 0 }} end={{ x: 1, y: 0 }}
+                            : ['#f87171', '#dc2626']}
                         style={styles.resultTopBar}
+                        start={{ x: 0, y: 0 }}
+                        end={{ x: 1, y: 0 }}
                     />
                     <View style={styles.resultContent}>
                         <View style={styles.resultRow}>

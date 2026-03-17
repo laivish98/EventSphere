@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, ScrollView, Share, Platform, ActivityIndicator } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import ViewShot from 'react-native-view-shot';
 import * as Sharing from 'expo-sharing';
 import { useTheme } from '../context/ThemeContext';
@@ -113,7 +113,7 @@ export default function CertificateScreen({ route, navigation }) {
                         style={{ width: '100%' }}
                     >
                         <View id="certificate-to-capture">
-                            <LinearGradient
+                            <ExpoGradient
                                 colors={['#ffffff', '#f8fafc']}
                                 style={styles.certificateCard}
                             >
@@ -146,7 +146,7 @@ export default function CertificateScreen({ route, navigation }) {
                                         <Text style={styles.signatureText}>EventSphere</Text>
                                     </View>
                                 </View>
-                            </LinearGradient>
+                            </ExpoGradient>
                         </View>
                     </ViewShot>
                 </View>

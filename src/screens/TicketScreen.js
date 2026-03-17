@@ -3,7 +3,7 @@ import {
     View, StyleSheet, Text, TouchableOpacity, ScrollView,
     ImageBackground, Image, Dimensions, Animated, ActivityIndicator
 } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import QRCode from 'react-native-qrcode-svg';
@@ -68,7 +68,7 @@ export default function TicketScreen({ navigation }) {
                     style={styles.ticketHeaderImage}
                     resizeMode="cover"
                 >
-                    <LinearGradient
+                    <ExpoGradient
                         colors={['transparent', 'rgba(0,0,0,0.6)']}
                         style={StyleSheet.absoluteFill}
                     />

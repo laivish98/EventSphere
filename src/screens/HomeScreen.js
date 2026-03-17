@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, StyleSheet, ScrollView, Image, TouchableOpacity, Text, Dimensions, FlatList, Alert, TextInput } from 'react-native';
+import { View, StyleSheet, ScrollView, Image, TouchableOpacity, Text, Dimensions, FlatList, Alert, TextInput, Platform } from 'react-native';
 import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -67,7 +67,7 @@ export default function HomeScreen({ navigation }) {
             const upcomingEvents = allEvents.filter(event => !isEventPast(event.date));
             setEvents(upcomingEvents);
         }, (error) => {
-            console.error("Error fetching events: ", error);
+            // Silently handle error in production or use a toast
         });
         return unsubscribe;
     }, []);
@@ -227,7 +227,6 @@ export default function HomeScreen({ navigation }) {
                         }}
                         style={styles.avatar}
                         onError={(e) => {
-                            console.log('Avatar load error, falling back to Dicebear');
                             setHasImageError(true);
                         }}
                     />

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, TextInput, ImageBackground, Dimensions, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '../context/ThemeContext';
@@ -22,16 +22,13 @@ export default function LoginScreen({ navigation }) {
         const trimmedEmail = email.trim();
         const trimmedPassword = password.trim();
 
-        console.log('[Login] Attempting login for:', trimmedEmail);
-
         if (!trimmedEmail || !trimmedPassword) {
-            alert('Please fill in all fields');
+            Alert.alert('Required Fields', 'Please fill in all fields to log in.');
             return;
         }
         setLoading(true);
         try {
             const cred = await login(trimmedEmail, trimmedPassword);
-            console.log('[Login] Success: UID', cred.user.uid);
             const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
             const role = userDoc.exists() ? userDoc.data().role : 'student';
             if (role === 'admin' || role === 'organizer') {
@@ -40,8 +37,7 @@ export default function LoginScreen({ navigation }) {
                 navigation.replace('Home');
             }
         } catch (error) {
-            console.error('[Login] Error:', error.code, error.message);
-            alert(error.message);
+            Alert.alert('Login Error', error.message);
         } finally {
             setLoading(false);
         }
@@ -59,7 +55,7 @@ export default function LoginScreen({ navigation }) {
                         style={styles.heroImage}
                         resizeMode="cover"
                     >
-                        <LinearGradient
+                        <ExpoGradient
                             colors={isDarkMode ? ['transparent', colors.background + '80', colors.background] : ['transparent', 'rgba(255, 255, 255, 0.4)', colors.background]}
                             style={StyleSheet.absoluteFill}
                         />
@@ -137,7 +133,7 @@ export default function LoginScreen({ navigation }) {
                         disabled={loading}
                         activeOpacity={0.9}
                     >
-                        <LinearGradient
+                        <ExpoGradient
                             colors={[colors.primary, colors.primaryLight]}
                             start={{ x: 0, y: 0 }}
                             end={{ x: 1, y: 0 }}
@@ -173,7 +169,7 @@ const styles = StyleSheet.create({
     heroImage: { width: '100%', height: '100%', justifyContent: 'flex-end' },
     heroContent: { padding: 24 },
     logoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
-    logoIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginRight: 12, elevation: 8, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 10 },
+    logoIcon: { width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', marginRight: 12, elevation: 8, ...(Platform.OS === 'web' ? { boxShadow: '0 4px 10px rgba(0,0,0,0.3)' } : { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 10 }) },
     brandName: { fontSize: 26, fontWeight: 'bold', letterSpacing: -0.5 },
     heroTitle: { fontSize: 38, fontWeight: '900', lineHeight: 44, letterSpacing: -1 },
     formContainer: { flex: 1, padding: 24, gap: 24 },
@@ -187,7 +183,7 @@ const styles = StyleSheet.create({
     forgotPassword: { alignSelf: 'flex-end' },
     forgotPasswordText: { fontSize: 13, fontWeight: 'bold' },
     spacer: { flex: 1, minHeight: 12 },
-    loginButton: { height: 60, borderRadius: 20, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 12, marginBottom: 12 },
+    loginButton: { height: 60, borderRadius: 20, overflow: 'hidden', alignItems: 'center', justifyContent: 'center', elevation: 8, marginBottom: 12, ...(Platform.OS === 'web' ? { boxShadow: '0 4px 12px rgba(0,0,0,0.2)' } : { shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 12 }) },
     buttonContent: { flexDirection: 'row', alignItems: 'center', gap: 8 },
     loginButtonText: { color: 'white', fontSize: 17, fontWeight: 'bold', letterSpacing: 0.2 },
     footer: { marginTop: 8, flexDirection: 'row', justifyContent: 'center', alignItems: 'center', paddingBottom: 20 },
