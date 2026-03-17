@@ -211,14 +211,13 @@ export default function HomeScreen({ navigation }) {
                         source={{
                             uri: (userData?.avatarUrl &&
                                 !userData.avatarUrl.includes('iran.liara.run') &&
-                                !userData.avatarUrl.includes('hair=short') &&
-                                !userData.avatarUrl.includes('hair=long'))
+                                !hasImageError)
                                 ? userData.avatarUrl
                                 : getDefaultAvatar(userData?.name || user?.email?.split('@')?.[0] || 'User', userData?.gender)
                         }}
                         style={styles.avatar}
                         onError={(e) => {
-                            console.log('Avatar load error, falling back to UI Avatars');
+                            console.log('Avatar load error, falling back to Dicebear');
                             setHasImageError(true);
                         }}
                     />

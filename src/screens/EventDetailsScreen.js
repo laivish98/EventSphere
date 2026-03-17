@@ -17,6 +17,8 @@ export default function EventDetailsScreen({ route, navigation }) {
     const { colors, isDarkMode } = useTheme();
     const { user, userData, getDefaultAvatar } = useAuth();
     const [isRegistered, setIsRegistered] = useState(false);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [hasImageError, setHasImageError] = useState(false);
     const [registering, setRegistering] = useState(false);
     const [organizer, setOrganizer] = useState(null);
     const [isFollowing, setIsFollowing] = useState(false);
@@ -470,12 +472,12 @@ export default function EventDetailsScreen({ route, navigation }) {
                                     source={{
                                         uri: (organizer.avatarUrl &&
                                             !organizer.avatarUrl.includes('iran.liara.run') &&
-                                            !organizer.avatarUrl.includes('hair=short') &&
-                                            !organizer.avatarUrl.includes('hair=long'))
+                                            !hasImageError)
                                             ? organizer.avatarUrl
                                             : getDefaultAvatar(organizer.name || 'Organizer', organizer.gender)
                                     }}
                                     style={styles.organizerAvatar}
+                                    onError={() => setHasImageError(true)}
                                 />
                                 <View style={styles.organizerDetails}>
                                     <Text style={[styles.organizerName, { color: colors.text }]}>{organizer.name}</Text>
@@ -602,11 +604,15 @@ export default function EventDetailsScreen({ route, navigation }) {
                                     <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                                         <MaterialCommunityIcons name="account-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                                         <TextInput
+                                            nativeID="reg-name"
+                                            name="name"
                                             style={[styles.input, { color: colors.text }]}
                                             placeholder="John Doe"
                                             placeholderTextColor={colors.textSecondary}
                                             value={regFormData.name}
                                             onChangeText={(val) => setRegFormData(prev => ({ ...prev, name: val }))}
+                                            autoComplete="name"
+                                            textContentType="name"
                                         />
                                     </View>
                                 </View>
@@ -616,6 +622,8 @@ export default function EventDetailsScreen({ route, navigation }) {
                                     <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                                         <MaterialCommunityIcons name="email-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                                         <TextInput
+                                            nativeID="reg-email"
+                                            name="email"
                                             style={[styles.input, { color: colors.text }]}
                                             placeholder="john@example.com"
                                             placeholderTextColor={colors.textSecondary}
@@ -623,6 +631,8 @@ export default function EventDetailsScreen({ route, navigation }) {
                                             onChangeText={(val) => setRegFormData(prev => ({ ...prev, email: val }))}
                                             keyboardType="email-address"
                                             autoCapitalize="none"
+                                            autoComplete="email"
+                                            textContentType="emailAddress"
                                         />
                                     </View>
                                 </View>
@@ -632,12 +642,16 @@ export default function EventDetailsScreen({ route, navigation }) {
                                     <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                                         <MaterialCommunityIcons name="phone-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                                         <TextInput
+                                            nativeID="reg-contact"
+                                            name="contact"
                                             style={[styles.input, { color: colors.text }]}
                                             placeholder="+91 98765-43210"
                                             placeholderTextColor={colors.textSecondary}
                                             value={regFormData.contact}
                                             onChangeText={(val) => setRegFormData(prev => ({ ...prev, contact: val }))}
                                             keyboardType="phone-pad"
+                                            autoComplete="tel"
+                                            textContentType="telephoneNumber"
                                         />
                                     </View>
                                 </View>
@@ -648,6 +662,8 @@ export default function EventDetailsScreen({ route, navigation }) {
                                         <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                                             <MaterialCommunityIcons name="school-outline" size={18} color={colors.primary} style={styles.inputIcon} />
                                             <TextInput
+                                                nativeID="reg-course"
+                                                name="course"
                                                 style={[styles.input, { color: colors.text }]}
                                                 placeholder="B.Tech"
                                                 placeholderTextColor={colors.textSecondary}
@@ -661,6 +677,8 @@ export default function EventDetailsScreen({ route, navigation }) {
                                         <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                                             <MaterialCommunityIcons name="office-building" size={18} color={colors.primary} style={styles.inputIcon} />
                                             <TextInput
+                                                nativeID="reg-dept"
+                                                name="department"
                                                 style={[styles.input, { color: colors.text }]}
                                                 placeholder="CSE"
                                                 placeholderTextColor={colors.textSecondary}

@@ -112,18 +112,26 @@ export default function SecurityScreen({ navigation }) {
 
                     <View style={styles.form}>
                         <TextInput
+                            nativeID="new-password"
+                            name="newPassword"
                             style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
                             placeholder="New Password"
                             placeholderTextColor={colors.textSecondary}
                             secureTextEntry
+                            autoComplete="new-password"
+                            textContentType="password"
                             value={newPassword}
                             onChangeText={setNewPassword}
                         />
                         <TextInput
+                            nativeID="confirm-password"
+                            name="confirmPassword"
                             style={[styles.input, { backgroundColor: colors.background, color: colors.text, borderColor: colors.border }]}
                             placeholder="Confirm New Password"
                             placeholderTextColor={colors.textSecondary}
                             secureTextEntry
+                            autoComplete="new-password"
+                            textContentType="password"
                             value={confirmPassword}
                             onChangeText={setConfirmPassword}
                         />

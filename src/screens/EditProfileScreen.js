@@ -100,17 +100,18 @@ export default function EditProfileScreen({ navigation }) {
         try {
             const userDocRef = doc(db, 'users', user.uid);
 
-            // Auto-update avatar if it matches the default pattern or is missing
             let newAvatarUrl = userData?.avatarUrl;
 
-            // Detection: Has dicebear or ui-avatars, OR has the old "hair=short/long" bug
+            // Detection: Has dicebear or ui-avatars, OR has the old legacy patterns
             const isDefaultAvatar = !userData?.avatarUrl ||
                 userData.avatarUrl.includes('dicebear.com') ||
                 userData.avatarUrl.includes('ui-avatars.com') ||
+                userData.avatarUrl.includes('iran.liara.run') ||
                 userData.avatarUrl.includes('hair=short') ||
                 userData.avatarUrl.includes('hair=long');
 
             if (isDefaultAvatar) {
+                // If it's a default avatar, we sync it with the NEW parameters
                 newAvatarUrl = getDefaultAvatar(name.trim() || 'User', gender);
             }
 
@@ -187,11 +188,15 @@ export default function EditProfileScreen({ navigation }) {
                         <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                             <MaterialCommunityIcons name="account-outline" size={20} color={colors.textSecondary} style={styles.inputIcon} />
                             <TextInput
+                                nativeID="edit-name"
+                                name="name"
                                 style={[styles.input, { color: colors.text }]}
                                 placeholder="Jane Doe"
                                 placeholderTextColor={colors.textSecondary}
                                 value={name}
                                 onChangeText={setName}
+                                autoComplete="name"
+                                textContentType="name"
                             />
                         </View>
                     </View>
@@ -237,6 +242,8 @@ export default function EditProfileScreen({ navigation }) {
                         <View style={[styles.searchWrapper, { backgroundColor: colors.background, borderColor: colors.border }]}>
                             <MaterialCommunityIcons name="magnify" size={20} color={colors.textSecondary} />
                             <TextInput
+                                nativeID="search-college"
+                                name="search"
                                 style={[styles.searchInput, { color: colors.text }]}
                                 placeholder="Search university..."
                                 placeholderTextColor={colors.textSecondary}

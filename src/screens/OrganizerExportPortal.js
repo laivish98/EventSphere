@@ -105,6 +105,7 @@ export default function OrganizerExportPortal({ navigation }) {
     const [exportProgress, setExportProgress] = useState(0);
     const [error, setError] = useState(null);
     const [successToast, setSuccessToast] = useState(false);
+    const [hasImageError, setHasImageError] = useState(false);
 
     // Animations
     const headerAnim = useRef(new Animated.Value(0)).current;
@@ -566,12 +567,12 @@ export default function OrganizerExportPortal({ navigation }) {
                                 source={{
                                     uri: (userData?.avatarUrl &&
                                         !userData.avatarUrl.includes('iran.liara.run') &&
-                                        !userData.avatarUrl.includes('hair=short') &&
-                                        !userData.avatarUrl.includes('hair=long'))
+                                        !hasImageError)
                                         ? userData.avatarUrl
                                         : getDefaultAvatar(userData?.name || user?.email?.split('@')?.[0] || 'User', userData?.gender)
                                 }}
                                 style={[styles.headerAvatar, { borderColor: colors.primary }]}
+                                onError={() => setHasImageError(true)}
                             />
                         </View>
                     </View>

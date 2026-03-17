@@ -163,6 +163,8 @@ export default function EditEventScreen({ route, navigation }) {
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <TextInput
+                    nativeID="edit-event-title"
+                    name="title"
                     label="Event Title"
                     value={title}
                     onChangeText={setTitle}
@@ -174,6 +176,8 @@ export default function EditEventScreen({ route, navigation }) {
                     theme={{ colors: { primary: colors.primary, outline: colors.border } }}
                 />
                 <TextInput
+                    nativeID="edit-event-desc"
+                    name="description"
                     label="Description"
                     value={description}
                     onChangeText={setDescription}
@@ -187,6 +191,8 @@ export default function EditEventScreen({ route, navigation }) {
                     theme={{ colors: { primary: colors.primary, outline: colors.border } }}
                 />
                 <TextInput
+                    nativeID="edit-event-date"
+                    name="date"
                     label="Date (e.g., 25 OCT 2024)"
                     value={date}
                     onChangeText={setDate}
@@ -198,6 +204,8 @@ export default function EditEventScreen({ route, navigation }) {
                     theme={{ colors: { primary: colors.primary, outline: colors.border } }}
                 />
                 <TextInput
+                    nativeID="edit-event-venue"
+                    name="venue"
                     label="Venue / Location"
                     value={venue}
                     onChangeText={setVenue}
@@ -210,6 +218,8 @@ export default function EditEventScreen({ route, navigation }) {
                 />
 
                 <TextInput
+                    nativeID="edit-event-dept"
+                    name="department"
                     label="Department"
                     value={department}
                     onChangeText={setDepartment}
@@ -312,6 +322,8 @@ export default function EditEventScreen({ route, navigation }) {
                 </View>
 
                 <TextInput
+                    nativeID="edit-event-price"
+                    name="price"
                     label="Ticket Price (₹)"
                     value={price}
                     onChangeText={setPrice}
@@ -338,6 +350,8 @@ export default function EditEventScreen({ route, navigation }) {
 
                 {acceptsSponsorship && (
                     <TextInput
+                        nativeID="edit-event-sponsor"
+                        name="sponsorshipAmount"
                         label="Sponsorship Amount (₹)"
                         value={sponsorshipAmount}
                         onChangeText={setSponsorshipAmount}

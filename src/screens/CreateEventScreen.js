@@ -171,6 +171,8 @@ export default function CreateEventScreen({ navigation }) {
 
             <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
                 <TextInput
+                    nativeID="event-title"
+                    name="title"
                     label="Event Title"
                     value={title}
                     onChangeText={setTitle}
@@ -180,9 +182,11 @@ export default function CreateEventScreen({ navigation }) {
                     activeOutlineColor={colors.primary}
                     textColor={colors.text}
                     placeholder="Enter a catchy title"
-                    theme={{ roundness: 16, colors: { primary: colors.primary } }}
+                    theme={{ colors: { primary: colors.primary, outline: colors.border } }}
                 />
                 <TextInput
+                    nativeID="event-desc"
+                    name="description"
                     label="Description"
                     value={description}
                     onChangeText={setDescription}
@@ -194,10 +198,12 @@ export default function CreateEventScreen({ navigation }) {
                     activeOutlineColor={colors.primary}
                     textColor={colors.text}
                     placeholder="What's happening?"
-                    theme={{ roundness: 16, colors: { primary: colors.primary } }}
+                    theme={{ colors: { primary: colors.primary, outline: colors.border } }}
                 />
                 <View style={styles.gridRow}>
                     <TextInput
+                        nativeID="event-date"
+                        name="date"
                         label="Date"
                         value={date}
                         onChangeText={setDate}
@@ -208,6 +214,8 @@ export default function CreateEventScreen({ navigation }) {
                     />
                     <View style={{ width: 12 }} />
                     <TextInput
+                        nativeID="event-venue"
+                        name="venue"
                         label="Venue"
                         value={venue}
                         onChangeText={setVenue}
@@ -219,6 +227,8 @@ export default function CreateEventScreen({ navigation }) {
                 </View>
 
                 <TextInput
+                    nativeID="event-dept"
+                    name="department"
                     label="Department"
                     placeholder="e.g. Computer Science"
                     value={department}

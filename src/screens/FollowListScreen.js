@@ -16,6 +16,7 @@ export default function FollowListScreen({ route, navigation }) {
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
+    const [imageErrors, setImageErrors] = useState({});
 
     useEffect(() => {
         const fetchData = async () => {
@@ -75,12 +76,12 @@ export default function FollowListScreen({ route, navigation }) {
                 source={{
                     uri: (item.avatarUrl &&
                         !item.avatarUrl.includes('iran.liara.run') &&
-                        !item.avatarUrl.includes('hair=short') &&
-                        !item.avatarUrl.includes('hair=long'))
+                        !imageErrors[item.id])
                         ? item.avatarUrl
                         : getDefaultAvatar(item.name || 'User', item.gender)
                 }}
                 style={styles.avatar}
+                onError={() => setImageErrors(prev => ({ ...prev, [item.id]: true }))}
             />
             <View style={styles.userInfo}>
                 <Text style={[styles.userName, { color: colors.text }]}>{item.name}</Text>

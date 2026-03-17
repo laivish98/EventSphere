@@ -232,11 +232,15 @@ export default function SignupScreen({ navigation }) {
                         <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                             <MaterialCommunityIcons name="account-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                             <TextInput
+                                nativeID="signup-name"
+                                name="name"
                                 style={[styles.input, { color: colors.text }]}
                                 placeholder="Jane Doe"
                                 placeholderTextColor={colors.textSecondary}
                                 value={name}
                                 onChangeText={setName}
+                                autoComplete="name"
+                                textContentType="name"
                             />
                         </View>
                     </View>
@@ -246,12 +250,16 @@ export default function SignupScreen({ navigation }) {
                         <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                             <MaterialCommunityIcons name="email-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                             <TextInput
+                                nativeID="signup-email"
+                                name="email"
                                 style={[styles.input, { color: colors.text }]}
                                 placeholder="jane@college.edu"
                                 placeholderTextColor={colors.textSecondary}
                                 value={email}
                                 onChangeText={setEmail}
                                 autoCapitalize="none"
+                                autoComplete="email"
+                                textContentType="emailAddress"
                                 keyboardType="email-address"
                             />
                         </View>
@@ -262,12 +270,16 @@ export default function SignupScreen({ navigation }) {
                         <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                             <MaterialCommunityIcons name="lock-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                             <TextInput
+                                nativeID="signup-password"
+                                name="password"
                                 style={[styles.input, { color: colors.text }]}
                                 placeholder="••••••••"
                                 placeholderTextColor={colors.textSecondary}
                                 value={password}
                                 onChangeText={setPassword}
                                 secureTextEntry={!showPassword}
+                                autoComplete="new-password"
+                                textContentType="password"
                             />
                             <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
                                 <MaterialCommunityIcons name={showPassword ? "eye-outline" : "eye-off-outline"} size={20} color={colors.textSecondary} />

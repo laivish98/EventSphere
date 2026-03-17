@@ -323,12 +323,15 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                     <View style={styles.inputGroup}>
                         <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>BRAND / COMPANY NAME</Text>
                         <TextInput
+                            nativeID="company-name"
+                            name="companyName"
                             style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
                             placeholder="e.g. Acme Corp"
                             placeholderTextColor={colors.textSecondary}
                             value={companyName}
                             onChangeText={setCompanyName}
                             selectionColor={colors.primary}
+                            autoComplete="organization"
                         />
                     </View>
 
@@ -336,6 +339,8 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                     <View style={styles.inputGroup}>
                         <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>LOGO IMAGE URL</Text>
                         <TextInput
+                            nativeID="logo-url"
+                            name="logoUrl"
                             style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
                             placeholder="https://example.com/logo.png"
                             placeholderTextColor={colors.textSecondary}
@@ -349,6 +354,8 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                     <View style={styles.inputGroup}>
                         <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>SPONSORSHIP DETAILS / MESSAGE</Text>
                         <TextInput
+                            nativeID="sponsor-details"
+                            name="details"
                             style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text, height: 100, textAlignVertical: 'top' }]}
                             placeholder="Tell us about your brand and what you'd like to promote..."
                             placeholderTextColor={colors.textSecondary}
@@ -363,6 +370,8 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                     <View style={styles.inputGroup}>
                         <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>CONTACT EMAIL</Text>
                         <TextInput
+                            nativeID="contact-email"
+                            name="contactEmail"
                             style={[styles.input, { backgroundColor: colors.surface, borderColor: colors.border, color: colors.text }]}
                             placeholder="sponsor@company.com"
                             placeholderTextColor={colors.textSecondary}
@@ -371,6 +380,8 @@ export default function SponsorRegistrationScreen({ route, navigation }) {
                             keyboardType="email-address"
                             autoCapitalize="none"
                             selectionColor={colors.primary}
+                            autoComplete="email"
+                            textContentType="emailAddress"
                         />
                     </View>
                 </View>

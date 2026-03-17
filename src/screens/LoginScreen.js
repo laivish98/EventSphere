@@ -88,12 +88,16 @@ export default function LoginScreen({ navigation }) {
                         <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                             <MaterialCommunityIcons name="email-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                             <TextInput
+                                nativeID="email"
+                                name="email"
                                 style={[styles.input, { color: colors.text }]}
-                                placeholder="student@university.edu"
+                                placeholder="jane@college.edu"
                                 placeholderTextColor={colors.textSecondary}
                                 value={email}
                                 onChangeText={setEmail}
                                 autoCapitalize="none"
+                                autoComplete="email"
+                                textContentType="emailAddress"
                                 keyboardType="email-address"
                             />
                         </View>
@@ -104,12 +108,16 @@ export default function LoginScreen({ navigation }) {
                         <View style={[styles.inputWrapper, { backgroundColor: colors.surface, borderColor: colors.border }]}>
                             <MaterialCommunityIcons name="lock-outline" size={20} color={colors.primary} style={styles.inputIcon} />
                             <TextInput
+                                nativeID="password"
+                                name="password"
                                 style={[styles.input, { color: colors.text }]}
                                 placeholder="••••••••"
                                 placeholderTextColor={colors.textSecondary}
                                 value={password}
                                 onChangeText={setPassword}
                                 secureTextEntry={!showPassword}
+                                autoComplete="current-password"
+                                textContentType="password"
                             />
                             <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
                                 <MaterialCommunityIcons name={showPassword ? "eye-outline" : "eye-off-outline"} size={20} color={colors.textSecondary} />

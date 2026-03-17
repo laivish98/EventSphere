@@ -143,8 +143,6 @@ export default function ProfileScreen({ navigation }) {
                                     source={{
                                         uri: (userData?.avatarUrl &&
                                             !userData.avatarUrl.includes('iran.liara.run') &&
-                                            !userData.avatarUrl.includes('hair=short') &&
-                                            !userData.avatarUrl.includes('hair=long') &&
                                             !hasImageError)
                                             ? userData.avatarUrl
                                             : getDefaultAvatar(userData?.name || user?.email?.split('@')?.[0] || 'User', userData?.gender)
