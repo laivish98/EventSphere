@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, ScrollView, Alert, TouchableOpacity, Image, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, StyleSheet, ScrollView, Alert, TouchableOpacity, Image, KeyboardAvoidingView, Platform, TextInput as RNTextInput } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
@@ -98,10 +98,10 @@ export default function CreateEventScreen({ navigation }) {
         if (imageSearchQuery.trim() !== '') {
             setIsSearching(true);
             const timeoutId = setTimeout(() => {
-                const results = searchImages(imageSearchQuery);
+                const results = searchImages(imageSearchQuery.trim());
                 setSuggestedImages(results);
                 setIsSearching(false);
-            }, 300);
+            }, 400); // Slightly longer debounce for better UX
             return () => clearTimeout(timeoutId);
         }
     }, [imageSearchQuery]);
@@ -320,15 +320,12 @@ export default function CreateEventScreen({ navigation }) {
                             {/* NEW: Search Bar for Images */}
                             <View style={[styles.imageSearchContainer, { backgroundColor: colors.surface + '40', borderColor: colors.glassBorder }]}>
                                 <MaterialCommunityIcons name="magnify" size={20} color={colors.primary} />
-                                <TextInput
+                                <RNTextInput
                                     placeholder="Search posters (e.g. 'coding', 'neon', 'beach')"
                                     placeholderTextColor={colors.textSecondary + '80'}
                                     value={imageSearchQuery}
                                     onChangeText={setImageSearchQuery}
-                                    style={styles.imageSearchInput}
-                                    underlineColor="transparent"
-                                    activeUnderlineColor="transparent"
-                                    dense
+                                    style={[styles.imageSearchInput, { color: colors.text }]}
                                 />
                                 {imageSearchQuery !== '' && (
                                     <TouchableOpacity onPress={() => setImageSearchQuery('')}>

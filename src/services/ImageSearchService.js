@@ -41,6 +41,12 @@ const KEYWORD_IMAGE_MAP = {
         'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=800',
         'https://images.unsplash.com/photo-1452860606245-08befc0ff44b?q=80&w=800',
     ],
+    social: [
+        'https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=800',
+        'https://images.unsplash.com/photo-1543007630-9710e4a00a20?q=80&w=800',
+        'https://images.unsplash.com/photo-1528605248644-14dd04022da1?q=80&w=800',
+        'https://images.unsplash.com/photo-1519671482749-fd09be4ccebf?q=80&w=800',
+    ],
     gaming: [
         'https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=800',
         'https://images.unsplash.com/photo-1511512578047-dfb367046420?q=80&w=800',
@@ -92,14 +98,15 @@ const SEARCH_INDEX = {
     programming: 'tech', startup: 'tech', hackathon: 'tech', software: 'tech', ai: 'tech', robot: 'tech',
     football: 'sports', cricket: 'sports', match: 'sports', tournament: 'sports', fitness: 'sports', gym: 'sports',
     clubbing: 'party', celebration: 'party', nightlife: 'party', birthday: 'party', wedding: 'party',
+    gathering: 'social', meetup: 'social', community: 'social', group: 'social',
     seminar: 'workshop', class: 'workshop', training: 'workshop', learning: 'workshop', education: 'workshop',
     esports: 'gaming', pc: 'gaming', console: 'gaming', streamer: 'gaming',
     outdoor: 'nature', hiking: 'nature', camping: 'nature', scenic: 'nature', mountains: 'nature',
     painting: 'art', gallery: 'art', creative: 'art', exhibition: 'art', design: 'art',
     development: 'coding', web: 'coding', app: 'coding',
     meditation: 'yoga', wellness: 'yoga', health: 'yoga',
-    conference: 'business', meeting: 'business', corporate: 'business', startup: 'business',
-    dinner: 'food', lunch: 'food', cooking: 'food', restaurant: 'food',
+    conference: 'business', meeting: 'business', corporate: 'business', finance: 'business',
+    dinner: 'food', lunch: 'food', cooking: 'food', restaurant: 'food', cafe: 'food',
     summer: 'beach', ocean: 'beach', vacation: 'beach', sand: 'beach',
 };
 
@@ -107,26 +114,31 @@ const SEARCH_INDEX = {
  * Suggests images based on provided text
  */
 export const suggestImages = (text) => {
-    if (!text) return [];
+    if (!text || typeof text !== 'string') return KEYWORD_IMAGE_MAP.social || [];
 
     const tokens = text.toLowerCase().split(/\W+/);
     const suggestedPools = new Set();
 
     tokens.forEach(token => {
-        if (SEARCH_INDEX[token]) {
+        if (token && SEARCH_INDEX[token]) {
             suggestedPools.add(SEARCH_INDEX[token]);
         }
     });
 
-    // If no specific keywords found, return a default social pool
+    // If no specific keywords found, return the social pool as default
     if (suggestedPools.size === 0) {
-        return KEYWORD_IMAGE_MAP.party;
+        return KEYWORD_IMAGE_MAP.social || [];
     }
 
     let results = [];
     suggestedPools.forEach(poolKey => {
-        results = [...results, ...KEYWORD_IMAGE_MAP[poolKey]];
+        if (KEYWORD_IMAGE_MAP[poolKey]) {
+            results = [...results, ...KEYWORD_IMAGE_MAP[poolKey]];
+        }
     });
+
+    // Fallback if results is somehow still empty
+    if (results.length === 0) return KEYWORD_IMAGE_MAP.social || [];
 
     return [...new Set(results)].slice(0, 16);
 };
@@ -135,18 +147,25 @@ export const suggestImages = (text) => {
  * Searches for images based on a query string
  */
 export const searchImages = (query) => {
-    if (!query) return Object.values(KEYWORD_IMAGE_MAP).flat().slice(0, 24);
+    if (!query || typeof query !== 'string') return Object.values(KEYWORD_IMAGE_MAP).flat().slice(0, 24);
 
     const term = query.toLowerCase().trim();
+    if (!term) return Object.values(KEYWORD_IMAGE_MAP).flat().slice(0, 24);
+
     const results = [];
 
     // Check if the term directly matches or is an index key
     Object.keys(SEARCH_INDEX).forEach(key => {
         if (key.includes(term)) {
             const poolKey = SEARCH_INDEX[key];
-            results.push(...KEYWORD_IMAGE_MAP[poolKey]);
+            if (KEYWORD_IMAGE_MAP[poolKey]) {
+                results.push(...KEYWORD_IMAGE_MAP[poolKey]);
+            }
         }
     });
+
+    // If no results from search, return general fallback
+    if (results.length === 0) return suggestImages(term);
 
     return [...new Set(results)].slice(0, 24);
 };
