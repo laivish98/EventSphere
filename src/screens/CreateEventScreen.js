@@ -23,7 +23,6 @@ export default function CreateEventScreen({ navigation }) {
     const [category, setCategory] = useState('social');
     const [department, setDepartment] = useState('');
     const [acceptsSponsorship, setAcceptsSponsorship] = useState(true);
-    const [certificateTemplateUrl, setCertificateTemplateUrl] = useState('');
     const [loading, setLoading] = useState(false);
     const [selectedImage, setSelectedImage] = useState('https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2670&auto=format&fit=crop');
     const [suggestedImages, setSuggestedImages] = useState([]);
@@ -144,7 +143,6 @@ export default function CreateEventScreen({ navigation }) {
                 acceptsSponsorship: acceptsSponsorship,
                 category: category,
                 imageUrl: selectedImage || getRandomImage(category),
-                certificateTemplateUrl: certificateTemplateUrl.trim(),
                 createdBy: user.uid,
                 collegeName: userData?.name || user.displayName || 'Campus Organizer',
                 createdAt: serverTimestamp(),
@@ -395,26 +393,6 @@ export default function CreateEventScreen({ navigation }) {
                                 <Text style={[styles.thumbnailHint, { color: colors.textSecondary }]}>
                                     Our AI suggests posters based on your event description.
                                 </Text>
-                            </View>
-
-                            <View style={{ marginTop: 24 }}>
-                                <Text style={[styles.sectionLabel, { color: colors.textSecondary, marginLeft: 0 }]}>CERTIFICATE TEMPLATE</Text>
-                                <TextInput
-                                    label="Custom Template URL (Optional)"
-                                    value={certificateTemplateUrl}
-                                    onChangeText={setCertificateTemplateUrl}
-                                    style={[styles.input, { backgroundColor: colors.surface + '40' }]}
-                                    mode="outlined"
-                                    outlineColor={colors.glassBorder}
-                                    activeOutlineColor={colors.primary}
-                                    textColor={colors.text}
-                                    placeholder="https://example.com/template.png"
-                                    placeholderTextColor={colors.textSecondary + '80'}
-                                    theme={{ roundness: 16, colors: { primary: colors.primary, outline: colors.glassBorder } }}
-                                />
-                                <HelperText type="info" style={{ color: colors.textSecondary, fontSize: 11, fontWeight: '600', opacity: 0.6 }}>
-                                    If left blank, a default certificate design will be used.
-                                </HelperText>
                             </View>
                         </View>
                     </BlurView>

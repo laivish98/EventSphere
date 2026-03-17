@@ -142,8 +142,7 @@ export default function TicketScreen({ navigation }) {
                             eventTitle: reg.eventTitle,
                             userName: reg.userName || 'Attendee',
                             date: reg.eventDate,
-                            university: userData?.college || 'EventSphere University',
-                            certificateTemplateUrl: reg.certificateTemplateUrl || null
+                            university: userData?.college || 'EventSphere University'
                         })}
                     >
                         <MaterialCommunityIcons name="certificate" size={18} color={colors.success} />

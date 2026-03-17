@@ -11,6 +11,7 @@ import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { StatusBar } from 'expo-status-bar';
 import { db } from '../services/firebase';
 import { useTheme } from '../context/ThemeContext';
+import { useAuth } from '../context/AuthContext';
 import { doc, getDoc, updateDoc, collection, query, where, getDocs } from 'firebase/firestore';
 
 const { width } = Dimensions.get('window');
@@ -20,6 +21,7 @@ const SCAN_WINDOW = 260;
 export default function ScanTicketScreen({ navigation, route }) {
     const eventId = route.params?.eventId;
     const { colors, isDarkMode } = useTheme();
+    const { user } = useAuth();
     const [permission, requestPermission] = useCameraPermissions();
     const [scanned, setScanned] = useState(false);
     const [scanResult, setScanResult] = useState(null); // { type, name, passType, time, message }
@@ -99,17 +101,36 @@ export default function ScanTicketScreen({ navigation, route }) {
                     });
                 }
             } else {
-                // If direct doc fetch fails, try to resolve as a short ID if we have an eventId context
-                if (registrationId.length <= 8 && eventId) {
-                    const q = query(collection(db, 'registrations'), where('eventId', '==', eventId));
-                    const querySnapshot = await getDocs(q);
+                // If direct doc fetch fails, try to resolve as a short ID if we have an eventId context or can fetch organizer's events
+                if (registrationId.length <= 8) {
+                    let querySnapshots = [];
+
+                    if (eventId) {
+                        const q = query(collection(db, 'registrations'), where('eventId', '==', eventId));
+                        querySnapshots.push(await getDocs(q));
+                    } else if (user) {
+                        // Global scan without specific eventId: Find all events created by this organizer
+                        const eQ = query(collection(db, 'events'), where('createdBy', '==', user.uid));
+                        const eSnap = await getDocs(eQ);
+                        const eventIds = eSnap.docs.map(d => d.id);
+
+                        // Chunk by 30 due to Firestore 'in' query limits
+                        for (let i = 0; i < eventIds.length; i += 30) {
+                            const chunk = eventIds.slice(i, i + 30);
+                            const rQ = query(collection(db, 'registrations'), where('eventId', 'in', chunk));
+                            querySnapshots.push(await getDocs(rQ));
+                        }
+                    }
 
                     let matchedDoc = null;
-                    querySnapshot.forEach((d) => {
-                        if (d.id.toUpperCase().startsWith(registrationId.toUpperCase())) {
-                            matchedDoc = d;
-                        }
-                    });
+                    for (const snap of querySnapshots) {
+                        snap.forEach((d) => {
+                            if (d.id.toUpperCase().startsWith(registrationId.toUpperCase())) {
+                                matchedDoc = d;
+                            }
+                        });
+                        if (matchedDoc) break;
+                    }
 
                     if (matchedDoc) {
                         const regData = matchedDoc.data();
