@@ -41,12 +41,13 @@ const MenuButton = ({ icon, label, onPress, colors, showBadge, badgeCount, color
 
 export default function ProfileScreen({ navigation }) {
     const { colors, isDarkMode, toggleTheme } = useTheme();
-    const { user, userData, logout } = useAuth();
+    const { user, userData, logout, getDefaultAvatar } = useAuth();
     const [notificationsEnabled, setNotificationsEnabled] = useState(true);
     const [regCount, setRegCount] = useState(0);
     const [createdCount, setCreatedCount] = useState(0);
     const [followersCount, setFollowersCount] = useState(0);
     const [followingCount, setFollowingCount] = useState(0);
+    const [hasImageError, setHasImageError] = useState(false);
 
     useEffect(() => {
         if (!user) return;
@@ -143,11 +144,13 @@ export default function ProfileScreen({ navigation }) {
                                         uri: (userData?.avatarUrl &&
                                             !userData.avatarUrl.includes('iran.liara.run') &&
                                             !userData.avatarUrl.includes('hair=short') &&
-                                            !userData.avatarUrl.includes('hair=long'))
+                                            !userData.avatarUrl.includes('hair=long') &&
+                                            !hasImageError)
                                             ? userData.avatarUrl
-                                            : getDefaultAvatar(userData?.name || user?.email?.split('@')[0], userData?.gender)
+                                            : getDefaultAvatar(userData?.name || user?.email?.split('@')?.[0] || 'User', userData?.gender)
                                     }}
                                     style={styles.avatar}
+                                    onError={() => setHasImageError(true)}
                                 />
                             </View>
                         </View>

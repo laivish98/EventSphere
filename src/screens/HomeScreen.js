@@ -214,7 +214,7 @@ export default function HomeScreen({ navigation }) {
                                 !userData.avatarUrl.includes('hair=short') &&
                                 !userData.avatarUrl.includes('hair=long'))
                                 ? userData.avatarUrl
-                                : getDefaultAvatar(userData?.name || user?.email?.split('@')[0], userData?.gender)
+                                : getDefaultAvatar(userData?.name || user?.email?.split('@')?.[0] || 'User', userData?.gender)
                         }}
                         style={styles.avatar}
                         onError={(e) => {
@@ -224,7 +224,7 @@ export default function HomeScreen({ navigation }) {
                     />
                     <View>
                         <Text style={[styles.greeting, { color: colors.textSecondary }]}>Discover Events</Text>
-                        <Text style={[styles.username, { color: colors.text }]}>{userData?.name || user?.email?.split('@')[0]}</Text>
+                        <Text style={[styles.username, { color: colors.text }]}>{userData?.name || user?.email?.split('@')?.[0] || 'User'}</Text>
                     </View>
                 </TouchableOpacity>
                 <TouchableOpacity style={[styles.iconButton, { backgroundColor: colors.surface }]} onPress={() => navigation.navigate('Profile')}>

@@ -23,9 +23,9 @@ export const getDefaultAvatar = (name, gender) => {
         hairParam = `&hair=${femaleHair}`;
     }
 
-    // Using SVG for better reliability on web/native + better scale
+    // Using PNG for universal compatibility across React Native (Native & Web)
     // Background colors: light blue, purple, soft indigo
-    return `https://api.dicebear.com/7.x/adventurer/svg?seed=${seed}${hairParam}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+    return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}${hairParam}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
 };
 
 export const AuthProvider = ({ children }) => {

@@ -569,7 +569,7 @@ export default function OrganizerExportPortal({ navigation }) {
                                         !userData.avatarUrl.includes('hair=short') &&
                                         !userData.avatarUrl.includes('hair=long'))
                                         ? userData.avatarUrl
-                                        : getDefaultAvatar(userData?.name || user?.email?.split('@')[0], userData?.gender)
+                                        : getDefaultAvatar(userData?.name || user?.email?.split('@')?.[0] || 'User', userData?.gender)
                                 }}
                                 style={[styles.headerAvatar, { borderColor: colors.primary }]}
                             />
