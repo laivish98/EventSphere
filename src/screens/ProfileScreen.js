@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, TouchableOpacity, Text, ScrollView, Image, Dimensions, Switch, Platform, Alert, Modal, TextInput } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 import { useTheme } from '../context/ThemeContext';
 import { useAuth } from '../context/AuthContext';
 import { db } from '../services/firebase';
@@ -23,12 +24,12 @@ const MenuButton = ({ icon, label, onPress, colors, showBadge, badgeCount, color
         onPress={onPress}
         activeOpacity={0.6}
     >
-        <LinearGradient
+        <ExpoGradient
             colors={[color + '15', color + '05']}
             style={styles.menuIconContainer}
         >
             <MaterialCommunityIcons name={icon} size={22} color={color} />
-        </LinearGradient>
+        </ExpoGradient>
         <Text style={[styles.menuLabel, { color: colors.text }]}>{label}</Text>
         {showBadge && (
             <View style={[styles.badgeContainer, { backgroundColor: colors.primary }]}>
@@ -120,6 +121,13 @@ export default function ProfileScreen({ navigation }) {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar style={isDarkMode ? "light" : "dark"} />
 
+            <ExpoGradient
+                colors={isDarkMode
+                    ? [colors.background, '#1e1b4b', '#0f172a']
+                    : ['#f8fafc', '#f1f5f9', '#e2e8f0']}
+                style={StyleSheet.absoluteFill}
+            />
+
             <ScrollView showsVerticalScrollIndicator={false}>
                 {/* Header Profile Section */}
                 <View style={styles.profileHeader}>
@@ -153,10 +161,10 @@ export default function ProfileScreen({ navigation }) {
                             </View>
                         </View>
 
-                        <Text style={styles.userNameText}>{userData.name || 'User'}</Text>
-                        <Text style={styles.userEmailText}>{user.email}</Text>
+                        <Text style={[styles.userNameText, { color: colors.text }]}>{userData.name || 'User'}</Text>
+                        <Text style={[styles.userEmailText, { color: colors.textSecondary }]}>{user.email}</Text>
 
-                        <View style={styles.roleBadgeContainer}>
+                        <View style={[styles.roleBadgeContainer, { backgroundColor: colors.primary }]}>
                             <MaterialCommunityIcons name={userData.role === 'admin' ? "shield-check" : "school"} size={14} color="white" />
                             <Text style={styles.roleBadgeText}>
                                 {userData.role === 'admin' ? 'Event Organizer' : 'Student Pro'}
@@ -165,7 +173,7 @@ export default function ProfileScreen({ navigation }) {
                     </View>
 
                     {/* Stats Row */}
-                    <View style={[styles.statsRow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    <BlurView intensity={isDarkMode ? 30 : 50} tint={isDarkMode ? "dark" : "light"} style={[styles.statsRowGlass, { borderColor: colors.border }]}>
                         <TouchableOpacity style={styles.statItem} activeOpacity={0.7}>
                             <StatItem label="Tickets" value={regCount} colors={colors} />
                         </TouchableOpacity>
@@ -185,13 +193,13 @@ export default function ProfileScreen({ navigation }) {
                         <TouchableOpacity style={styles.statItem} activeOpacity={0.7}>
                             <StatItem label="XP Points" value={regCount * 50} colors={colors} />
                         </TouchableOpacity>
-                    </View>
+                    </BlurView>
                 </View>
 
                 {/* Content Sections */}
                 <View style={styles.contentSections}>
                     <Text style={[styles.sectionHeading, { color: colors.textSecondary }]}>ACCOUNT SETTINGS</Text>
-                    <View style={[styles.menuCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.menuCardGlass, { borderColor: colors.border }]}>
                         <MenuButton
                             icon="account-outline"
                             label="Personal Information"
@@ -216,10 +224,10 @@ export default function ProfileScreen({ navigation }) {
                             isLast
                             onPress={() => navigation.navigate('Security')}
                         />
-                    </View>
+                    </BlurView>
 
                     <Text style={[styles.sectionHeading, { color: colors.textSecondary, marginTop: 24 }]}>PREFERENCES</Text>
-                    <View style={[styles.menuCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.menuCardGlass, { borderColor: colors.border }]}>
                         <View style={styles.menuButton}>
                             <View style={[styles.menuIconContainer, { backgroundColor: '#8b5cf615' }]}>
                                 <MaterialCommunityIcons name="theme-light-dark" size={22} color="#8b5cf6" />
@@ -232,10 +240,10 @@ export default function ProfileScreen({ navigation }) {
                                 thumbColor={Platform.OS === 'android' ? '#f4f3f4' : ''}
                             />
                         </View>
-                    </View>
+                    </BlurView>
 
                     <Text style={[styles.sectionHeading, { color: colors.textSecondary, marginTop: 24 }]}>SUPPORT</Text>
-                    <View style={[styles.menuCard, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.menuCardGlass, { borderColor: colors.border }]}>
                         <MenuButton
                             icon="help-circle-outline"
                             label="Help Center"
@@ -251,7 +259,7 @@ export default function ProfileScreen({ navigation }) {
                             isLast
                             onPress={() => navigation.navigate('About')}
                         />
-                    </View>
+                    </BlurView>
 
                     <TouchableOpacity
                         style={[styles.logoutButton, { backgroundColor: isDarkMode ? '#ef444410' : '#fee2e2' }]}
@@ -294,6 +302,17 @@ const styles = StyleSheet.create({
     roleBadgeContainer: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 14, paddingVertical: 8, borderRadius: 20, gap: 6, backgroundColor: 'rgba(255,255,255,0.15)' },
     roleBadgeText: { fontSize: 13, fontWeight: 'bold', color: 'white' },
     statsRow: { flexDirection: 'row', marginTop: 32, width: '100%', borderRadius: 28, padding: 22, borderWidth: 1.5, justifyContent: 'space-around', alignItems: 'center', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.1, shadowRadius: 20 },
+    statsRowGlass: {
+        flexDirection: 'row',
+        marginTop: 32,
+        width: '100%',
+        borderRadius: 28,
+        padding: 22,
+        borderWidth: 1.5,
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        overflow: 'hidden',
+    },
     statItem: { alignItems: 'center' },
     statValue: { fontSize: 20, fontWeight: 'bold', marginBottom: 2 },
     statLabel: { fontSize: 11, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 0.8, opacity: 0.6 },
@@ -301,6 +320,11 @@ const styles = StyleSheet.create({
     contentSections: { paddingHorizontal: 20, marginTop: 40 },
     sectionHeading: { fontSize: 12, fontWeight: '900', letterSpacing: 1.5, marginLeft: 8, marginBottom: 16 },
     menuCard: { borderRadius: 32, borderWidth: 1.5, overflow: 'hidden', elevation: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.05, shadowRadius: 12 },
+    menuCardGlass: {
+        borderRadius: 32,
+        borderWidth: 1.5,
+        overflow: 'hidden',
+    },
     menuButton: { flexDirection: 'row', alignItems: 'center', padding: 20 },
     menuIconContainer: { width: 46, height: 46, borderRadius: 16, alignItems: 'center', justifyContent: 'center', marginRight: 18 },
     menuLabel: { flex: 1, fontSize: 16, fontWeight: '600' },

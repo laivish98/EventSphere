@@ -6,6 +6,8 @@ import {
 import Svg, { Path, Defs, LinearGradient, Stop } from 'react-native-svg';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { StatusBar } from 'expo-status-bar';
+import { BlurView } from 'expo-blur';
+import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { db } from '../services/firebase';
@@ -175,66 +177,71 @@ export default function OrganizerDashboardScreen({ navigation }) {
         return (
             <TouchableOpacity
                 key={event.id}
-                style={[styles.glassCard, styles.eventCard, { borderColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.05)' }]}
-                onPress={() => navigation.navigate('EventDetails', { event })}
                 activeOpacity={0.8}
+                onPress={() => navigation.navigate('EventDetails', { event })}
             >
-                <View style={styles.eventImageContainer}>
-                    <Image
-                        source={{ uri: event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=400&auto=format&fit=crop' }}
-                        style={styles.eventThumb}
-                    />
-                    {!isPast && (
-                        <View style={styles.livePulseContainer}>
-                            <View style={[styles.livePulse, { backgroundColor: colors.success }]} />
-                        </View>
-                    )}
-                </View>
-                <View style={styles.eventInfo}>
-                    <View style={styles.eventInfoTop}>
-                        <Text style={[styles.eventName, { color: colors.text }]} numberOfLines={1}>{event.title}</Text>
-                        <View style={[
-                            styles.premiumStatusBadge,
-                            { backgroundColor: !isPast ? colors.success + '15' : colors.error + '15' }
-                        ]}>
-                            <Text style={[
-                                styles.premiumStatusText,
-                                { color: !isPast ? colors.success : colors.error }
+                <BlurView
+                    intensity={isDarkMode ? 20 : 40}
+                    tint={isDarkMode ? "dark" : "light"}
+                    style={[styles.glassCard, styles.eventCard, { borderColor: colors.border }]}
+                >
+                    <View style={styles.eventImageContainer}>
+                        <Image
+                            source={{ uri: event.imageUrl || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=400&auto=format&fit=crop' }}
+                            style={styles.eventThumb}
+                        />
+                        {!isPast && (
+                            <View style={styles.livePulseContainer}>
+                                <View style={[styles.livePulse, { backgroundColor: colors.success }]} />
+                            </View>
+                        )}
+                    </View>
+                    <View style={styles.eventInfo}>
+                        <View style={styles.eventInfoTop}>
+                            <Text style={[styles.eventName, { color: colors.text }]} numberOfLines={1}>{event.title}</Text>
+                            <View style={[
+                                styles.premiumStatusBadge,
+                                { backgroundColor: !isPast ? colors.success + '15' : colors.error + '15' }
                             ]}>
-                                {!isPast ? 'LIVE' : 'FINISHED'}
-                            </Text>
+                                <Text style={[
+                                    styles.premiumStatusText,
+                                    { color: !isPast ? colors.success : colors.error }
+                                ]}>
+                                    {!isPast ? 'LIVE' : 'FINISHED'}
+                                </Text>
+                            </View>
                         </View>
-                    </View>
-                    <Text style={[styles.eventMeta, { color: colors.textSecondary }]}>{event.venue} • {event.date}</Text>
+                        <Text style={[styles.eventMeta, { color: colors.textSecondary }]}>{event.venue} • {event.date}</Text>
 
-                    <View style={styles.eventStatsRow}>
-                        <View style={styles.miniStatItem}>
-                            <Text style={[styles.miniStatValue, { color: colors.text }]}>{eventRegs}</Text>
-                            <Text style={[styles.miniStatLabel, { color: colors.textSecondary }]}>Sales</Text>
+                        <View style={styles.eventStatsRow}>
+                            <View style={styles.miniStatItem}>
+                                <Text style={[styles.miniStatValue, { color: colors.text }]}>{eventRegs}</Text>
+                                <Text style={[styles.miniStatLabel, { color: colors.textSecondary }]}>Sales</Text>
+                            </View>
+                            <View style={styles.miniStatDivider} />
+                            <View style={styles.miniStatItem}>
+                                <Text style={[styles.miniStatValue, { color: colors.text }]}>{percent}%</Text>
+                                <Text style={[styles.miniStatLabel, { color: colors.textSecondary }]}>Capacity</Text>
+                            </View>
+                            <View style={{ flex: 1 }} />
+                            <View style={styles.actionRow}>
+                                <TouchableOpacity
+                                    onPress={() => navigation.navigate('EditEvent', { event })}
+                                    style={[styles.iconButtonSmall, { backgroundColor: colors.surface }]}
+                                >
+                                    <MaterialCommunityIcons name="pencil" size={16} color={colors.primary} />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    onPress={() => navigation.navigate('EventChat', { eventId: event.id, eventTitle: event.title })}
+                                    style={[styles.iconButtonSmall, { backgroundColor: colors.primary + '15' }]}
+                                >
+                                    <MaterialCommunityIcons name="chat-processing" size={16} color={colors.primary} />
+                                </TouchableOpacity>
+                            </View>
                         </View>
-                        <View style={styles.miniStatDivider} />
-                        <View style={styles.miniStatItem}>
-                            <Text style={[styles.miniStatValue, { color: colors.text }]}>{percent}%</Text>
-                            <Text style={[styles.miniStatLabel, { color: colors.textSecondary }]}>Capacity</Text>
-                        </View>
-                        <View style={{ flex: 1 }} />
-                        <View style={styles.actionRow}>
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate('EditEvent', { event })}
-                                style={[styles.iconButtonSmall, { backgroundColor: colors.surface }]}
-                            >
-                                <MaterialCommunityIcons name="pencil" size={16} color={colors.primary} />
-                            </TouchableOpacity>
-                            <TouchableOpacity
-                                onPress={() => navigation.navigate('EventChat', { eventId: event.id, eventTitle: event.title })}
-                                style={[styles.iconButtonSmall, { backgroundColor: colors.primary + '15' }]}
-                            >
-                                <MaterialCommunityIcons name="chat-processing" size={16} color={colors.primary} />
-                            </TouchableOpacity>
-                        </View>
+                        <ProgressBar percent={percent} colors={colors} />
                     </View>
-                    <ProgressBar percent={percent} colors={colors} />
-                </View>
+                </BlurView>
             </TouchableOpacity>
         );
     };
@@ -255,6 +262,14 @@ export default function OrganizerDashboardScreen({ navigation }) {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar style={isDarkMode ? "light" : "dark"} />
 
+            {/* Super Premium Background Gradient */}
+            <ExpoGradient
+                colors={isDarkMode
+                    ? [colors.background, '#1e1b4b', '#0f172a']
+                    : ['#f8fafc', '#f1f5f9', '#e2e8f0']}
+                style={StyleSheet.absoluteFill}
+            />
+
             {/* Header */}
             <View style={[styles.header, { backgroundColor: colors.background }]}>
                 <View style={styles.headerLeft}>
@@ -273,7 +288,11 @@ export default function OrganizerDashboardScreen({ navigation }) {
                         onPress={() => navigation.navigate('Profile')}
                     >
                         <Image
-                            source={{ uri: userData?.avatarUrl || 'https://ui-avatars.com/api/?name=' + (userData?.name || 'A') }}
+                            source={{
+                                uri: (userData?.avatarUrl && !userData.avatarUrl.includes('iran.liara.run'))
+                                    ? userData.avatarUrl
+                                    : getDefaultAvatar(userData?.name || user?.email?.split('@')?.[0], userData?.gender)
+                            }}
                             style={styles.avatarMini}
                         />
                     </TouchableOpacity>
@@ -309,33 +328,33 @@ export default function OrganizerDashboardScreen({ navigation }) {
                     </TouchableOpacity>
 
                     <View style={styles.gridStats}>
-                        <View style={[styles.glassCard, styles.statCard, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }]}>
-                            <View style={[styles.statIconBox, { backgroundColor: colors.primary + '15' }]}>
+                        <BlurView intensity={isDarkMode ? 30 : 50} tint={isDarkMode ? "dark" : "light"} style={[styles.glassCard, styles.statCard, { borderColor: colors.border }]}>
+                            <View style={[styles.statIconBox, { backgroundColor: colors.primary + '20' }]}>
                                 <MaterialCommunityIcons name="ticket" size={20} color={colors.primary} />
                             </View>
                             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Sales</Text>
                             <Text style={[styles.statValue, { color: colors.text }]}>₹{ticketRevenue.toLocaleString()}</Text>
-                        </View>
-                        <View style={[styles.glassCard, styles.statCard, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }]}>
-                            <View style={[styles.statIconBox, { backgroundColor: colors.success + '15' }]}>
+                        </BlurView>
+                        <BlurView intensity={isDarkMode ? 30 : 50} tint={isDarkMode ? "dark" : "light"} style={[styles.glassCard, styles.statCard, { borderColor: colors.border }]}>
+                            <View style={[styles.statIconBox, { backgroundColor: colors.success + '20' }]}>
                                 <MaterialCommunityIcons name="handshake" size={20} color={colors.success} />
                             </View>
                             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Sponsors</Text>
                             <Text style={[styles.statValue, { color: colors.text }]}>₹{sponsorshipRevenue.toLocaleString()}</Text>
-                        </View>
+                        </BlurView>
                     </View>
 
                     <View style={styles.gridStats}>
-                        <View style={[styles.glassCard, styles.statCard, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }]}>
-                            <View style={[styles.statIconBox, { backgroundColor: colors.accent + '15' }]}>
+                        <BlurView intensity={isDarkMode ? 30 : 50} tint={isDarkMode ? "dark" : "light"} style={[styles.glassCard, styles.statCard, { borderColor: colors.border }]}>
+                            <View style={[styles.statIconBox, { backgroundColor: colors.accent + '20' }]}>
                                 <MaterialCommunityIcons name="account-group" size={20} color={colors.accent || colors.primary} />
                             </View>
                             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Users</Text>
                             <Text style={[styles.statValue, { color: colors.text }]}>{totalRegistrations}</Text>
-                        </View>
-                        <View style={[styles.glassCard, styles.statCard, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.03)' : 'rgba(0,0,0,0.02)' }]}>
+                        </BlurView>
+                        <BlurView intensity={isDarkMode ? 30 : 50} tint={isDarkMode ? "dark" : "light"} style={[styles.glassCard, styles.statCard, { borderColor: colors.border }]}>
                             <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-                                <View style={[styles.statIconBox, { backgroundColor: colors.success + '15' }]}>
+                                <View style={[styles.statIconBox, { backgroundColor: colors.success + '20' }]}>
                                     <MaterialCommunityIcons name="check-decagram" size={20} color={colors.success} />
                                 </View>
                                 <View style={styles.liveIndicatorContainer}>
@@ -344,7 +363,7 @@ export default function OrganizerDashboardScreen({ navigation }) {
                             </View>
                             <Text style={[styles.statLabel, { color: colors.textSecondary }]}>Check-ins</Text>
                             <Text style={[styles.statValue, { color: colors.text }]}>{liveCheckIns}</Text>
-                        </View>
+                        </BlurView>
                     </View>
                 </View>
 
@@ -357,10 +376,10 @@ export default function OrganizerDashboardScreen({ navigation }) {
                                 <Text style={[styles.sectionSubtitle, { color: colors.textSecondary }]}>Registration volume by event type</Text>
                             </View>
                         </View>
-                        <View style={[styles.categoryStatsRow, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                        <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={[styles.categoryStatsRow, { borderColor: colors.border, overflow: 'hidden' }]}>
                             {categoryStats.slice(0, 4).map(([cat, count]) => (
                                 <View key={cat} style={styles.categoryStatItem}>
-                                    <View style={[styles.categoryStatBarContainer, { backgroundColor: colors.background }]}>
+                                    <View style={[styles.categoryStatBarContainer, { backgroundColor: colors.background + '50' }]}>
                                         <View
                                             style={[
                                                 styles.categoryStatBar,
@@ -372,7 +391,7 @@ export default function OrganizerDashboardScreen({ navigation }) {
                                     <Text style={[styles.categoryStatCount, { color: colors.text }]}>{count}</Text>
                                 </View>
                             ))}
-                        </View>
+                        </BlurView>
                     </View>
                 )}
 

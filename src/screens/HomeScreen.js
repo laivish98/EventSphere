@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, StyleSheet, ScrollView, Image, TouchableOpacity, Text, Dimensions, FlatList, Alert, TextInput } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { LinearGradient as ExpoGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { useAuth } from '../context/AuthContext';
@@ -85,7 +85,7 @@ export default function HomeScreen({ navigation }) {
                 source={{ uri: item.image || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=1000&auto=format&fit=crop' }}
                 style={styles.featuredImage}
             />
-            <LinearGradient
+            <ExpoGradient
                 colors={['transparent', 'rgba(15, 23, 42, 0.5)', 'rgba(15, 23, 42, 0.95)']}
                 style={StyleSheet.absoluteFill}
             />
@@ -110,43 +110,45 @@ export default function HomeScreen({ navigation }) {
     const renderEventItem = (item) => (
         <TouchableOpacity
             key={item.id}
-            style={[styles.eventCard, { backgroundColor: colors.surface, borderColor: colors.border }]}
-            activeOpacity={0.7}
+            activeOpacity={0.8}
             onPress={() => navigation.navigate('EventDetails', { event: item })}
+            style={styles.eventItemWrapper}
         >
-            <View style={styles.imageWrapper}>
-                <Image
-                    source={{ uri: item.imageUrl || item.image || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=400&auto=format&fit=crop' }}
-                    style={styles.eventImage}
-                />
-                <View style={[styles.categoryFloatingBadge, { backgroundColor: colors.primary }]}>
-                    <Text style={styles.categoryFloatingText}>{item.category || 'Event'}</Text>
-                </View>
-            </View>
-            <View style={styles.eventInfo}>
-                <View style={styles.eventHeader}>
-                    <Text style={[styles.eventTime, { color: colors.primary }]}>{item.date}</Text>
-                    <MaterialCommunityIcons name="heart-outline" size={18} color={colors.textSecondary} />
-                </View>
-                <Text style={[styles.eventTitle, { color: colors.text }]} numberOfLines={1}>{item.title}</Text>
-                <View style={styles.locationRow}>
-                    <MaterialCommunityIcons name="map-marker-outline" size={14} color={colors.primary} />
-                    <Text style={[styles.locationText, { color: colors.textSecondary }]} numberOfLines={1}>
-                        {item.department || 'General'} • {item.venue || item.location || 'TBA'}
-                    </Text>
-                </View>
-                <View style={styles.eventFooter}>
-                    <Text style={[styles.eventPrice, { color: item.price > 0 ? '#10b981' : colors.primary }]}>
-                        {item.price > 0 ? `₹${item.price}` : 'FREE'}
-                    </Text>
-                    <View style={styles.participantSmallRow}>
-                        <MaterialCommunityIcons name="account-group-outline" size={14} color={colors.textSecondary} />
-                        <Text style={[styles.participantCount, { color: colors.textSecondary }]}>
-                            {item.currentParticipants || 0}
-                        </Text>
+            <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={styles.eventItemGlass}>
+                <View style={styles.imageWrapper}>
+                    <Image
+                        source={{ uri: item.imageUrl || item.image || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=400&auto=format&fit=crop' }}
+                        style={styles.eventImage}
+                    />
+                    <View style={[styles.categoryFloatingBadge, { backgroundColor: colors.primary }]}>
+                        <Text style={styles.categoryFloatingText}>{item.category || 'Event'}</Text>
                     </View>
                 </View>
-            </View>
+                <View style={styles.eventInfo}>
+                    <View style={styles.eventHeader}>
+                        <Text style={[styles.eventTime, { color: colors.primary, fontWeight: 'bold' }]}>{item.date}</Text>
+                        <MaterialCommunityIcons name="heart-outline" size={18} color={colors.textSecondary} />
+                    </View>
+                    <Text style={[styles.eventTitle, { color: colors.text }]} numberOfLines={1}>{item.title}</Text>
+                    <View style={styles.locationRow}>
+                        <MaterialCommunityIcons name="map-marker-outline" size={14} color={colors.primary} />
+                        <Text style={[styles.locationText, { color: colors.textSecondary }]} numberOfLines={1}>
+                            {item.department || 'General'} • {item.venue || item.location || 'TBA'}
+                        </Text>
+                    </View>
+                    <View style={styles.eventFooter}>
+                        <Text style={[styles.eventPrice, { color: '#10b981', fontWeight: 'bold' }]}>
+                            {item.price > 0 ? `₹${item.price}` : 'FREE'}
+                        </Text>
+                        <View style={styles.participantSmallRow}>
+                            <MaterialCommunityIcons name="account-group-outline" size={14} color={colors.textSecondary} />
+                            <Text style={[styles.participantCount, { color: colors.textSecondary }]}>
+                                {item.currentParticipants || 0}
+                            </Text>
+                        </View>
+                    </View>
+                </View>
+            </BlurView>
         </TouchableOpacity>
     );
 
@@ -201,8 +203,16 @@ export default function HomeScreen({ navigation }) {
         <View style={[styles.container, { backgroundColor: colors.background }]}>
             <StatusBar style={isDarkMode ? "light" : "dark"} />
 
+            <ExpoGradient
+                colors={isDarkMode
+                    ? [colors.background, '#1e1b4b', '#0f172a']
+                    : ['#f8fafc', '#f1f5f9', '#e2e8f0']}
+                style={StyleSheet.absoluteFill}
+            />
+
             {/* Header */}
-            <View style={[styles.header, { backgroundColor: colors.background, borderBottomColor: colors.border }]}>
+            <View style={[styles.header, { backgroundColor: 'transparent', borderBottomColor: colors.border }]}>
+                <BlurView intensity={isDarkMode ? 20 : 40} tint={isDarkMode ? "dark" : "light"} style={StyleSheet.absoluteFill} />
                 <TouchableOpacity
                     style={styles.userInfo}
                     onPress={() => navigation.navigate('Profile')}
@@ -234,7 +244,7 @@ export default function HomeScreen({ navigation }) {
             <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 100 }}>
                 {/* Search Bar */}
                 <View style={styles.searchSection}>
-                    <View style={[styles.searchBar, { backgroundColor: colors.surface, borderColor: colors.border }]}>
+                    <BlurView intensity={isDarkMode ? 30 : 60} tint={isDarkMode ? "dark" : "light"} style={[styles.searchBar, { borderColor: colors.border, overflow: 'hidden' }]}>
                         <MaterialCommunityIcons name="magnify" size={22} color={colors.textSecondary} />
                         <TextInput
                             placeholder="Search events, organizers..."
@@ -243,7 +253,7 @@ export default function HomeScreen({ navigation }) {
                             value={searchQuery}
                             onChangeText={setSearchQuery}
                         />
-                    </View>
+                    </BlurView>
                 </View>
 
                 {/* Categories */}
@@ -257,11 +267,12 @@ export default function HomeScreen({ navigation }) {
                             key={cat.id}
                             style={[
                                 styles.categoryChip,
-                                { backgroundColor: colors.surface, borderColor: colors.border },
-                                activeCategory === cat.id && { backgroundColor: colors.primary, borderColor: colors.primary }
+                                { borderColor: colors.border, overflow: 'hidden' },
+                                activeCategory === cat.id && { borderColor: colors.primary }
                             ]}
                             onPress={() => setActiveCategory(cat.id)}
                         >
+                            <BlurView intensity={activeCategory === cat.id ? 80 : 30} tint={isDarkMode ? "dark" : "light"} style={StyleSheet.absoluteFill} />
                             <View style={[
                                 styles.iconCircle,
                                 activeCategory === cat.id && { backgroundColor: 'rgba(255,255,255,0.2)' }
@@ -275,7 +286,7 @@ export default function HomeScreen({ navigation }) {
                             <Text style={[
                                 styles.categoryLabel,
                                 { color: colors.textSecondary },
-                                activeCategory === cat.id && { color: 'white' }
+                                activeCategory === cat.id && { color: 'white', fontWeight: 'bold' }
                             ]}>
                                 {cat.label}
                             </Text>
@@ -334,7 +345,7 @@ export default function HomeScreen({ navigation }) {
                                         source={{ uri: item.imageUrl || item.image || 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?q=80&w=2670&auto=format&fit=crop' }}
                                         style={styles.featuredImage}
                                     />
-                                    <LinearGradient
+                                    <ExpoGradient
                                         colors={['transparent', 'rgba(0,0,0,0.8)']}
                                         style={styles.featuredGradient}
                                     />
@@ -466,12 +477,11 @@ const styles = StyleSheet.create({
         marginBottom: 24,
     },
     searchBar: {
-        flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
-        borderRadius: 16,
         paddingHorizontal: 16,
-        height: 52,
+        paddingVertical: Platform.OS === 'ios' ? 12 : 8,
+        borderRadius: 20,
         borderWidth: 1,
     },
     searchInput: {
@@ -669,6 +679,17 @@ const styles = StyleSheet.create({
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.05,
         shadowRadius: 10,
+    },
+    eventItemWrapper: {
+        marginBottom: 16,
+        borderRadius: 24,
+        overflow: 'hidden',
+    },
+    eventItemGlass: {
+        flexDirection: 'row',
+        padding: 10,
+        borderWidth: 1,
+        borderColor: 'rgba(255,255,255,0.1)',
     },
     imageWrapper: { position: 'relative' },
     eventImage: {

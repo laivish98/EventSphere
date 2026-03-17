@@ -7,23 +7,19 @@ const AuthContext = createContext();
 
 export const useAuth = () => useContext(AuthContext);
 
-// Helper to get animated avatar from Dicebear
 export const getDefaultAvatar = (name, gender) => {
     const seed = encodeURIComponent(name || 'User');
+    const backgrounds = 'b6e3f4,c0aede,d1d4f9';
 
-    // Dicebear Adventurer v7 Hair Enums
-    const maleHair = 'short01,short02,short03,short04,short05,short06,short08,short09,short10,short12,short14,short16,short18';
-    const femaleHair = 'long01,long02,long03,long04,long05,long06,long07,long08,long09,long10,long12,long14,long16,long18,long20';
-
-    let hairParam = '';
+    // Dicebear Adventurer v7 parameters
     if (gender === 'Male') {
-        hairParam = `&hair=${maleHair}`;
+        const maleHair = 'short01,short02,short03,short04,short05,shaved01,shaved02,mowhawk';
+        return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&hair=${maleHair}&backgroundColor=${backgrounds}`;
     } else if (gender === 'Female') {
-        hairParam = `&hair=${femaleHair}`;
+        const femaleHair = 'long01,long02,long03,long04,long05,bob01,bob02,curly';
+        return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&hair=${femaleHair}&backgroundColor=${backgrounds}`;
     }
-
-    // Using PNG for universal compatibility across React Native (Native & Web)
-    return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}${hairParam}&backgroundColor=b6e3f4,c0aede,d1d4f9`;
+    return `https://api.dicebear.com/7.x/adventurer/png?seed=${seed}&backgroundColor=${backgrounds}`;
 };
 
 export const AuthProvider = ({ children }) => {
