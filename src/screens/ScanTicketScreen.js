@@ -157,6 +157,8 @@ export default function ScanTicketScreen({ navigation }) {
                 onBarcodeScanned={scanned ? undefined : handleBarCodeScanned}
                 barcodeScannerSettings={{ barcodeTypes: ['qr', 'pdf417'] }}
                 enableTorch={torchOn}
+                autofocus="on"
+                facing="back"
             />
 
             {/* Premium Scanner Overlay */}
