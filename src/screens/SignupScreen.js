@@ -172,199 +172,206 @@ export default function SignupScreen({ navigation }) {
             <View style={[styles.bgOrb, { bottom: height * 0.1, left: -width * 0.3, width: 400, height: 400, backgroundColor: isDarkMode ? '#6366f130' : '#6366f110' }]} />
             <View style={[styles.bgOrb, { top: height * 0.4, right: -width * 0.1, width: 250, height: 250, backgroundColor: isDarkMode ? 'rgba(16, 185, 129, 0.08)' : 'rgba(16, 185, 129, 0.03)' }]} />
 
+            <View style={[styles.bgOrb, { top: height * 0.4, right: -width * 0.1, width: 250, height: 250, backgroundColor: isDarkMode ? 'rgba(16, 185, 129, 0.08)' : 'rgba(16, 185, 129, 0.03)' }]} />
 
-            <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-                {/* Header */}
-                <View style={styles.header}>
-                    <TouchableOpacity
-                        onPress={() => navigation.goBack()}
-                        style={[styles.backButton, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.6)', borderColor: colors.glassBorder }]}
+            <KeyboardAvoidingView
+                style={{ flex: 1 }}
+                behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+            >
+                <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false} keyboardShouldPersistTaps="handled">
+                    {/* Header */}
+                    <View style={styles.header}>
+                        <TouchableOpacity
+                            onPress={() => navigation.goBack()}
+                            style={[styles.backButton, { backgroundColor: isDarkMode ? 'rgba(255,255,255,0.08)' : 'rgba(255,255,255,0.6)', borderColor: colors.glassBorder }]}
+                        >
+                            <MaterialCommunityIcons name="chevron-left" size={28} color={colors.text} />
+                        </TouchableOpacity>
+                        <Text style={[styles.headerTitle, { color: colors.textSecondary }]}>USER REGISTRATION</Text>
+                        <View style={{ width: 44 }} />
+                    </View>
+
+                    <View style={styles.titleContainer}>
+                        <Text style={[styles.screenTitle, { color: colors.text }]}>Create Account</Text>
+                        <Text style={[styles.screenSubtitle, { color: colors.textSecondary }]}>Join the ultimate college event network.</Text>
+                    </View>
+
+                    {/* Role Selection */}
+                    <View style={styles.section}>
+                        <Text style={[styles.sectionLabel, { color: colors.primary }]}>I AM A...</Text>
+                        <View style={styles.roleContainer}>
+                            <RoleCard
+                                role="student"
+                                icon="school"
+                                label="Student"
+                                selected={role === 'student'}
+                                onSelect={setRole}
+                                colors={colors}
+                                isDarkMode={isDarkMode}
+                            />
+                            <RoleCard
+                                role="organizer"
+                                icon="calendar-text"
+                                label="Organizer"
+                                selected={role === 'organizer'}
+                                onSelect={setRole}
+                                colors={colors}
+                                isDarkMode={isDarkMode}
+                            />
+                        </View>
+                    </View>
+
+                    {/* Gender Selection */}
+                    <View style={[styles.section, { marginBottom: 24 }]}>
+                        <Text style={[styles.sectionLabel, { color: colors.primary }]}>GENDER</Text>
+                        <View style={styles.genderContainer}>
+                            <GenderCard
+                                value="Male"
+                                icon="gender-male"
+                                selected={gender === 'Male'}
+                                onSelect={setGender}
+                                colors={colors}
+                                isDarkMode={isDarkMode}
+                            />
+                            <GenderCard
+                                value="Female"
+                                icon="gender-female"
+                                selected={gender === 'Female'}
+                                onSelect={setGender}
+                                colors={colors}
+                                isDarkMode={isDarkMode}
+                            />
+                            <GenderCard
+                                value="Other"
+                                icon="gender-non-binary"
+                                selected={gender === 'Other'}
+                                onSelect={setGender}
+                                colors={colors}
+                                isDarkMode={isDarkMode}
+                            />
+                        </View>
+                    </View>
+
+                    {/* Form Inputs Container */}
+                    <BlurView
+                        intensity={isDarkMode ? 40 : 25}
+                        tint={isDarkMode ? "dark" : "light"}
+                        style={[styles.formContainer, { borderColor: colors.glassBorder }]}
                     >
-                        <MaterialCommunityIcons name="chevron-left" size={28} color={colors.text} />
-                    </TouchableOpacity>
-                    <Text style={[styles.headerTitle, { color: colors.textSecondary }]}>USER REGISTRATION</Text>
-                    <View style={{ width: 44 }} />
-                </View>
-
-                <View style={styles.titleContainer}>
-                    <Text style={[styles.screenTitle, { color: colors.text }]}>Create Account</Text>
-                    <Text style={[styles.screenSubtitle, { color: colors.textSecondary }]}>Join the ultimate college event network.</Text>
-                </View>
-
-                {/* Role Selection */}
-                <View style={styles.section}>
-                    <Text style={[styles.sectionLabel, { color: colors.primary }]}>I AM A...</Text>
-                    <View style={styles.roleContainer}>
-                        <RoleCard
-                            role="student"
-                            icon="school"
-                            label="Student"
-                            selected={role === 'student'}
-                            onSelect={setRole}
-                            colors={colors}
-                            isDarkMode={isDarkMode}
+                        <ExpoGradient
+                            colors={isDarkMode ? ['rgba(255,255,255,0.03)', 'transparent'] : ['rgba(19, 91, 236, 0.03)', 'transparent']}
+                            style={StyleSheet.absoluteFill}
                         />
-                        <RoleCard
-                            role="organizer"
-                            icon="calendar-text"
-                            label="Organizer"
-                            selected={role === 'organizer'}
-                            onSelect={setRole}
-                            colors={colors}
-                            isDarkMode={isDarkMode}
-                        />
-                    </View>
-                </View>
 
-                {/* Gender Selection */}
-                <View style={[styles.section, { marginBottom: 24 }]}>
-                    <Text style={[styles.sectionLabel, { color: colors.primary }]}>GENDER</Text>
-                    <View style={styles.genderContainer}>
-                        <GenderCard
-                            value="Male"
-                            icon="gender-male"
-                            selected={gender === 'Male'}
-                            onSelect={setGender}
-                            colors={colors}
-                            isDarkMode={isDarkMode}
-                        />
-                        <GenderCard
-                            value="Female"
-                            icon="gender-female"
-                            selected={gender === 'Female'}
-                            onSelect={setGender}
-                            colors={colors}
-                            isDarkMode={isDarkMode}
-                        />
-                        <GenderCard
-                            value="Other"
-                            icon="gender-non-binary"
-                            selected={gender === 'Other'}
-                            onSelect={setGender}
-                            colors={colors}
-                            isDarkMode={isDarkMode}
-                        />
-                    </View>
-                </View>
-
-                {/* Form Inputs Container */}
-                <BlurView
-                    intensity={isDarkMode ? 40 : 25}
-                    tint={isDarkMode ? "dark" : "light"}
-                    style={[styles.formContainer, { borderColor: colors.glassBorder }]}
-                >
-                    <ExpoGradient
-                        colors={isDarkMode ? ['rgba(255,255,255,0.03)', 'transparent'] : ['rgba(19, 91, 236, 0.03)', 'transparent']}
-                        style={StyleSheet.absoluteFill}
-                    />
-
-                    <View style={styles.inputGroup}>
-                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>FULL NAME</Text>
-                        <View style={[styles.inputWrapper, { backgroundColor: colors.surface + '60', borderColor: colors.glassBorder }]}>
-                            <MaterialCommunityIcons name="account-outline" size={20} color={colors.primary} style={styles.inputIcon} />
-                            <TextInput
-                                nativeID="signup-name"
-                                name="name"
-                                style={[styles.input, { color: colors.text }]}
-                                placeholder="Jane Doe"
-                                placeholderTextColor={colors.textSecondary + '80'}
-                                value={name}
-                                onChangeText={setName}
-                                autoComplete="name"
-                                textContentType="name"
-                            />
+                        <View style={styles.inputGroup}>
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>FULL NAME</Text>
+                            <View style={[styles.inputWrapper, { backgroundColor: colors.surface + '60', borderColor: colors.glassBorder }]}>
+                                <MaterialCommunityIcons name="account-outline" size={20} color={colors.primary} style={styles.inputIcon} />
+                                <TextInput
+                                    nativeID="signup-name"
+                                    name="name"
+                                    style={[styles.input, { color: colors.text }]}
+                                    placeholder="Jane Doe"
+                                    placeholderTextColor={colors.textSecondary + '80'}
+                                    value={name}
+                                    onChangeText={setName}
+                                    autoComplete="name"
+                                    textContentType="name"
+                                />
+                            </View>
                         </View>
-                    </View>
 
-                    <View style={styles.inputGroup}>
-                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>EMAIL ADDRESS</Text>
-                        <View style={[styles.inputWrapper, { backgroundColor: colors.surface + '60', borderColor: colors.glassBorder }]}>
-                            <MaterialCommunityIcons name="email-outline" size={20} color={colors.primary} style={styles.inputIcon} />
-                            <TextInput
-                                nativeID="signup-email"
-                                name="email"
-                                style={[styles.input, { color: colors.text }]}
-                                placeholder="jane@college.edu"
-                                placeholderTextColor={colors.textSecondary + '80'}
-                                value={email}
-                                onChangeText={setEmail}
-                                autoCapitalize="none"
-                                autoComplete="email"
-                                textContentType="emailAddress"
-                                keyboardType="email-address"
-                            />
+                        <View style={styles.inputGroup}>
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>EMAIL ADDRESS</Text>
+                            <View style={[styles.inputWrapper, { backgroundColor: colors.surface + '60', borderColor: colors.glassBorder }]}>
+                                <MaterialCommunityIcons name="email-outline" size={20} color={colors.primary} style={styles.inputIcon} />
+                                <TextInput
+                                    nativeID="signup-email"
+                                    name="email"
+                                    style={[styles.input, { color: colors.text }]}
+                                    placeholder="jane@college.edu"
+                                    placeholderTextColor={colors.textSecondary + '80'}
+                                    value={email}
+                                    onChangeText={setEmail}
+                                    autoCapitalize="none"
+                                    autoComplete="email"
+                                    textContentType="emailAddress"
+                                    keyboardType="email-address"
+                                />
+                            </View>
                         </View>
-                    </View>
 
-                    <View style={styles.inputGroup}>
-                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>PASSWORD</Text>
-                        <View style={[styles.inputWrapper, { backgroundColor: colors.surface + '60', borderColor: colors.glassBorder }]}>
-                            <MaterialCommunityIcons name="lock-outline" size={20} color={colors.primary} style={styles.inputIcon} />
-                            <TextInput
-                                nativeID="signup-password"
-                                name="password"
-                                style={[styles.input, { color: colors.text }]}
-                                placeholder="••••••••"
-                                placeholderTextColor={colors.textSecondary + '80'}
-                                value={password}
-                                onChangeText={setPassword}
-                                secureTextEntry={!showPassword}
-                                autoComplete="new-password"
-                                textContentType="password"
-                            />
-                            <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
-                                <MaterialCommunityIcons name={showPassword ? "eye-outline" : "eye-off-outline"} size={20} color={colors.textSecondary} />
+                        <View style={styles.inputGroup}>
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>PASSWORD</Text>
+                            <View style={[styles.inputWrapper, { backgroundColor: colors.surface + '60', borderColor: colors.glassBorder }]}>
+                                <MaterialCommunityIcons name="lock-outline" size={20} color={colors.primary} style={styles.inputIcon} />
+                                <TextInput
+                                    nativeID="signup-password"
+                                    name="password"
+                                    style={[styles.input, { color: colors.text }]}
+                                    placeholder="••••••••"
+                                    placeholderTextColor={colors.textSecondary + '80'}
+                                    value={password}
+                                    onChangeText={setPassword}
+                                    secureTextEntry={!showPassword}
+                                    autoComplete="new-password"
+                                    textContentType="password"
+                                />
+                                <TouchableOpacity onPress={() => setShowPassword(!showPassword)} style={styles.eyeIcon}>
+                                    <MaterialCommunityIcons name={showPassword ? "eye-outline" : "eye-off-outline"} size={20} color={colors.textSecondary} />
+                                </TouchableOpacity>
+                            </View>
+                        </View>
+
+                        <View style={styles.inputGroup}>
+                            <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>COLLEGE / UNIVERSITY</Text>
+                            <TouchableOpacity style={[styles.inputWrapper, { backgroundColor: colors.surface + '60', borderColor: colors.glassBorder }]} onPress={() => setShowCollegeModal(true)}>
+                                <View style={[styles.collegeIconBadge, { backgroundColor: colors.primary + '15' }]}>
+                                    <MaterialCommunityIcons name="bank-outline" size={18} color={colors.primary} />
+                                </View>
+                                <Text style={[styles.input, { textAlignVertical: 'center', paddingTop: Platform.OS === 'android' ? 14 : 0, color: college ? colors.text : colors.textSecondary + '80' }]} numberOfLines={1}>
+                                    {college || "Search for your college..."}
+                                </Text>
+                                <MaterialCommunityIcons name="chevron-down" size={20} color={colors.textSecondary} style={{ marginRight: 15 }} />
                             </TouchableOpacity>
                         </View>
-                    </View>
+                    </BlurView>
 
-                    <View style={styles.inputGroup}>
-                        <Text style={[styles.inputLabel, { color: colors.textSecondary }]}>COLLEGE / UNIVERSITY</Text>
-                        <TouchableOpacity style={[styles.inputWrapper, { backgroundColor: colors.surface + '60', borderColor: colors.glassBorder }]} onPress={() => setShowCollegeModal(true)}>
-                            <View style={[styles.collegeIconBadge, { backgroundColor: colors.primary + '15' }]}>
-                                <MaterialCommunityIcons name="bank-outline" size={18} color={colors.primary} />
-                            </View>
-                            <Text style={[styles.input, { textAlignVertical: 'center', paddingTop: Platform.OS === 'android' ? 14 : 0, color: college ? colors.text : colors.textSecondary + '80' }]} numberOfLines={1}>
-                                {college || "Search for your college..."}
-                            </Text>
-                            <MaterialCommunityIcons name="chevron-down" size={20} color={colors.textSecondary} style={{ marginRight: 15 }} />
+                    <Text style={[styles.termsText, { color: colors.textSecondary }]}>
+                        By creating an account, you agree to our <Text style={{ color: colors.primary }}>Terms of Service</Text> and <Text style={{ color: colors.primary }}>Privacy Policy</Text>.
+                    </Text>
+
+                    <View style={{ height: 120 }} />
+                </ScrollView>
+
+                {/* Bottom Actions */}
+                {/* Bottom Sticky Action Bar */}
+                <BlurView intensity={80} tint={isDarkMode ? "dark" : "light"} style={[styles.bottomActionContainer, { borderTopColor: colors.glassBorder }]}>
+                    <ExpoGradient
+                        colors={isDarkMode ? ['rgba(15, 23, 42, 0.9)', 'rgba(15, 23, 42, 0.95)'] : ['rgba(255, 255, 255, 0.9)', 'rgba(255, 255, 255, 0.98)']}
+                        style={StyleSheet.absoluteFill}
+                    />
+                    <TouchableOpacity onPress={handleSignup} disabled={loading} activeOpacity={0.9}>
+                        <View style={[styles.primaryButton, { shadowColor: isDarkMode ? 'transparent' : colors.primary }]}>
+                            <ExpoGradient
+                                colors={[colors.primary, '#6366f1']}
+                                start={{ x: 0, y: 0 }}
+                                end={{ x: 1, y: 0 }}
+                                style={StyleSheet.absoluteFill}
+                            />
+                            <Text style={styles.primaryButtonText}>{loading ? 'Establishing Identity...' : 'Join EventSphere Ecosystem'}</Text>
+                        </View>
+                    </TouchableOpacity>
+
+                    <View style={styles.loginLinkContainer}>
+                        <Text style={[styles.loginText, { color: colors.textSecondary }]}>Already a member? </Text>
+                        <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+                            <Text style={[styles.loginLink, { color: colors.primary, textDecorationLine: 'underline' }]}>Log In here</Text>
                         </TouchableOpacity>
                     </View>
                 </BlurView>
 
-                <Text style={[styles.termsText, { color: colors.textSecondary }]}>
-                    By creating an account, you agree to our <Text style={{ color: colors.primary }}>Terms of Service</Text> and <Text style={{ color: colors.primary }}>Privacy Policy</Text>.
-                </Text>
-
-                <View style={{ height: 120 }} />
-            </ScrollView>
-
-            {/* Bottom Actions */}
-            {/* Bottom Sticky Action Bar */}
-            <BlurView intensity={80} tint={isDarkMode ? "dark" : "light"} style={[styles.bottomActionContainer, { borderTopColor: colors.glassBorder }]}>
-                <ExpoGradient
-                    colors={isDarkMode ? ['rgba(15, 23, 42, 0.9)', 'rgba(15, 23, 42, 0.95)'] : ['rgba(255, 255, 255, 0.9)', 'rgba(255, 255, 255, 0.98)']}
-                    style={StyleSheet.absoluteFill}
-                />
-                <TouchableOpacity onPress={handleSignup} disabled={loading} activeOpacity={0.9}>
-                    <View style={[styles.primaryButton, { shadowColor: isDarkMode ? 'transparent' : colors.primary }]}>
-                        <ExpoGradient
-                            colors={[colors.primary, '#6366f1']}
-                            start={{ x: 0, y: 0 }}
-                            end={{ x: 1, y: 0 }}
-                            style={StyleSheet.absoluteFill}
-                        />
-                        <Text style={styles.primaryButtonText}>{loading ? 'Establishing Identity...' : 'Join EventSphere Ecosystem'}</Text>
-                    </View>
-                </TouchableOpacity>
-
-                <View style={styles.loginLinkContainer}>
-                    <Text style={[styles.loginText, { color: colors.textSecondary }]}>Already a member? </Text>
-                    <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-                        <Text style={[styles.loginLink, { color: colors.primary, textDecorationLine: 'underline' }]}>Log In here</Text>
-                    </TouchableOpacity>
-                </View>
-            </BlurView>
+            </KeyboardAvoidingView>
 
             {/* Modal */}
             <Modal animationType="slide" transparent={true} visible={showCollegeModal}>
@@ -420,7 +427,7 @@ export default function SignupScreen({ navigation }) {
                     </BlurView>
                 </View>
             </Modal>
-        </View>
+        </View >
     );
 }
 
@@ -487,7 +494,7 @@ const styles = StyleSheet.create({
     eyeIcon: { padding: 12, marginRight: 8 },
     collegeIconBadge: { width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', marginLeft: 12, marginRight: 10 },
     termsText: { textAlign: 'center', fontSize: 11, marginTop: 32, lineHeight: 18, opacity: 0.4, paddingHorizontal: 20, fontWeight: '600' },
-    bottomActionContainer: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 20, paddingBottom: 40, borderTopWidth: 1.5, overflow: 'hidden' },
+    bottomActionContainer: { position: Platform.OS === 'web' ? 'fixed' : 'absolute', bottom: 0, left: 0, right: 0, padding: 20, paddingBottom: 40, borderTopWidth: 1.5, overflow: 'hidden' },
     primaryButton: {
         height: 64,
         borderRadius: 24,
