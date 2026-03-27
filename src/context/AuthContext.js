@@ -43,10 +43,25 @@ export const AuthProvider = ({ children }) => {
                 unsubscribeUser = onSnapshot(userDocRef, (doc) => {
                     if (doc.exists()) {
                         setUserData(doc.data());
+                    } else {
+                        // Fallback if Firestore rules blocked creation or doc was deleted
+                        setUserData({
+                            email: firebaseUser.email,
+                            role: 'student', // Default safe role
+                            name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+                            avatarUrl: getDefaultAvatar(firebaseUser.displayName || firebaseUser.email.split('@')[0], 'Other')
+                        });
                     }
                     setLoading(false);
                 }, (error) => {
                     console.error("AuthContext onSnapshot error:", error);
+                    // Provide fallback data so the app doesn't crash on null userData
+                    setUserData({
+                        email: firebaseUser.email,
+                        role: 'student',
+                        name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+                        avatarUrl: getDefaultAvatar(firebaseUser.displayName || firebaseUser.email.split('@')[0], 'Other')
+                    });
                     setLoading(false); // Crucial to prevent permanent white screen
                 });
             } else {
@@ -86,7 +101,13 @@ export const AuthProvider = ({ children }) => {
         };
 
         // Create user document with role and metadata
-        await setDoc(doc(db, 'users', user.uid), userDataToSave);
+        try {
+            await setDoc(doc(db, 'users', user.uid), userDataToSave);
+        } catch (error) {
+            console.error("Firestore user doc creation failed on signup:", error);
+            // DO NOT THROW. User is already authenticated in Firebase Auth.
+            // Throwing here causes the SignupScreen to trap the user.
+        }
 
         // Manually set userData for immediate feedback
         setUserData(userDataToSave);
