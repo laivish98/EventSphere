@@ -30,8 +30,15 @@ export default function LoginScreen({ navigation }) {
         setLoading(true);
         try {
             const cred = await login(trimmedEmail, trimmedPassword);
-            const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
-            const role = userDoc.exists() ? userDoc.data().role : 'student';
+            let role = 'student';
+            try {
+                const userDoc = await getDoc(doc(db, 'users', cred.user.uid));
+                if (userDoc.exists()) {
+                    role = userDoc.data().role;
+                }
+            } catch (err) {
+                console.warn("Could not fetch user role, defaulting to student:", err.message);
+            }
             if (role === 'admin' || role === 'organizer') {
                 navigation.replace('OrganizerDashboard');
             } else {
