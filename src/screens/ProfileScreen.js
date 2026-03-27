@@ -55,22 +55,22 @@ export default function ProfileScreen({ navigation }) {
 
         // Fetch registration count
         const qReg = query(collection(db, 'registrations'), where('userId', '==', user.uid));
-        const unsubReg = onSnapshot(qReg, (snap) => setRegCount(snap.size));
+        const unsubReg = onSnapshot(qReg, (snap) => setRegCount(snap.size), (error) => console.log('Reg listener error:', error.message));
 
         // If admin, fetch created events count
         let unsubCreated = () => { };
         if (userData?.role === 'admin') {
             const qCreated = query(collection(db, 'events'), where('createdBy', '==', user.uid));
-            unsubCreated = onSnapshot(qCreated, (snap) => setCreatedCount(snap.size));
+            unsubCreated = onSnapshot(qCreated, (snap) => setCreatedCount(snap.size), (error) => console.log('Created event listener error:', error.message));
         }
 
         // Fetch following count (users this user follows)
         const qFollowing = query(collection(db, 'follows'), where('followerId', '==', user.uid));
-        const unsubFollowing = onSnapshot(qFollowing, (snap) => setFollowingCount(snap.size));
+        const unsubFollowing = onSnapshot(qFollowing, (snap) => setFollowingCount(snap.size), (error) => console.log('Following listener error:', error.message));
 
         // Fetch followers count (people following this user - typically relevant for admins)
         const qFollowers = query(collection(db, 'follows'), where('organizerId', '==', user.uid));
-        const unsubFollowers = onSnapshot(qFollowers, (snap) => setFollowersCount(snap.size));
+        const unsubFollowers = onSnapshot(qFollowers, (snap) => setFollowersCount(snap.size), (error) => console.log('Followers listener error:', error.message));
 
         return () => {
             unsubReg();

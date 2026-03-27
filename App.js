@@ -32,6 +32,14 @@ export default function App() {
         }
         originalConsoleWarn(...args);
       };
+
+      // Bulletproof explicit height for React Native Web root to prevent phantom white screens on Vercel
+      const style = document.createElement('style');
+      style.textContent = `
+        html, body { height: 100%; width: 100%; overflow: hidden; margin: 0; padding: 0; }
+        #root { display: flex; flex: 1; height: 100%; width: 100%; }
+      `;
+      document.head.appendChild(style);
     }
   }, []);
 

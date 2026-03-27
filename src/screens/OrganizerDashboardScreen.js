@@ -106,7 +106,7 @@ export default function OrganizerDashboardScreen({ navigation }) {
         );
         const unsub = onSnapshot(q, snap => {
             setEvents(snap.docs.map(d => ({ id: d.id, ...d.data() })));
-        });
+        }, (err) => console.log('Dashboard events error:', err.message));
         return unsub;
     }, [user]);
 
@@ -128,7 +128,7 @@ export default function OrganizerDashboardScreen({ navigation }) {
                     const otherRegs = prev.filter(r => !ids.includes(r.eventId));
                     return [...otherRegs, ...regs];
                 });
-            });
+            }, (err) => console.log('Dashboard regs error:', err.message));
         });
 
         return () => unsubs.forEach(unsub => unsub());
@@ -141,7 +141,7 @@ export default function OrganizerDashboardScreen({ navigation }) {
             const allSponsorships = snap.docs.map(d => ({ id: d.id, ...d.data() }));
             const filtered = allSponsorships.filter(s => events.some(e => e.id === s.eventId));
             setSponsorships(filtered);
-        });
+        }, (err) => console.log('Dashboard sponsors error:', err.message));
         return unsub;
     }, [user, events]);
 

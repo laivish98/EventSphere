@@ -45,6 +45,9 @@ export const AuthProvider = ({ children }) => {
                         setUserData(doc.data());
                     }
                     setLoading(false);
+                }, (error) => {
+                    console.error("AuthContext onSnapshot error:", error);
+                    setLoading(false); // Crucial to prevent permanent white screen
                 });
             } else {
                 setUser(null);
